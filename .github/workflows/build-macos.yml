@@ -64,10 +64,134 @@ jobs:
           codesign --verify --deep --strict dist/mac/StockAnalysis.app
           codesign -dv --verbose=2 dist/mac/StockAnalysis.app
 
-      - name: Upload complete macOS distribution
+      - name: Split final archive for reliable transfer
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          arch = os.environ["MACOS_ARCH_LABEL"]
+          source = Path(f"dist/mac/StockAnalysis_macOS_{arch}.zip")
+          target_dir = Path("dist/mac/transfer")
+          target_dir.mkdir(parents=True, exist_ok=True)
+          chunk_count = 8
+          total_size = source.stat().st_size
+          chunk_size = (total_size + chunk_count - 1) // chunk_count
+          digest = hashlib.sha256()
+          parts = []
+          with source.open("rb") as input_stream:
+              for index in range(chunk_count):
+                  part = target_dir / f"{source.name}.part-{index:02d}"
+                  remaining = min(chunk_size, total_size - input_stream.tell())
+                  with part.open("wb") as output_stream:
+                      while remaining > 0:
+                          block = input_stream.read(min(1024 * 1024, remaining))
+                          if not block:
+                              raise RuntimeError("Unexpected end of macOS archive")
+                          output_stream.write(block)
+                          digest.update(block)
+                          remaining -= len(block)
+                  parts.append({"name": part.name, "size": part.stat().st_size})
+              consumed = input_stream.tell()
+          if consumed != total_size or len(parts) != chunk_count:
+              raise RuntimeError("macOS archive split is incomplete")
+          manifest = {
+              "archive": source.name,
+              "architecture": arch,
+              "chunk_count": chunk_count,
+              "size": total_size,
+              "sha256": digest.hexdigest(),
+              "parts": parts,
+          }
+          (target_dir / f"TRANSFER_MANIFEST_{arch}.json").write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Upload macOS transfer metadata
         uses: actions/upload-artifact@v4
         with:
-          name: StockAnalysis-macOS-${{ matrix.arch }}-${{ github.sha }}
-          path: dist/mac
+          name: StockAnalysis-macOS-${{ matrix.arch }}-metadata-${{ github.sha }}
+          path: |
+            dist/mac/transfer/TRANSFER_MANIFEST_${{ matrix.arch }}.json
+            dist/mac/SHA256SUMS_${{ matrix.arch }}.txt
+            dist/mac/BUILD_REPORT_macOS_${{ matrix.arch }}.md
+            dist/mac/ARCHITECTURE_${{ matrix.arch }}.txt
+            dist/mac/requirements-lock-macos-${{ matrix.arch }}-resolved.txt
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 00
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-00-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-00
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 01
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-01-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-01
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 02
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-02-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-02
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 03
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-03-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-03
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 04
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-04-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-04
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 05
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-05-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-05
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 06
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-06-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-06
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload macOS archive part 07
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ matrix.arch }}-part-07-${{ github.sha }}
+          path: dist/mac/transfer/StockAnalysis_macOS_${{ matrix.arch }}.zip.part-07
+          compression-level: 0
           if-no-files-found: error
           retention-days: 1
