@@ -388,7 +388,13 @@ def _Main_Write(
             "范围：港交所普通股；双柜台证券按发行人去重。"
             "港股大宗交易和资金流会自动尝试备源，无法验证时留空。"
         )
-    scope += f" 排序：{config.table_sort_mode.value}；“-”表示不适用，空白表示未取得。"
+    blank_meaning = "空白表示未取得"
+    if market is Market.HK:
+        blank_meaning += "（港股发行资料可能因发行时间过早、网站无记录）"
+    scope += (
+        f" 排序：{config.table_sort_mode.value}；“-”表示不适用，"
+        f"{blank_meaning}。"
+    )
     sheet["A2"] = scope
     headers = MainHeaders_Get(market, config.financial_year)
     for column, header in enumerate(headers, 1):
@@ -566,7 +572,9 @@ def _SourceGuide_Write(
     sheet.append([f"{APP_DISPLAY_NAME}｜数据来源与口径说明（版本 {__version__}）"])
     sheet.append(
         [
-            "显示约定：“-”仅表示指标对该公司不适用；空白表示已尝试来源但未取得或无法验证；"
+            "显示约定：“-”仅表示指标对该公司不适用；"
+            "空白表示已尝试来源但未取得或无法验证"
+            "（港股发行资料可能因发行时间过早、网站无记录）；"
             "数值 0 表示来源成功且确认结果为零。程序不读取或写入跨运行缓存。"
             "数据仅供个人分析参考。"
         ]
@@ -744,7 +752,8 @@ def _SourceGuide_Write(
             "东方财富上市日期或发行价单字段为空时按字段回退",
             "ETNet 仅补真实披露的上市日期/上市价；不以当前股本代替发行后总股本",
             "不适用",
-            "实际尝试的来源均未取得；发行股数不从当前已发行股本推断",
+            "实际尝试的来源均未取得；发行时间过早时公开网站可能无记录；"
+            "发行股数不从当前已发行股本推断",
             "历史上市/发行日期",
             "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_brief.php",
         ),

@@ -99,6 +99,11 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
     assert workbook["港股"]["Y5"].value == 0
     assert workbook["港股"]["Z5"].value == 0
     assert workbook["港股"]["AA5"].value == 0
+    assert "空白表示未取得。" in workbook["A股"]["A2"].value
+    assert (
+        "空白表示未取得（港股发行资料可能因发行时间过早、网站无记录）"
+        in workbook["港股"]["A2"].value
+    )
     assert workbook["异常记录"].max_row == 1
     source_groups = {
         workbook["数据来源"].cell(row, 4).value
@@ -150,7 +155,17 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
     assert source_guide["B6"].value == "营业收入"
     assert source_guide["I6"].number_format == "0.00%"
     assert "不读取或写入跨运行缓存" in source_guide["A2"].value
+    assert "港股发行资料可能因发行时间过早、网站无记录" in source_guide["A2"].value
     assert "数据仅供个人分析参考" in source_guide["A2"].value
+    hk_ipo_row = next(
+        row
+        for row in range(static_header_row + 1, source_guide.max_row + 1)
+        if source_guide.cell(row, 1).value == "港股"
+        and source_guide.cell(row, 2).value == "上市日期、发行价、发行股数"
+    )
+    assert "发行时间过早时公开网站可能无记录" in source_guide.cell(
+        hk_ipo_row, 9
+    ).value
     assert not getattr(workbook, "_external_links", [])
 
 
