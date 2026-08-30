@@ -5,7 +5,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 $Python = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
-$TestTempRoot = Join-Path $ProjectRoot "build\pytest-windows"
+$TestTempRoot = Join-Path $ProjectRoot "build\win\pytest-windows"
 if (-not (Test-Path -LiteralPath $Python)) { throw "Missing .venv; run bootstrap_windows.ps1 first." }
 
 function Invoke-PythonChecked {

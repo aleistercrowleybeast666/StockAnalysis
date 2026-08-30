@@ -15,7 +15,9 @@ from stock_analysis.common.performance import RequestStatistics
 from stock_analysis.common.rate_limit import DomainRateLimiter
 from stock_analysis.common.retry import Retry_Execute
 from stock_analysis.domain.enums import DataStatus, Market, NetworkMode
+from stock_analysis.domain.fields import FLOW_FIVE_DAY_FIELD, FlowOneMonthField_Get
 from stock_analysis.domain.models import (
+    BatchProgressUpdate,
     BlockTradeData,
     FinancialPeriod,
     FlowData,
@@ -325,7 +327,7 @@ class MarketDataSource(ABC):
         self,
         securities: Sequence[Security],
         year: int,
-        progress_callback: Callable[[Security], None] | None = None,
+        progress_callback: Callable[[Security | BatchProgressUpdate], None] | None = None,
     ) -> dict[str, SourceValue[BlockTradeData]]:
         results: dict[str, SourceValue[BlockTradeData]] = {}
         for security in securities:
@@ -389,8 +391,8 @@ class MarketDataSource(ABC):
                     standard_currency=currency,
                     missing_reason=str(error),
                     field_statuses={
-                        "近五个交易日资金净额": DataStatus.ERROR,
-                        "近一月资金净额（最近22个交易日）": DataStatus.ERROR,
+                        FLOW_FIVE_DAY_FIELD: DataStatus.ERROR,
+                        FlowOneMonthField_Get(security.market): DataStatus.ERROR,
                     },
                 ),
             )

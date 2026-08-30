@@ -7,13 +7,24 @@ from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from datetime import date
+from inspect import signature
 from typing import Any
 
 from stock_analysis.common.performance import Statistics_Merge
 from stock_analysis.config.models import AppConfig
 from stock_analysis.domain.calculations import Calculation_IssueMarketCap
 from stock_analysis.domain.enums import DataStatus, Market
-from stock_analysis.domain.models import BlockTradeData, FlowData, Quote, Security
+from stock_analysis.domain.fields import (
+    FLOW_FIVE_DAY_FIELD,
+    FlowOneMonthField_Get,
+)
+from stock_analysis.domain.models import (
+    BatchProgressUpdate,
+    BlockTradeData,
+    FlowData,
+    Quote,
+    Security,
+)
 from stock_analysis.sources.aastocks import AastocksSource
 from stock_analysis.sources.base import (
     HttpJsonClient,
@@ -28,7 +39,8 @@ from stock_analysis.sources.etnet import EtnetSource
 from stock_analysis.sources.exchanges import OfficialAShareListSource
 from stock_analysis.sources.fixture import FixtureSource
 from stock_analysis.sources.fx import FrankfurterFxSource
-from stock_analysis.sources.hkex import HkexSecurityListSource
+from stock_analysis.sources.hkex import HkexBlockTradeSource, HkexSecurityListSource
+from stock_analysis.sources.issuer_mapping import IssuerMapping_Find
 from stock_analysis.sources.tencent import TencentQuoteSource
 from stock_analysis.sources.tonghuashun import TonghuashunSource
 from stock_analysis.sources.tradego import TradegoSource
@@ -37,6 +49,8 @@ from stock_analysis.sources.tradego import TradegoSource
 class LiveMarketDataSource(MarketDataSource):
     source_name = "公开结构化数据组合源"
     security_list_minimums = {Market.A_SHARE: 4_000, Market.HK: 1_000}
+    _BLOCK_HKEX_SCAN_START_FRACTION = 0.10
+    _BLOCK_HKEX_SCAN_END_FRACTION = 0.98
     _SAMPLES = {
         Market.A_SHARE: [
             Security(Market.A_SHARE, "SSE", "600519", "贵州茅台"),
@@ -63,6 +77,7 @@ class LiveMarketDataSource(MarketDataSource):
         tradego: TradegoSource,
         tonghuashun: TonghuashunSource | None = None,
         etnet: EtnetSource | None = None,
+        hkex_block: HkexBlockTradeSource | None = None,
         *,
         sample_mode: bool,
         concurrency: int,
@@ -77,6 +92,7 @@ class LiveMarketDataSource(MarketDataSource):
         self._tradego = tradego
         self._tonghuashun = tonghuashun
         self._etnet = etnet
+        self._hkex_block = hkex_block
         self._sample_mode = sample_mode
         self.security_list_minimums = (
             {} if sample_mode else {Market.A_SHARE: 4_000, Market.HK: 1_000}
@@ -126,7 +142,71 @@ class LiveMarketDataSource(MarketDataSource):
 
     def Financials_Fetch(self, security: Security, years: set[int]):
         if security.market is Market.HK:
-            return self._eastmoney.Financials_Fetch(security, years)
+            primary_error: SourceError | None = None
+            try:
+                primary = self._eastmoney.Financials_Fetch(security, years)
+            except SourceError as error:
+                primary_error = error
+                primary = None
+            primary_periods = list(primary.value or []) if primary is not None else []
+            available_years = {period.fiscal_year for period in primary_periods}
+            missing_years = set(years) - available_years
+            mapping = IssuerMapping_Find(security)
+            if not missing_years or mapping is None:
+                if primary is not None:
+                    return primary
+                assert primary_error is not None
+                raise primary_error
+            try:
+                mapped = self._eastmoney.FinancialsMappedAForHk_Fetch(
+                    security,
+                    mapping.AShareSecurity_Create(),
+                    missing_years,
+                    mapping.evidence,
+                )
+            except SourceError as mapping_error:
+                if primary is None:
+                    raise SourceError(
+                        f"港股自身财务失败：{primary_error}；A/H 映射失败：{mapping_error}"
+                    ) from mapping_error
+                return SourceValue(
+                    primary_periods,
+                    replace(
+                        primary.provenance,
+                        source_ref=(
+                            f"{primary.provenance.source_ref}；"
+                            f"A/H 映射 {mapping.a_share_code} 失败：{mapping_error}"
+                        ),
+                        missing_reason=(
+                            f"缺少年度 {sorted(missing_years)}；"
+                            f"A/H 映射失败：{mapping_error}"
+                        ),
+                    ),
+                )
+            merged_by_year = {
+                period.fiscal_year: period for period in mapped.value or []
+            }
+            merged_by_year.update(
+                {period.fiscal_year: period for period in primary_periods}
+            )
+            merged = [merged_by_year[year] for year in sorted(merged_by_year, reverse=True)]
+            unresolved = sorted(set(years) - set(merged_by_year))
+            primary_ref = (
+                primary.provenance.source_ref
+                if primary is not None
+                else f"港股自身财务失败：{primary_error}"
+            )
+            return SourceValue(
+                merged,
+                replace(
+                    mapped.provenance,
+                    source_ref=f"{primary_ref}；{mapped.provenance.source_ref}",
+                    missing_reason=(
+                        f"仍缺少完整年度：{unresolved}" if unresolved else None
+                    ),
+                    status=DataStatus.OK if merged else DataStatus.MISSING,
+                ),
+            )
         try:
             return self._cninfo.Financials_Fetch(security, years)
         except SourceError as primary_error:
@@ -196,6 +276,119 @@ class LiveMarketDataSource(MarketDataSource):
     def IPO_Fetch(self, security: Security):
         primary = self._eastmoney.IPO_Fetch(security)
         ipo = primary.value
+        if security.market is Market.HK and self._etnet is not None:
+            needs_etnet = (
+                ipo is None
+                or ipo.listing_date is None
+                or ipo.issue_price is None
+            )
+            if needs_etnet:
+                try:
+                    etnet = self._etnet.IPO_Fetch(security)
+                except SourceError as error:
+                    return SourceValue(
+                        ipo,
+                        replace(
+                            primary.provenance,
+                            source_ref=(
+                                f"{primary.provenance.source_ref}；"
+                                f"ETNet 公司资料备源失败：{error}"
+                            ),
+                            missing_reason=(
+                                f"{primary.provenance.missing_reason or '东方财富字段不完整'}；"
+                                f"ETNet 备源失败：{error}"
+                            ),
+                        ),
+                    )
+                if etnet.value is not None:
+                    fallback = etnet.value
+                    merged = replace(
+                        ipo or fallback,
+                        listing_date=(
+                            ipo.listing_date
+                            if ipo is not None and ipo.listing_date is not None
+                            else fallback.listing_date
+                        ),
+                        issue_price=(
+                            ipo.issue_price
+                            if ipo is not None and ipo.issue_price is not None
+                            else fallback.issue_price
+                        ),
+                    )
+                    issue_market_cap, approximate = Calculation_IssueMarketCap(
+                        merged.issue_price,
+                        merged.post_issue_total_shares,
+                        merged.issued_shares,
+                    )
+                    # issued_shares is not a substitute for post-issue total
+                    # shares. Calculation_IssueMarketCap only uses it as an
+                    # explicit approximation for legacy A-share paths, so HK
+                    # keeps the market cap blank unless historical total shares
+                    # were actually obtained.
+                    if merged.post_issue_total_shares is None:
+                        issue_market_cap = None
+                        approximate = False
+                    merged = replace(
+                        merged,
+                        issue_market_cap=issue_market_cap,
+                        approximate=approximate,
+                    )
+                    statuses = dict(primary.provenance.field_statuses)
+                    statuses.update(
+                        {
+                            "上市日期": (
+                                DataStatus.OK
+                                if merged.listing_date is not None
+                                else DataStatus.MISSING
+                            ),
+                            "发行价": (
+                                DataStatus.OK
+                                if merged.issue_price is not None
+                                else DataStatus.MISSING
+                            ),
+                            "发行股数": (
+                                DataStatus.OK
+                                if merged.issued_shares is not None
+                                else DataStatus.MISSING
+                            ),
+                            "发行后总股本": (
+                                DataStatus.OK
+                                if merged.post_issue_total_shares is not None
+                                else DataStatus.MISSING
+                            ),
+                            "发行时总市值": (
+                                DataStatus.OK
+                                if merged.issue_market_cap is not None
+                                else DataStatus.MISSING
+                            ),
+                        }
+                    )
+                    missing_fields = [
+                        name
+                        for name, status in statuses.items()
+                        if status is not DataStatus.OK
+                    ]
+                    return SourceValue(
+                        merged,
+                        replace(
+                            etnet.provenance,
+                            source_name=(
+                                f"{primary.provenance.source_name} + "
+                                f"{etnet.provenance.source_name}"
+                            ),
+                            source_ref=(
+                                f"{primary.provenance.source_ref}；字段级回退="
+                                f"{etnet.provenance.source_ref}"
+                            ),
+                            status=DataStatus.OK,
+                            missing_reason=(
+                                f"未取得字段：{', '.join(missing_fields)}"
+                                if missing_fields
+                                else None
+                            ),
+                            field_statuses=statuses,
+                        ),
+                    )
         if (
             security.market is not Market.A_SHARE
             or ipo is None
@@ -268,20 +461,38 @@ class LiveMarketDataSource(MarketDataSource):
 
     def BlockTrade_Fetch(self, security: Security, year: int):
         if security.market is Market.HK:
-            if self._etnet is not None:
-                return self._etnet.BlockTrade_Fetch(security, year)
-            return self._aastocks.BlockTrade_Fetch(security, year)
+            return self.BlockTrades_Fetch([security], year)[security.key]
         return self._eastmoney.BlockTrade_Fetch(security, year)
 
     def BlockTrades_Fetch(
         self,
         securities: Sequence[Security],
         year: int,
-        progress_callback: Callable[[Security], None] | None = None,
+        progress_callback: Callable[[Security | BatchProgressUpdate], None] | None = None,
     ) -> dict[str, SourceValue[BlockTradeData]]:
         a_share = [item for item in securities if item.market is Market.A_SHARE]
         hk = [item for item in securities if item.market is Market.HK]
         results: dict[str, SourceValue[BlockTradeData]] = {}
+
+        def BlockBatchProgress_Report(
+            stage_fraction: float,
+            completed: int,
+            total: int,
+            current_company: str,
+            message: str,
+        ) -> None:
+            if progress_callback is None:
+                return
+            progress_callback(
+                BatchProgressUpdate(
+                    stage_fraction=stage_fraction,
+                    completed=completed,
+                    total=total,
+                    current_company=current_company,
+                    message=message,
+                )
+            )
+
         if a_share:
             try:
                 results.update(self._eastmoney.BlockTrades_Fetch(a_share, year))
@@ -294,42 +505,196 @@ class LiveMarketDataSource(MarketDataSource):
                     results[security.key] = self._BlockTradeError_Create(
                         security, year, "东方财富 A 股年度大宗交易", error
                     )
-            if progress_callback is not None:
-                for security in a_share:
-                    progress_callback(security)
-        if hk and self._etnet is not None:
-            try:
-                results.update(self._etnet.BlockTrades_Fetch(hk, year))
-            except Exception as error:
-                self._logger.warning(
-                    "ETNet 港股年度大宗/大额交易批量源失败；逐只记录错误：%s",
-                    error,
+            if hk:
+                BlockBatchProgress_Report(
+                    0.03,
+                    len(a_share),
+                    len(securities),
+                    "A 股批量大宗交易",
+                    f"A 股年度大宗交易批量完成 {len(a_share)} 家",
                 )
-                for security in hk:
-                    results[security.key] = self._BlockTradeError_Create(
-                        security, year, "ETNet 港股 Block Trades", error
-                    )
-            if progress_callback is not None:
-                for security in hk:
-                    progress_callback(security)
-        else:
-            for security in hk:
+        if hk:
+            hk_attempts: dict[str, list[SourceValue[BlockTradeData]]] = {
+                security.key: [] for security in hk
+            }
+            if self._etnet is not None:
                 try:
-                    results[security.key] = self._aastocks.BlockTrade_Fetch(
-                        security, year
-                    )
+                    primary_results = self._etnet.BlockTrades_Fetch(hk, year)
                 except Exception as error:
                     self._logger.warning(
-                        "港股 %s 年度大宗/大额交易失败；其他证券继续：%s",
-                        security.code,
+                        "ETNet 港股年度大宗/大额交易批量源失败；备源仍继续：%s",
                         error,
                     )
-                    results[security.key] = self._BlockTradeError_Create(
-                        security, year, "AASTOCKS 港股 Block Trades", error
+                    primary_results = {
+                        security.key: self._BlockTradeError_Create(
+                            security, year, "ETNet", error
+                        )
+                        for security in hk
+                    }
+                for security in hk:
+                    hk_attempts[security.key].append(primary_results[security.key])
+                BlockBatchProgress_Report(
+                    0.07,
+                    len(hk),
+                    len(hk),
+                    "ETNet 深分页",
+                    f"ETNet 港股年度大额交易深分页完成 {len(hk)} 家",
+                )
+
+            needs_aastocks = [
+                security
+                for security in hk
+                if not hk_attempts[security.key]
+                or hk_attempts[security.key][-1].value is None
+            ]
+            if needs_aastocks:
+                with ThreadPoolExecutor(max_workers=self._concurrency) as executor:
+                    futures = {
+                        executor.submit(
+                            self._aastocks.BlockTrade_Fetch, security, year
+                        ): security
+                        for security in needs_aastocks
+                    }
+                    for future in as_completed(futures):
+                        security = futures[future]
+                        try:
+                            attempt = future.result()
+                        except Exception as error:
+                            self._logger.warning(
+                                "AASTOCKS 港股大宗/大额交易 %s 失败；"
+                                "HKEX 备源仍继续：%s",
+                                security.code,
+                                error,
+                            )
+                            attempt = self._BlockTradeError_Create(
+                                security, year, "AASTOCKS", error
+                            )
+                        hk_attempts[security.key].append(attempt)
+                BlockBatchProgress_Report(
+                    self._BLOCK_HKEX_SCAN_START_FRACTION,
+                    len(needs_aastocks),
+                    len(needs_aastocks),
+                    "AASTOCKS 大额交易",
+                    f"AASTOCKS 港股大额交易回退完成 {len(needs_aastocks)} 家",
+                )
+
+            needs_hkex = [
+                security
+                for security in hk
+                if not hk_attempts[security.key]
+                or hk_attempts[security.key][-1].value is None
+            ]
+            if needs_hkex and self._hkex_block is not None:
+                try:
+                    def HkexBatchProgress_Report(completed: int, total: int) -> None:
+                        if progress_callback is None or total <= 0:
+                            return
+                        scan_span = (
+                            self._BLOCK_HKEX_SCAN_END_FRACTION
+                            - self._BLOCK_HKEX_SCAN_START_FRACTION
+                        )
+                        stage_fraction = self._BLOCK_HKEX_SCAN_START_FRACTION + (
+                            scan_span * completed / total
+                        )
+                        BlockBatchProgress_Report(
+                            stage_fraction,
+                            completed,
+                            total,
+                            "HKEX 公开日报",
+                            "HKEX 港股年度大宗交易公开日报 "
+                            f"{completed}/{total}",
+                        )
+
+                    fetch_parameters = signature(
+                        self._hkex_block.BlockTrades_Fetch
+                    ).parameters
+                    if "progress_callback" in fetch_parameters:
+                        hkex_results = self._hkex_block.BlockTrades_Fetch(
+                            needs_hkex,
+                            year,
+                            progress_callback=HkexBatchProgress_Report,
+                        )
+                    else:
+                        hkex_results = self._hkex_block.BlockTrades_Fetch(
+                            needs_hkex, year
+                        )
+                except Exception as error:
+                    self._logger.warning(
+                        "HKEX 港股年度大宗交易备源批量失败：%s", error
                     )
-                if progress_callback is not None:
-                    progress_callback(security)
+                    hkex_results = {
+                        security.key: self._BlockTradeError_Create(
+                            security, year, "HKEX", error
+                        )
+                        for security in needs_hkex
+                    }
+                for security in needs_hkex:
+                    hk_attempts[security.key].append(hkex_results[security.key])
+
+            for security in hk:
+                attempts = hk_attempts[security.key]
+                if not attempts:
+                    attempts.append(
+                        self._BlockTradeError_Create(
+                            security,
+                            year,
+                            "港股大宗交易",
+                            SourceError("未配置可用的数据源"),
+                        )
+                    )
+                selected = next(
+                    (attempt for attempt in attempts if attempt.value is not None),
+                    attempts[-1],
+                )
+                results[security.key] = self._BlockTradeAttempts_Combine(
+                    selected, attempts
+                )
+        BlockBatchProgress_Report(
+            1.0,
+            len(securities),
+            len(securities),
+            "年度大宗交易汇总",
+            f"年度大宗/大额交易完成 {len(securities)} 家",
+        )
         return results
+
+    @staticmethod
+    def _BlockTradeAttempts_Combine(
+        selected: SourceValue[BlockTradeData],
+        attempts: list[SourceValue[BlockTradeData]],
+    ) -> SourceValue[BlockTradeData]:
+        source_names = list(
+            dict.fromkeys(
+                attempt.provenance.source_name
+                for attempt in attempts
+                if attempt.provenance.source_name
+            )
+        )
+        refs = [
+            f"{attempt.provenance.source_name}={attempt.provenance.source_ref}"
+            for attempt in attempts
+        ]
+        failed_reasons = [
+            f"{attempt.provenance.source_name}：{attempt.provenance.missing_reason}"
+            for attempt in attempts
+            if attempt.value is None and attempt.provenance.missing_reason
+        ]
+        provenance = replace(
+            selected.provenance,
+            source_name="+".join(source_names),
+            source_ref="；".join(refs),
+            missing_reason=(
+                selected.provenance.missing_reason
+                if selected.value is None
+                else ("；".join(failed_reasons) if failed_reasons else None)
+            ),
+            primary_source=(
+                attempts[0].provenance.source_name
+                if attempts
+                else selected.provenance.primary_source
+            ),
+        )
+        return SourceValue(selected.value, provenance)
 
     @staticmethod
     def _BlockTradeError_Create(
@@ -491,9 +856,9 @@ class LiveMarketDataSource(MarketDataSource):
                 healthy_probe_count += 1
         if healthy_probe_count != probe_count:
             self._logger.warning(
-                "港股资金流历史主源健康探测未全部取得 22 日数据"
+                "港股资金流历史主源健康探测未全部取得 20 日数据"
                 "（成功=%s/%s，错误=%s）；"
-                "本次运行剩余证券改用 TradeGo/AASTOCKS 5 日来源",
+                "本次运行剩余证券改用 TradeGo 5/20 日与 AASTOCKS 5 日来源",
                 healthy_probe_count,
                 probe_count,
                 probe_errors[:1] or "返回历史不足",
@@ -508,7 +873,7 @@ class LiveMarketDataSource(MarketDataSource):
             self._ParallelFlow_Fetch(
                 securities[probe_count:],
                 self._eastmoney.Flow_Fetch,
-                "东方财富港股 5/22 日资金流主源",
+                "东方财富港股 5/20 日资金流主源",
                 progress_callback,
             )
         )
@@ -518,12 +883,19 @@ class LiveMarketDataSource(MarketDataSource):
             if probe_results.get(security.key) is None
             or probe_results[security.key].value is None
             or probe_results[security.key].value.five_day_net is None
+            or probe_results[security.key].value.one_month_net is None
         ]
         if missing:
             fallbacks = self._HkFiveDayFallbacks_Fetch(
                 missing, as_of_date
             )
-            probe_results.update(fallbacks)
+            for security in missing:
+                fallback = fallbacks.get(security.key)
+                primary = probe_results.get(security.key)
+                if fallback is not None:
+                    probe_results[security.key] = self._FlowValues_Merge(
+                        security, primary, fallback
+                    )
         return probe_results
 
     def _HkFiveDayFallbacks_Fetch(
@@ -535,7 +907,7 @@ class LiveMarketDataSource(MarketDataSource):
         try:
             results = self._tradego.Flows_Fetch(securities, as_of_date)
         except SourceError as error:
-            self._logger.warning("TradeGo 港股批量资金流不可用，改用 AASTOCKS 5 日页：%s", error)
+            self._logger.warning("TradeGo 港股批量 5/20 日资金流不可用，改用 AASTOCKS 5 日页：%s", error)
             results = {}
         missing = [
             security
@@ -558,8 +930,82 @@ class LiveMarketDataSource(MarketDataSource):
             )
             for security in missing:
                 if security.key in fallbacks:
-                    results[security.key] = fallbacks[security.key]
+                    results[security.key] = self._FlowValues_Merge(
+                        security,
+                        results.get(security.key),
+                        fallbacks[security.key],
+                    )
         return results
+
+    @staticmethod
+    def _FlowValues_Merge(
+        security: Security,
+        primary: SourceValue[FlowData] | None,
+        fallback: SourceValue[FlowData],
+    ) -> SourceValue[FlowData]:
+        primary_value = primary.value if primary is not None else None
+        fallback_value = fallback.value
+        five_day = (
+            primary_value.five_day_net
+            if primary_value is not None and primary_value.five_day_net is not None
+            else fallback_value.five_day_net
+            if fallback_value is not None
+            else None
+        )
+        one_month = (
+            primary_value.one_month_net
+            if primary_value is not None and primary_value.one_month_net is not None
+            else fallback_value.one_month_net
+            if fallback_value is not None
+            else None
+        )
+        chosen = primary_value or fallback_value
+        value = (
+            FlowData(
+                security.key,
+                max(
+                    item.end_date
+                    for item in (primary_value, fallback_value)
+                    if item is not None
+                ),
+                five_day,
+                one_month,
+                "CNY" if security.market is Market.A_SHARE else "HKD",
+            )
+            if chosen is not None
+            else None
+        )
+        one_month_field = FlowOneMonthField_Get(security.market)
+        provenance = fallback.provenance
+        if primary is not None:
+            provenance = replace(
+                fallback.provenance,
+                source_name=f"{primary.provenance.source_name} + {fallback.provenance.source_name}",
+                source_ref=(
+                    f"{primary.provenance.source_ref}；字段级回退="
+                    f"{fallback.provenance.source_ref}"
+                ),
+                primary_source=primary.provenance.source_name,
+            )
+        statuses = dict(provenance.field_statuses)
+        statuses[FLOW_FIVE_DAY_FIELD] = (
+            DataStatus.OK if five_day is not None else DataStatus.MISSING
+        )
+        statuses[one_month_field] = (
+            DataStatus.OK if one_month is not None else DataStatus.MISSING
+        )
+        missing_fields = [name for name, status in statuses.items() if status is not DataStatus.OK]
+        return SourceValue(
+            value,
+            replace(
+                provenance,
+                status=DataStatus.OK if value is not None else provenance.status,
+                field_statuses=statuses,
+                missing_reason=(
+                    f"未取得字段：{', '.join(missing_fields)}" if missing_fields else None
+                ),
+            ),
+        )
 
     def _ParallelFlow_Fetch(
         self,
@@ -597,8 +1043,8 @@ class LiveMarketDataSource(MarketDataSource):
                             ),
                             missing_reason=str(error),
                             field_statuses={
-                                "近五个交易日资金净额": DataStatus.ERROR,
-                                "近一月资金净额（最近22个交易日）": DataStatus.ERROR,
+                                FLOW_FIVE_DAY_FIELD: DataStatus.ERROR,
+                                FlowOneMonthField_Get(security.market): DataStatus.ERROR,
                             },
                         ),
                     )
@@ -716,6 +1162,11 @@ def SourceRegistry_Create(
         TradegoSource(tradego_client),
         TonghuashunSource(tonghuashun_client),
         EtnetSource(etnet_client, concurrency=config.concurrency),
+        HkexBlockTradeSource(
+            hkex_client,
+            tencent_client,
+            concurrency=config.concurrency,
+        ),
         sample_mode=config.test_mode,
         concurrency=config.concurrency,
         clients=(

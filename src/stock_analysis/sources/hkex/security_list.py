@@ -31,7 +31,9 @@ class HkexSecurityListSource:
                 exchange="HKEX",
                 code=row["code"],
                 name=row["name"],
-                is_financial=Security_FinancialClassify(row["name"]),
+                is_financial=Security_FinancialClassify(
+                    row["name"], security_code=row["code"]
+                ),
             )
             for row in rows
         ]

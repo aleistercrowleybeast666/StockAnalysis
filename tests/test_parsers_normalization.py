@@ -148,4 +148,24 @@ def test_financial_classification_uses_industry_then_known_name_patterns() -> No
     assert Security_FinancialClassify("普通公司", "J 金融业")
     assert Security_FinancialClassify("HSBC HOLDINGS")
     assert Security_FinancialClassify("BOC HONG KONG")
+    for code, name in (
+        ("02318", "PING AN"),
+        ("02628", "CHINA LIFE"),
+        ("01299", "AIA"),
+        ("00388", "HKEX"),
+        ("06030", "CITIC SEC"),
+        ("02611", "GTHT"),
+        ("06886", "HTSC"),
+        ("01776", "GF SEC"),
+        ("02328", "PICC P&C"),
+        ("02601", "CPIC"),
+        ("02378", "PRUDENTIAL"),
+        ("00945", "MANULIFE"),
+        ("03328", "BANKCOMM"),
+        ("02888", "STANCHART"),
+        ("00267", "CITIC"),
+        ("01339", "PICC GROUP"),
+        ("01336", "NCI"),
+    ):
+        assert Security_FinancialClassify(name, security_code=code)
     assert not Security_FinancialClassify("CKH HOLDINGS")

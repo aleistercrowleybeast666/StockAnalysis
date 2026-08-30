@@ -3,4 +3,4 @@
 APP_INTERNAL_NAME = "StockAnalysis"
 APP_DISPLAY_NAME = "股票分析表生成器"
 ORGANIZATION_NAME = "StockAnalysis"
-__version__ = "0.4.1"
+__version__ = "0.5.0"

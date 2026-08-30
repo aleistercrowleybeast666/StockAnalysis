@@ -8,40 +8,66 @@ permissions:
 
 jobs:
   build-macos:
-    runs-on: macos-14
+    name: Build macOS (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+            uname: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+            uname: x86_64
+    env:
+      MACOS_ARCH_LABEL: ${{ matrix.arch }}
+      MACOS_EXPECTED_UNAME: ${{ matrix.uname }}
+      MACOS_RUNNER_LABEL: ${{ matrix.runner }}
+      QT_QPA_PLATFORM: offscreen
 
     steps:
       - name: Checkout dispatched commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: requirements-lock-macos.txt
 
-      - name: Create isolated environment
+      - name: Verify native runner architecture
+        run: |
+          test "$(uname -m)" = "$MACOS_EXPECTED_UNAME"
+          sw_vers
+          uname -a
+
+      - name: Create isolated locked environment
         run: ./scripts/bootstrap_macos.sh
 
       - name: Test, build, smoke, and package app
-        env:
-          QT_QPA_PLATFORM: offscreen
         run: ./scripts/build_macos_onedir.sh
 
       - name: Verify native app and hashes
         run: |
           test -x dist/mac/StockAnalysis.app/Contents/MacOS/StockAnalysis
-          test -s dist/mac/StockAnalysis_macOS.zip
-          test -s dist/mac/SHA256SUMS.txt
-          test -s dist/mac/BUILD_REPORT_macOS.md
-          (cd dist/mac && shasum -a 256 -c SHA256SUMS.txt)
-          codesign -dv --verbose=2 dist/mac/StockAnalysis.app || true
+          test -s "dist/mac/StockAnalysis_macOS_${MACOS_ARCH_LABEL}.zip"
+          test -s "dist/mac/SHA256SUMS_${MACOS_ARCH_LABEL}.txt"
+          test -s "dist/mac/BUILD_REPORT_macOS_${MACOS_ARCH_LABEL}.md"
+          test -s "dist/mac/ARCHITECTURE_${MACOS_ARCH_LABEL}.txt"
+          (cd dist/mac && shasum -a 256 -c "SHA256SUMS_${MACOS_ARCH_LABEL}.txt")
+          file dist/mac/StockAnalysis.app/Contents/MacOS/StockAnalysis | grep "$MACOS_EXPECTED_UNAME"
+          codesign --verify --deep --strict dist/mac/StockAnalysis.app
+          codesign -dv --verbose=2 dist/mac/StockAnalysis.app
 
       - name: Upload complete macOS distribution
         uses: actions/upload-artifact@v4
         with:
-          name: StockAnalysis-macOS-${{ github.sha }}
+          name: StockAnalysis-macOS-${{ matrix.arch }}-${{ github.sha }}
           path: dist/mac
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1

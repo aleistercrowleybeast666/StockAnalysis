@@ -5,6 +5,7 @@ import threading
 import time
 from collections.abc import Callable, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -17,9 +18,11 @@ from stock_analysis.domain.enums import (
     MarketScopeMode,
     PipelineRunResult,
 )
+from stock_analysis.domain.fields import FLOW_FIVE_DAY_FIELD, FlowOneMonthField_Get
 from stock_analysis.domain.models import (
     AnalysisIssue,
     AnalysisRecord,
+    BatchProgressUpdate,
     MarketSelectionStats,
     RunProgress,
     RunSummary,
@@ -40,7 +43,7 @@ from stock_analysis.sources.base import (
 )
 
 ProgressCallback = Callable[[RunProgress], None]
-BatchProgressCallback = Callable[[Security], None]
+BatchProgressCallback = Callable[[Security | BatchProgressUpdate], None]
 BatchOperation = Callable[[BatchProgressCallback], dict[str, SourceValue[Any]]]
 ParallelOperation = Callable[[Security], SourceValue[Any]]
 ValueAssign = Callable[[AnalysisRecord, Any | None], None]
@@ -55,12 +58,13 @@ class PipelineRunner:
         "获取行情与市值": 8,
         "年度财务": 30,
         "上市与发行信息": 20,
-        "年度全市场大宗交易": 7,
-        "资金流": 28,
+        "年度全市场大宗交易": 10,
+        "资金流": 25,
         "标准化、计算与校验": 2,
         "生成 Excel": 2,
     }
     _OVERALL_WORK_UNITS = 100_000
+    _HK_ARCHIVE_SCAN_MAX_WEIGHT = 60
 
     def __init__(
         self,
@@ -217,6 +221,7 @@ class PipelineRunner:
 
     def _WorkPlan_Initialize(self, securities: Sequence[Security]) -> None:
         planned_company_count = 0
+        planned_market_counts: dict[Market, int] = {}
         for market in self._config.markets:
             market_count = sum(item.market is market for item in securities)
             scope_mode, top_n = self._config.MarketScope_Get(market)
@@ -226,6 +231,7 @@ class PipelineRunner:
                 else min(top_n, market_count)
             )
             planned_company_count += selected_count
+            planned_market_counts[market] = selected_count
 
         stage_company_counts = {
             "获取行情与市值": len(securities),
@@ -236,8 +242,20 @@ class PipelineRunner:
             "标准化、计算与校验": planned_company_count,
             "生成 Excel": planned_company_count,
         }
+        stage_weights = dict(self._STAGE_TIME_WEIGHTS)
+        planned_hk_count = planned_market_counts.get(Market.HK, 0)
+        if (
+            not self._config.fixture_mode
+            and planned_hk_count > 0
+            and self._config.financial_year < datetime.now().year
+        ):
+            archive_scan_weight = min(
+                self._HK_ARCHIVE_SCAN_MAX_WEIGHT,
+                round(planned_hk_count * 0.6),
+            )
+            stage_weights["年度全市场大宗交易"] += archive_scan_weight
         active_weights = {
-            stage: self._STAGE_TIME_WEIGHTS[stage]
+            stage: stage_weights[stage]
             for stage, count in stage_company_counts.items()
             if count > 0
         }
@@ -282,6 +300,15 @@ class PipelineRunner:
         else:
             fraction = min(1.0, max(0.0, company_count / company_total))
         completed_units = round(stage_units * fraction)
+        self._overall_work_completed[stage] = max(
+            self._overall_work_completed.get(stage, 0), completed_units
+        )
+
+    def _WorkPlan_StageFractionSet(self, stage: str, fraction: float) -> None:
+        stage_units = self._overall_work_totals.get(stage)
+        if stage_units is None:
+            return
+        completed_units = round(stage_units * min(1.0, max(0.0, fraction)))
         self._overall_work_completed[stage] = max(
             self._overall_work_completed.get(stage, 0), completed_units
         )
@@ -368,12 +395,31 @@ class PipelineRunner:
         started = time.perf_counter()
         reported_keys: set[str] = set()
 
-        def progress_report(security: Security) -> None:
+        def progress_report(
+            update: Security | BatchProgressUpdate,
+        ) -> None:
+            if isinstance(update, BatchProgressUpdate):
+                self._WorkPlan_StageFractionSet(stage, update.stage_fraction)
+                self._Progress_Emit(
+                    stage,
+                    update.current_company,
+                    update.completed,
+                    update.total,
+                    0,
+                    0,
+                    0,
+                    update.message,
+                )
+                return
+            security = update
             if security.key in reported_keys:
                 return
+            previous_units = self._overall_work_completed.get(stage, 0)
             reported_keys.add(security.key)
             completed_count = len(reported_keys)
             self._WorkPlan_StageProgressSet(stage, completed_count)
+            if self._overall_work_completed.get(stage, 0) <= previous_units:
+                return
             self._Progress_Emit(
                 stage,
                 security.name,
@@ -517,6 +563,7 @@ class PipelineRunner:
         ipo = record.ipo
         block = record.block_trade
         flow = record.flow
+        one_month_field = FlowOneMonthField_Get(record.security.market)
         field_values = {
             "最新总市值": quote.market_cap if quote else None,
             "最新价": quote.price if quote else None,
@@ -527,10 +574,8 @@ class PipelineRunner:
             "发行时总市值": ipo.issue_market_cap if ipo else None,
             "当年累计大宗交易笔数": block.trade_count if block else None,
             "当年累计大宗交易金额": block.total_amount if block else None,
-            "近五个交易日资金净额": flow.five_day_net if flow else None,
-            "近一月资金净额（最近22个交易日）": (
-                flow.one_month_net if flow else None
-            ),
+            FLOW_FIVE_DAY_FIELD: flow.five_day_net if flow else None,
+            one_month_field: flow.one_month_net if flow else None,
         }
         for name, value in field_values.items():
             if value is not None:
@@ -538,8 +583,8 @@ class PipelineRunner:
             else:
                 record.field_statuses.setdefault(name, DataStatus.MISSING)
         for name in (
-            "近五个交易日资金净额",
-            "近一月资金净额（最近22个交易日）",
+            FLOW_FIVE_DAY_FIELD,
+            one_month_field,
         ):
             if record.field_statuses[name] is DataStatus.MISSING:
                 record.field_statuses[name] = DataStatus.OPTIONAL_MISSING
@@ -980,7 +1025,18 @@ class PipelineRunner:
                 self._coordinator.IPO_Fetch,
                 self._Attribute_Assign("ipo"),
             )
-            active_securities = [record.security for record in active_records]
+            active_securities = [
+                replace(
+                    record.security,
+                    listing_date=(
+                        record.ipo.listing_date
+                        if record.ipo is not None
+                        and record.ipo.listing_date is not None
+                        else record.security.listing_date
+                    ),
+                )
+                for record in active_records
+            ]
             self._BatchStage_Run(
                 "年度全市场大宗交易",
                 active_records,

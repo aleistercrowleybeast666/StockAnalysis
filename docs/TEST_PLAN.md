@@ -1,35 +1,28 @@
-# 0.4.1 测试计划与结果
+# 0.5.0 测试计划与结果
 
-## 覆盖范围
+## 自动化范围
 
-1. Ruff、`compileall`、关键模块导入。
-2. “全部公司”、A/H 独立 Top N、包含 ST、年度上限、上市状态过滤和证券池不足日志。
-3. 不创建跨运行数据库/缓存；当前运行内相同请求去重。
-4. HKEX 错误声明尺寸读取真实行、双柜台去重、A/H 行情代码隔离。
-5. IPO 字段级状态、发行后股本解析、严格发行时市值计算。
-6. A/H 大宗交易市场及单公司异常隔离、真零与空白语义、ETNet 年度完整性。
-7. A/H 资金流 3 样本健康探测、5/22 日计算、只有 5 日时仅填 5 日。
-8. 金融公司不适用、普通公司抓取失败、三年历史不足的显示语义。
-9. 进度立即可见、不确定准备、时间权重、公司数推进、单调与跳变约束。
-10. 工作簿前三张可见页、28 列、第三页实际覆盖率、隐藏审计页和整列 0% 发布门禁。
-11. Windows 0.4.1 onedir 版本、自检、fixture、中文空格路径、便携日志、GUI、ZIP 和 SHA-256。
-12. macOS workflow/spec 静态准备；真实 `.app`、Cocoa、架构、签名和公证必须在 Darwin 验收。
+1. Ruff、`compileall`、关键模块导入和 Git diff whitespace。
+2. 全部公司、A/H 独立 Top N、默认包含 ST、年度上限、上市状态过滤和证券池不足日志。
+3. 不创建或读取跨运行数据库/缓存；当前运行内相同请求去重。
+4. HKEX 错误声明尺寸下读取全部真实 XML 行、双柜台去重、A/H 行情代码隔离。
+5. 港股金融联合分类；普通企业失败留空；数学不适用显示 `-`。
+6. 经验证 A/H 同一发行人历史映射，以及名称相似但无映射时禁止合并。
+7. IPO 字段级状态、多源回退和严格的发行时总市值公式。
+8. ETNet 深分页、重复页/新闻 ID 去重、AASTOCKS/HKEX 回退、年度完整性、真零/空白/不适用。
+9. A 股 5/22 日与港股 5/20 日资金流、运行内健康探测和窗口独立回退。
+10. 市场/单证券/字段错误隔离，港股失败不回滚 A 股。
+11. 点击后立即不确定进度、计划确定后单调总进度、真实请求批次推进、70%/90% 时间门禁、最大跳变与取消。
+12. 三张可见工作表、28 列不同市场表头、第三页全字段实际覆盖率、隐藏审计页和整列数值门禁。
+13. 安全清理脚本 dry-run、替代产物门禁和滚动 `current` Release 的精确资产集合。
+14. Windows onedir 版本、自检、两次 fixture、中文空格路径、便携日志、GUI、ZIP 和 SHA-256。
+15. macOS arm64/x86_64 原生 app、架构、offscreen smoke、ad-hoc 签名、ZIP 和 SHA-256。
 
-## 当前结果
+## 当前源码结果
 
-- Ruff、`compileall`：通过。
-- 离线 pytest：103 passed，8 deselected，覆盖率 79%。
-- 真实网络 pytest：7 passed，1 failed；失败为港股严格 22 日资金流。
-- Top100：公司级 200 success；字段门禁失败，港股年度大宗两列和 22 日资金流为 0%。
-- Windows：测试预览构建和全部打包后 smoke 通过，版本 0.4.1。
-- macOS：未执行原生构建，不得视为通过。
+- 离线 pytest：118 passed，9 deselected（最终批次进度测试加入后）。
+- 真实网络 pytest：9 passed，118 deselected。
+- 双市场 Top100：A 股 100、港股 100，公司级成功 200，字段整列门禁通过。
+- Ruff 与工作簿结构/公式/视觉检查：通过。
 
-严格 Windows 命令：
-
-```powershell
-.\.venv\Scripts\python.exe -m ruff check .
-.\.venv\Scripts\python.exe -m pytest -m "not network" -p no:cacheprovider
-$env:RUN_NETWORK_TESTS = "1"
-.\.venv\Scripts\python.exe -m pytest -m network -p no:cacheprovider
-powershell -ExecutionPolicy Bypass -File .\scripts\build_win.ps1
-```
+平台二进制测试和真实 GitHub Actions 结果以根目录 `TEST_REPORT.md`、`BUILD_REPORT_Windows.md`、`BUILD_REPORT_macOS.md` 为准。

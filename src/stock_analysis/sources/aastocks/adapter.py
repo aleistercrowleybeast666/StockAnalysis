@@ -5,6 +5,7 @@ import re
 from datetime import date, datetime
 
 from stock_analysis.domain.enums import DataStatus
+from stock_analysis.domain.fields import FLOW_FIVE_DAY_FIELD, FLOW_ONE_MONTH_HK_FIELD
 from stock_analysis.domain.models import BlockTradeData, FlowData, Quote, Security
 from stock_analysis.sources.base import HttpJsonClient, Provenance_Create, SourceValue
 
@@ -155,8 +156,8 @@ class AastocksSource:
                     ),
                     primary_source=self.source_name,
                     field_statuses={
-                        "近五个交易日资金净额": DataStatus.MISSING,
-                        "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
+                        FLOW_FIVE_DAY_FIELD: DataStatus.MISSING,
+                        FLOW_ONE_MONTH_HK_FIELD: DataStatus.MISSING,
                     },
                 ),
             )
@@ -183,12 +184,12 @@ class AastocksSource:
                 standard_currency="HKD",
                 missing_reason=(
                     "AASTOCKS 公开历史页仅提供最近 5 个交易日；"
-                    "已填写 5 日，22 日保持空白"
+                    "已填写 5 日，20 日保持空白"
                 ),
                 primary_source=self.source_name,
                 field_statuses={
-                    "近五个交易日资金净额": DataStatus.OK,
-                    "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
+                    FLOW_FIVE_DAY_FIELD: DataStatus.OK,
+                    FLOW_ONE_MONTH_HK_FIELD: DataStatus.MISSING,
                 },
             ),
         )

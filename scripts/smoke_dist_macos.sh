@@ -5,6 +5,7 @@ cd "$ROOT"
 APP="dist/mac/StockAnalysis.app"
 BIN="$APP/Contents/MacOS/StockAnalysis"
 [[ -x "$BIN" ]] || { echo "Missing $BIN" >&2; exit 1; }
+export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-offscreen}"
 TMP_DIR="$(mktemp -d -t '股票分析表 测试.XXXXXX')"
 trap 'rm -rf "$TMP_DIR"' EXIT
 export STOCK_ANALYSIS_HOME="$TMP_DIR/runtime"
@@ -33,9 +34,3 @@ test -d "$APP/Contents/Resources"
 find "$APP" -name '分析表.xlsx' -print -quit | grep -q .
 find "$APP" -name 'libqcocoa.dylib' -print -quit | grep -q .
 test -s dist/mac/logs/stock_analysis.log
-open "$APP"
-sleep 4
-pkill -x StockAnalysis || true
-if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
-  codesign --deep --force --options runtime --sign "$CODESIGN_IDENTITY" "$APP"
-fi

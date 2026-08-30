@@ -5,21 +5,23 @@ from collections.abc import Sequence
 from datetime import date
 
 from stock_analysis.domain.enums import DataStatus
+from stock_analysis.domain.fields import FLOW_FIVE_DAY_FIELD, FLOW_ONE_MONTH_HK_FIELD
 from stock_analysis.domain.models import FlowData, Security
 from stock_analysis.sources.base import (
     HttpJsonClient,
     Provenance_Create,
+    SourceError,
     SourceSchemaError,
     SourceValue,
 )
 
 
 class TradegoSource:
-    """TradeGo public five-trading-day HK money-flow ranking."""
+    """TradeGo public 5/20-trading-day HK money-flow rankings."""
 
     source_name = "TradeGo 港股资金流"
     FLOW_URL = "https://data.tradego8.com/RDS.aspx"
-    _WINDOWS = {5: 153}
+    _WINDOWS = {5: 153, 20: 153}
 
     def __init__(self, client: HttpJsonClient) -> None:
         self._client = client
@@ -30,24 +32,50 @@ class TradegoSource:
         as_of_date: date,
     ) -> dict[str, SourceValue[FlowData]]:
         securities_by_code = {security.code.zfill(5): security for security in securities}
-        five_day = self._Window_Fetch(5, set(securities_by_code))
+        wanted_codes = set(securities_by_code)
+        window_values: dict[int, dict[str, float]] = {}
+        window_errors: dict[int, str] = {}
+        for days in self._WINDOWS:
+            try:
+                window_values[days] = self._Window_Fetch(days, wanted_codes)
+            except SourceError as error:
+                window_values[days] = {}
+                window_errors[days] = str(error)
+        if len(window_errors) == len(self._WINDOWS):
+            raise SourceError(
+                "TradeGo 5/20 日资金流均不可用："
+                + "；".join(
+                    f"{days} 日={reason}" for days, reason in window_errors.items()
+                )
+            )
         results: dict[str, SourceValue[FlowData]] = {}
         for code, security in securities_by_code.items():
-            five_value = five_day.get(code)
-            if five_value is None:
+            five_value = window_values[5].get(code)
+            twenty_value = window_values[20].get(code)
+            if five_value is None and twenty_value is None:
                 results[security.key] = SourceValue(
                     None,
                     Provenance_Create(
                         security,
                         "资金流",
                         self.source_name,
-                        "RDS.aspx PkgType=12012（5 日公开排行）",
+                        "RDS.aspx PkgType=12012（5/20 日公开排行）",
                         DataStatus.MISSING,
                         standard_currency="HKD",
-                        missing_reason="公开排行未返回该港股代码",
+                        missing_reason=(
+                            "公开 5/20 日排行均未返回该港股代码"
+                            + (
+                                "；" + "；".join(
+                                    f"{days} 日请求失败：{reason}"
+                                    for days, reason in window_errors.items()
+                                )
+                                if window_errors
+                                else ""
+                            )
+                        ),
                         field_statuses={
-                            "近五个交易日资金净额": DataStatus.MISSING,
-                            "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
+                            FLOW_FIVE_DAY_FIELD: DataStatus.MISSING,
+                            FLOW_ONE_MONTH_HK_FIELD: DataStatus.MISSING,
                         },
                     ),
                 )
@@ -56,8 +84,7 @@ class TradegoSource:
                 security_key=security.key,
                 end_date=as_of_date,
                 five_day_net=five_value,
-                # 公开源只有 20 日口径，不能写入明确标为 22 日的列。
-                one_month_net=None,
+                one_month_net=twenty_value,
                 currency="HKD",
             )
             results[security.key] = SourceValue(
@@ -67,22 +94,41 @@ class TradegoSource:
                     "资金流",
                     self.source_name,
                     (
-                        "RDS.aspx PkgType=12012，5 日 NetIn；"
+                        "RDS.aspx PkgType=12012，5 日/20 日 NetIn；"
                         f"截止日按本次港股行情日 {as_of_date.isoformat()} 对齐"
                     ),
                     DataStatus.OK,
                     original_currency="HKD",
                     standard_currency="HKD",
                     missing_reason=(
-                        "该公开源只披露 20 日口径，不能冒充最近 22 个交易日；"
-                        "因此 22 日字段留空"
+                        "；".join(
+                            f"{days} 日请求失败：{reason}"
+                            for days, reason in window_errors.items()
+                        )
+                        or (
+                            "未取得字段："
+                            + "、".join(
+                                field
+                                for field, item in (
+                                    (FLOW_FIVE_DAY_FIELD, five_value),
+                                    (FLOW_ONE_MONTH_HK_FIELD, twenty_value),
+                                )
+                                if item is None
+                            )
+                            if five_value is None or twenty_value is None
+                            else None
+                        )
                     ),
                     approximate=False,
                     field_statuses={
-                        "近五个交易日资金净额": (
+                        FLOW_FIVE_DAY_FIELD: (
                             DataStatus.OK if five_value is not None else DataStatus.MISSING
                         ),
-                        "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
+                        FLOW_ONE_MONTH_HK_FIELD: (
+                            DataStatus.OK
+                            if twenty_value is not None
+                            else DataStatus.MISSING
+                        ),
                     },
                 ),
             )

@@ -6,8 +6,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import date, datetime
 
+from stock_analysis.domain.calculations import Calculation_IssueMarketCap
 from stock_analysis.domain.enums import DataStatus
-from stock_analysis.domain.models import BlockTradeData, Security
+from stock_analysis.domain.models import BlockTradeData, IPOInfo, Security
 from stock_analysis.sources.base import (
     HttpJsonClient,
     Provenance_Create,
@@ -30,6 +31,7 @@ class _BlockNewsList:
     page_count: int
     oldest_date: date | None
     complete_for_year: bool
+    stop_reason: str
 
 
 @dataclass(slots=True, frozen=True)
@@ -47,7 +49,8 @@ class EtnetSource:
         "https://www.etnet.com.hk/www/eng/stocks/realtime/"
         "quote_blocktrade_detail.php"
     )
-    _ARCHIVE_PAGE_LIMIT = 10
+    COMPANY_URL = "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_brief.php"
+    _ARCHIVE_SAFETY_PAGE_LIMIT = 250
     _DETAIL_PATTERN = re.compile(
         r"(?:<p[^>]*class=['\"]date['\"][^>]*>|"
         r"<span[^>]*class=['\"]date['\"][^>]*>)\s*"
@@ -129,33 +132,42 @@ class EtnetSource:
         }
 
     def _BlockNewsList_Fetch(self, security: Security, year: int) -> _BlockNewsList:
-        first_text = self._BlockNewsPage_Fetch(security, 1)
-        page_count = self._BlockPageCount_Parse(first_text)
-        entries = self._BlockNewsEntries_Parse(first_text, security.code, 1)
-        pages_to_fetch: list[int]
-        if page_count >= self._ARCHIVE_PAGE_LIMIT:
-            pages_to_fetch = [self._ARCHIVE_PAGE_LIMIT]
-        else:
-            pages_to_fetch = list(range(2, page_count + 1))
-        for page in pages_to_fetch:
-            text = self._BlockNewsPage_Fetch(security, page)
-            entries.extend(self._BlockNewsEntries_Parse(text, security.code, page))
-
-        oldest_date = min((entry.published_on for entry in entries), default=None)
         year_start = date(year, 1, 1)
-        complete = oldest_date is not None and oldest_date <= year_start
-        if year == date.today().year and page_count < self._ARCHIVE_PAGE_LIMIT:
-            complete = True
-        if not entries and year == date.today().year:
-            complete = page_count < self._ARCHIVE_PAGE_LIMIT
-        if complete and page_count >= self._ARCHIVE_PAGE_LIMIT:
-            known_pages = {1, self._ARCHIVE_PAGE_LIMIT}
-            for page in range(2, self._ARCHIVE_PAGE_LIMIT):
-                if page in known_pages:
-                    continue
-                text = self._BlockNewsPage_Fetch(security, page)
-                entries.extend(self._BlockNewsEntries_Parse(text, security.code, page))
-        entries_by_id = {entry.news_id: entry for entry in entries}
+        entries_by_id: dict[str, _BlockNewsEntry] = {}
+        page_signatures: set[tuple[str, ...]] = set()
+        oldest_date: date | None = None
+        page_count = 0
+        complete = False
+        stop_reason = "达到安全页数"
+        for page in range(1, self._ARCHIVE_SAFETY_PAGE_LIMIT + 1):
+            text = self._BlockNewsPage_Fetch(security, page)
+            page_count = page
+            page_entries = self._BlockNewsEntries_Parse(text, security.code, page)
+            signature = tuple(entry.news_id for entry in page_entries)
+            if signature and signature in page_signatures:
+                stop_reason = f"第 {page} 页与前页内容重复"
+                break
+            if signature:
+                page_signatures.add(signature)
+            new_entries = [
+                entry for entry in page_entries if entry.news_id not in entries_by_id
+            ]
+            if not page_entries:
+                stop_reason = f"第 {page} 页没有新闻记录"
+                break
+            if not new_entries:
+                stop_reason = f"第 {page} 页没有新增新闻 ID"
+                break
+            for entry in new_entries:
+                entries_by_id[entry.news_id] = entry
+            oldest_date = min(
+                (entry.published_on for entry in entries_by_id.values()),
+                default=None,
+            )
+            if oldest_date is not None and oldest_date <= year_start:
+                complete = True
+                stop_reason = f"最早日期已跨过 {year_start.isoformat()}"
+                break
         selected = tuple(
             sorted(
                 (
@@ -166,7 +178,81 @@ class EtnetSource:
                 key=lambda entry: (entry.published_on, entry.news_id),
             )
         )
-        return _BlockNewsList(selected, page_count, oldest_date, complete)
+        return _BlockNewsList(
+            selected, page_count, oldest_date, complete, stop_reason
+        )
+
+    def IPO_Fetch(self, security: Security) -> SourceValue[IPOInfo]:
+        payload = self._client.RequestBytes(
+            self.COMPANY_URL,
+            params={"code": str(int(security.code))},
+            request_id=f"etnet-company-{security.code}",
+            referer=(
+                "https://www.etnet.com.hk/www/eng/stocks/realtime/"
+                f"quote.php?code={int(security.code)}"
+            ),
+            endpoint_key=f"etnet-company-{security.code}",
+            headers=self._PageHeaders_Get(),
+        )
+        text = html.unescape(payload.decode("utf-8", errors="replace"))
+        listing_match = re.search(
+            r"Listing\s+Date\s*</td>\s*<td[^>]*>\s*(\d{2}/\d{2}/\d{4})",
+            text,
+            re.I | re.S,
+        )
+        price_match = re.search(
+            r"Listing\s+Price[^<]*</td>\s*<td[^>]*>\s*([\d,.]+)",
+            text,
+            re.I | re.S,
+        )
+        listing_date = None
+        if listing_match is not None:
+            try:
+                listing_date = datetime.strptime(
+                    listing_match.group(1), "%d/%m/%Y"
+                ).date()
+            except ValueError:
+                listing_date = None
+        issue_price = self._Number_Parse(price_match.group(1)) if price_match else None
+        issue_market_cap, approximate = Calculation_IssueMarketCap(
+            issue_price, None, None
+        )
+        value = IPOInfo(
+            security.key,
+            listing_date,
+            issue_price,
+            None,
+            None,
+            issue_market_cap,
+            approximate,
+        )
+        has_data = listing_date is not None or issue_price is not None
+        statuses = {
+            "上市日期": DataStatus.OK if listing_date is not None else DataStatus.MISSING,
+            "发行价": DataStatus.OK if issue_price is not None else DataStatus.MISSING,
+            "发行股数": DataStatus.MISSING,
+            "发行后总股本": DataStatus.MISSING,
+            "发行时总市值": DataStatus.MISSING,
+        }
+        return SourceValue(
+            value if has_data else None,
+            Provenance_Create(
+                security,
+                "上市与发行信息",
+                self.source_name,
+                f"quote_ci_brief.php?code={int(security.code)}（Listing Date/Price）",
+                DataStatus.OK if has_data else DataStatus.MISSING,
+                original_currency="HKD",
+                standard_currency="HKD",
+                missing_reason=(
+                    "ETNet 公司资料页未解析到上市日期或上市价"
+                    if not has_data
+                    else "ETNet 仅补上市日期/上市价；不以当前已发行股本冒充发行后总股本"
+                ),
+                primary_source="东方财富",
+                field_statuses=statuses,
+            ),
+        )
 
     def _BlockNewsPage_Fetch(self, security: Security, page: int) -> str:
         payload = self._client.RequestBytes(
@@ -225,19 +311,14 @@ class EtnetSource:
                 if news_list.oldest_date is not None
                 else "未取得"
             )
-            archive_reason = (
-                f"ETNet 公开列表已达 {news_list.page_count} 页上限"
-                if news_list.page_count >= self._ARCHIVE_PAGE_LIMIT
-                else f"ETNet 公开列表当前仅返回 {news_list.page_count} 页"
-            )
             return self._Missing_Create(
                 security,
                 year,
                 DataStatus.MISSING,
                 (
-                    f"{archive_reason}，"
+                    f"ETNet 已连续读取 {news_list.page_count} 页，"
                     f"最早可见日期为 {oldest}，晚于 {year}-01-01；"
-                    "无法证明年度区间完整"
+                    f"停止原因：{news_list.stop_reason}；无法证明年度区间完整"
                 ),
                 news_list,
             )
@@ -247,11 +328,13 @@ class EtnetSource:
         for entry in news_list.entries:
             detail = details.get(entry.news_id)
             value = detail.values.get(security.code) if detail is not None else None
-            if detail is None or detail.error is not None or value is None:
+            if detail is None or detail.error is not None:
                 missing_details.append(
                     f"{entry.news_id}:"
                     f"{detail.error if detail is not None else '明细缺失或未包含该代码'}"
                 )
+                continue
+            if value is None:
                 continue
             trade_count += value[0]
             total_amount += value[1]
@@ -333,7 +416,8 @@ class EtnetSource:
         )
         return (
             f"quote_blocktrade.php?code={int(security.code)}；"
-            f"页数={news_list.page_count}；最早可见={oldest}；"
+            f"实际读取页数={news_list.page_count}；最早可见={oldest}；"
+            f"停止原因={news_list.stop_reason}；"
             f"{year} 年明细={len(news_list.entries)} 篇"
         )
 
@@ -343,7 +427,14 @@ class EtnetSource:
             int(value)
             for value in re.findall(r"quote_blocktrade\.php\?page=(\d+)", text, re.I)
         ]
-        return min(max(pages, default=1), cls._ARCHIVE_PAGE_LIMIT)
+        return max(pages, default=1)
+
+    @staticmethod
+    def _Number_Parse(value: str) -> float | None:
+        try:
+            return float(value.replace(",", "").strip())
+        except (AttributeError, ValueError):
+            return None
 
     @classmethod
     def _BlockNewsEntries_Parse(

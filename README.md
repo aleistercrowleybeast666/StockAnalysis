@@ -1,29 +1,32 @@
-# StockAnalysis 0.4.1
+# StockAnalysis 0.5.0
 
-StockAnalysis is a local PySide6 desktop application that creates auditable annual A-share and Hong Kong stock analysis workbooks from public data. It is a data-preparation tool, not investment advice.
+StockAnalysis is a local PySide6 desktop application that generates annual A-share and Hong Kong stock analysis workbooks from public sources. It is intended for personal data organization and technical research, not investment advice.
 
-Version 0.4.1 includes independent checkbox-based all-company/Top-N scopes, an Include-ST option, no cross-run cache, field-level provenance, strict blank/`-`/zero semantics, A/H runtime source probing, a monotonic time-weighted overall progress bar, and a visible per-run coverage report in the third worksheet.
+## Current behavior
 
-Current release status is **blocked**. The Windows 0.4.1 onedir build passed offline tests and packaged smoke checks, but it is labeled as a test preview because three HK fields still have 0% coverage. No native macOS app has been produced.
+- A-share and Hong Kong scopes are independent. Each market defaults to all companies and can optionally be limited to its own Top N by current market capitalization.
+- The Include-ST checkbox is enabled by default and only affects A shares.
+- A-share money flow uses the latest 5/22 valid trading days; Hong Kong uses 5/20 days. The headers, calculations, provenance, and source guide use the same windows.
+- Every run fetches fresh public data. There is no cross-run result, negative-result, or raw-response cache.
+- Blank, `-`, and numeric zero have distinct meanings: unavailable/unverified, not applicable, and verified zero.
+- The progress bar is indeterminate only while the security scope is unknown, then becomes a monotonic overall percentage based on selected markets, companies, and real request batches.
+- The workbook has three visible sheets (`A股`, `港股`, and `数据来源说明`) plus hidden provenance, history, exception, and run-information sheets.
 
-## Windows
+## Development
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap_windows.ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\build_win.ps1
+.venv\Scripts\python.exe -m pytest -m "not network"
+$env:RUN_NETWORK_TESTS = "1"
+.venv\Scripts\python.exe -m pytest -m network
 ```
 
-The strict build stops when live network gates fail. The current test preview is under `dist/win`; keep the entire onedir folder. Frozen logs are written beside the executable and `_internal` at `StockAnalysis/logs/stock_analysis.log`.
+Strict Windows onedir build:
 
-## macOS
-
-PyInstaller cannot cross-build a genuine macOS application on Windows. On a real target-architecture Mac, run:
-
-```bash
-./scripts/bootstrap_macos.sh
-./scripts/build_mac.sh
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build_windows_onedir.ps1
 ```
 
-The repository also includes `.github/workflows/build-macos.yml` for manual `macos-14` builds. It must run from an exact committed revision and pass strict tests before a `dist/mac` artifact is accepted.
+Native macOS applications are built on real GitHub-hosted macOS runners through `.github/workflows/build-macos.yml`: `macos-15` for arm64 and `macos-15-intel` for x86_64. Windows does not fabricate `.app` bundles.
 
-See [README_CN.md](README_CN.md), [DATA_SOURCE_REPORT.md](DATA_SOURCE_REPORT.md), [TEST_REPORT.md](TEST_REPORT.md), and [BUILD_REPORT_macOS.md](BUILD_REPORT_macOS.md).
+See [README_CN.md](README_CN.md) for the full user guide, [DATA_SOURCE_REPORT.md](DATA_SOURCE_REPORT.md) for current field coverage, and the platform build reports for verified artifacts and hashes.

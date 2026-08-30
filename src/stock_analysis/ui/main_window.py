@@ -21,6 +21,11 @@ from stock_analysis.common.paths import Paths_GetRuntimePaths
 from stock_analysis.config.models import AppConfig
 from stock_analysis.config.storage import Config_Save
 from stock_analysis.domain.enums import DataStatus, Market, PipelineRunResult
+from stock_analysis.domain.fields import (
+    FLOW_FIVE_DAY_FIELD,
+    FLOW_ONE_MONTH_A_FIELD,
+    FLOW_ONE_MONTH_HK_FIELD,
+)
 from stock_analysis.domain.models import AnalysisIssue, RunProgress, RunSummary
 from stock_analysis.ui.config_widget import ConfigWidget
 from stock_analysis.ui.progress_widget import ProgressWidget
@@ -99,7 +104,10 @@ class MainWindow(QMainWindow):
         self._last_output = None
         self.open_folder_button.setEnabled(False)
         self.progress_widget.reset()
+        self.progress_widget.show()
+        self.progress_widget.repaint()
         self.status_label.setText("运行中…")
+        self.status_label.repaint()
         QApplication.processEvents()
         try:
             self._controller.start(config)
@@ -201,8 +209,9 @@ class MainWindow(QMainWindow):
             "市值增长率",
             "当年累计大宗交易笔数",
             "当年累计大宗交易金额",
-            "近五个交易日资金净额",
-            "近一月资金净额（最近22个交易日）",
+            FLOW_FIVE_DAY_FIELD,
+            FLOW_ONE_MONTH_A_FIELD,
+            FLOW_ONE_MONTH_HK_FIELD,
         }
         for record in summary.records:
             if record.excluded_reason:

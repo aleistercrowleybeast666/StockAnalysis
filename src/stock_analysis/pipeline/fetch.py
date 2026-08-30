@@ -9,6 +9,7 @@ from typing import Any, TypeVar, cast
 
 from stock_analysis.domain.enums import Market
 from stock_analysis.domain.models import (
+    BatchProgressUpdate,
     BlockTradeData,
     FinancialPeriod,
     FlowData,
@@ -118,7 +119,7 @@ class FetchCoordinator:
         self,
         securities: Sequence[Security],
         year: int,
-        progress_callback: Callable[[Security], None] | None = None,
+        progress_callback: Callable[[Security | BatchProgressUpdate], None] | None = None,
     ) -> dict[str, SourceValue[BlockTradeData]]:
         results: dict[str, SourceValue[BlockTradeData]] = {}
         missing: list[Security] = []

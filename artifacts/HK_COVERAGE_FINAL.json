@@ -1,0 +1,5503 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-08-30T22:42:37+08:00",
+  "workbook": "D:\\python_software\\StockAnalysis\\artifacts\\top100_0_5_0_release\\股票分析表_Top100_v0.5.0.xlsx",
+  "coverage_definition": "obtained_count / applicable_count；obtained_count = numeric_count + other_text_count；applicable_count = company_count - dash_count",
+  "sheets": {
+    "A股": {
+      "header_row": 4,
+      "company_count": 100,
+      "numeric_gate_fields": [
+        "发行时总市值",
+        "市值增长率",
+        "当年累计大宗交易笔数",
+        "当年累计大宗交易金额",
+        "近五个交易日资金净额",
+        "近一月资金净额（最近22个交易日）"
+      ],
+      "fields": {
+        "证券代码": {
+          "field": "证券代码",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "公司名称": {
+          "field": "公司名称",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "实际报告期": {
+          "field": "实际报告期",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "报表币种": {
+          "field": "报表币种",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "2025年营业收入": {
+          "field": "2025年营业收入",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "营业收入同比": {
+          "field": "营业收入同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "营业收入三年 CAGR": {
+          "field": "营业收入三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率": {
+          "field": "毛利率",
+          "company_count": 100,
+          "applicable_count": 76,
+          "obtained_count": 76,
+          "numeric_count": 76,
+          "nonzero_numeric_count": 76,
+          "zero_count": 0,
+          "dash_count": 24,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率同比变化（百分点）": {
+          "field": "毛利率同比变化（百分点）",
+          "company_count": 100,
+          "applicable_count": 76,
+          "obtained_count": 76,
+          "numeric_count": 76,
+          "nonzero_numeric_count": 76,
+          "zero_count": 0,
+          "dash_count": 24,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率三年变化（百分点）": {
+          "field": "毛利率三年变化（百分点）",
+          "company_count": 100,
+          "applicable_count": 76,
+          "obtained_count": 76,
+          "numeric_count": 76,
+          "nonzero_numeric_count": 76,
+          "zero_count": 0,
+          "dash_count": 24,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润": {
+          "field": "归母净利润",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利率": {
+          "field": "归母净利率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润同比": {
+          "field": "归母净利润同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润三年 CAGR": {
+          "field": "归母净利润三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 89,
+          "obtained_count": 89,
+          "numeric_count": 89,
+          "nonzero_numeric_count": 89,
+          "zero_count": 0,
+          "dash_count": 11,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流净额": {
+          "field": "经营活动现金流净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流同比": {
+          "field": "经营活动现金流同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流三年 CAGR": {
+          "field": "经营活动现金流三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 82,
+          "obtained_count": 82,
+          "numeric_count": 82,
+          "nonzero_numeric_count": 82,
+          "zero_count": 0,
+          "dash_count": 18,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "最新总市值": {
+          "field": "最新总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "上市日期": {
+          "field": "上市日期",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "发行价": {
+          "field": "发行价",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "发行股数": {
+          "field": "发行股数",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "发行时总市值": {
+          "field": "发行时总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "最新可得价格": {
+          "field": "最新可得价格",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "市值增长率": {
+          "field": "市值增长率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "当年累计大宗交易笔数": {
+          "field": "当年累计大宗交易笔数",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 84,
+          "zero_count": 16,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "当年累计大宗交易金额": {
+          "field": "当年累计大宗交易金额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 84,
+          "zero_count": 16,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "近五个交易日资金净额": {
+          "field": "近五个交易日资金净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "近一月资金净额（最近22个交易日）": {
+          "field": "近一月资金净额（最近22个交易日）",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 99,
+          "numeric_count": 99,
+          "nonzero_numeric_count": 99,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 1,
+          "other_text_count": 0,
+          "coverage_rate": 0.99,
+          "all_blank": false,
+          "all_numeric_missing": false
+        }
+      }
+    },
+    "港股": {
+      "header_row": 4,
+      "company_count": 100,
+      "numeric_gate_fields": [
+        "发行时总市值",
+        "市值增长率",
+        "当年累计大宗交易笔数",
+        "当年累计大宗交易金额",
+        "近五个交易日资金净额",
+        "近一月资金净额（最近20个交易日）"
+      ],
+      "fields": {
+        "证券代码": {
+          "field": "证券代码",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "公司名称": {
+          "field": "公司名称",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "实际报告期": {
+          "field": "实际报告期",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "报表币种": {
+          "field": "报表币种",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "2025年营业收入": {
+          "field": "2025年营业收入",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "营业收入同比": {
+          "field": "营业收入同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "营业收入三年 CAGR": {
+          "field": "营业收入三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 97,
+          "obtained_count": 97,
+          "numeric_count": 97,
+          "nonzero_numeric_count": 97,
+          "zero_count": 0,
+          "dash_count": 3,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率": {
+          "field": "毛利率",
+          "company_count": 100,
+          "applicable_count": 72,
+          "obtained_count": 72,
+          "numeric_count": 72,
+          "nonzero_numeric_count": 72,
+          "zero_count": 0,
+          "dash_count": 28,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率同比变化（百分点）": {
+          "field": "毛利率同比变化（百分点）",
+          "company_count": 100,
+          "applicable_count": 72,
+          "obtained_count": 72,
+          "numeric_count": 72,
+          "nonzero_numeric_count": 72,
+          "zero_count": 0,
+          "dash_count": 28,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "毛利率三年变化（百分点）": {
+          "field": "毛利率三年变化（百分点）",
+          "company_count": 100,
+          "applicable_count": 72,
+          "obtained_count": 72,
+          "numeric_count": 72,
+          "nonzero_numeric_count": 72,
+          "zero_count": 0,
+          "dash_count": 28,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润": {
+          "field": "归母净利润",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利率": {
+          "field": "归母净利率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润同比": {
+          "field": "归母净利润同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "归母净利润三年 CAGR": {
+          "field": "归母净利润三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 90,
+          "obtained_count": 90,
+          "numeric_count": 90,
+          "nonzero_numeric_count": 90,
+          "zero_count": 0,
+          "dash_count": 10,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流净额": {
+          "field": "经营活动现金流净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流同比": {
+          "field": "经营活动现金流同比",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "经营活动现金流三年 CAGR": {
+          "field": "经营活动现金流三年 CAGR",
+          "company_count": 100,
+          "applicable_count": 82,
+          "obtained_count": 82,
+          "numeric_count": 82,
+          "nonzero_numeric_count": 82,
+          "zero_count": 0,
+          "dash_count": 18,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "最新总市值": {
+          "field": "最新总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "上市日期": {
+          "field": "上市日期",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 100,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": true
+        },
+        "发行价": {
+          "field": "发行价",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 88,
+          "numeric_count": 88,
+          "nonzero_numeric_count": 88,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 12,
+          "other_text_count": 0,
+          "coverage_rate": 0.88,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "发行股数": {
+          "field": "发行股数",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 91,
+          "numeric_count": 91,
+          "nonzero_numeric_count": 91,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 9,
+          "other_text_count": 0,
+          "coverage_rate": 0.91,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "发行时总市值": {
+          "field": "发行时总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 81,
+          "numeric_count": 81,
+          "nonzero_numeric_count": 81,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 19,
+          "other_text_count": 0,
+          "coverage_rate": 0.81,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "最新可得价格": {
+          "field": "最新可得价格",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "市值增长率": {
+          "field": "市值增长率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 81,
+          "numeric_count": 81,
+          "nonzero_numeric_count": 81,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 19,
+          "other_text_count": 0,
+          "coverage_rate": 0.81,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "当年累计大宗交易笔数": {
+          "field": "当年累计大宗交易笔数",
+          "company_count": 100,
+          "applicable_count": 91,
+          "obtained_count": 6,
+          "numeric_count": 6,
+          "nonzero_numeric_count": 5,
+          "zero_count": 1,
+          "dash_count": 9,
+          "blank_count": 85,
+          "other_text_count": 0,
+          "coverage_rate": 0.065934,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "当年累计大宗交易金额": {
+          "field": "当年累计大宗交易金额",
+          "company_count": 100,
+          "applicable_count": 91,
+          "obtained_count": 6,
+          "numeric_count": 6,
+          "nonzero_numeric_count": 5,
+          "zero_count": 1,
+          "dash_count": 9,
+          "blank_count": 85,
+          "other_text_count": 0,
+          "coverage_rate": 0.065934,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "近五个交易日资金净额": {
+          "field": "近五个交易日资金净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        },
+        "近一月资金净额（最近20个交易日）": {
+          "field": "近一月资金净额（最近20个交易日）",
+          "company_count": 100,
+          "applicable_count": 100,
+          "obtained_count": 100,
+          "numeric_count": 100,
+          "nonzero_numeric_count": 100,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 0,
+          "other_text_count": 0,
+          "coverage_rate": 1.0,
+          "all_blank": false,
+          "all_numeric_missing": false
+        }
+      }
+    }
+  },
+  "hk_missing_reason_matrix": [
+    {
+      "code": "00700",
+      "company_name": "TENCENT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00700",
+      "company_name": "TENCENT",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00005",
+      "company_name": "HSBC HOLDINGS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01398",
+      "company_name": "ICBC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01398",
+      "company_name": "ICBC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01398",
+      "company_name": "ICBC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01398",
+      "company_name": "ICBC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01398",
+      "company_name": "ICBC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00939",
+      "company_name": "CCB",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00939",
+      "company_name": "CCB",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00939",
+      "company_name": "CCB",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00939",
+      "company_name": "CCB",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00939",
+      "company_name": "CCB",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09988",
+      "company_name": "BABA-W",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09988",
+      "company_name": "BABA-W",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01288",
+      "company_name": "ABC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01288",
+      "company_name": "ABC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01288",
+      "company_name": "ABC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01288",
+      "company_name": "ABC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01288",
+      "company_name": "ABC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00857",
+      "company_name": "PETROCHINA",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00857",
+      "company_name": "PETROCHINA",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03988",
+      "company_name": "BANK OF CHINA",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00941",
+      "company_name": "CHINA MOBILE",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00941",
+      "company_name": "CHINA MOBILE",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00941",
+      "company_name": "CHINA MOBILE",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00941",
+      "company_name": "CHINA MOBILE",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03968",
+      "company_name": "CM BANK",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03968",
+      "company_name": "CM BANK",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03968",
+      "company_name": "CM BANK",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03968",
+      "company_name": "CM BANK",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03968",
+      "company_name": "CM BANK",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03308",
+      "company_name": "ZJ INNOLIGHT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-30 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03308",
+      "company_name": "ZJ INNOLIGHT",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-30 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00883",
+      "company_name": "CNOOC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00883",
+      "company_name": "CNOOC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02318",
+      "company_name": "PING AN",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02318",
+      "company_name": "PING AN",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02318",
+      "company_name": "PING AN",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02318",
+      "company_name": "PING AN",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02318",
+      "company_name": "PING AN",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02899",
+      "company_name": "ZIJIN MINING",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02899",
+      "company_name": "ZIJIN MINING",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01088",
+      "company_name": "CHINA SHENHUA",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01088",
+      "company_name": "CHINA SHENHUA",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01211",
+      "company_name": "BYD COMPANY",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01211",
+      "company_name": "BYD COMPANY",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02628",
+      "company_name": "CHINA LIFE",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02628",
+      "company_name": "CHINA LIFE",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02628",
+      "company_name": "CHINA LIFE",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02628",
+      "company_name": "CHINA LIFE",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02628",
+      "company_name": "CHINA LIFE",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "营业收入三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01299",
+      "company_name": "AIA",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00300",
+      "company_name": "MIDEA GROUP",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00300",
+      "company_name": "MIDEA GROUP",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01810",
+      "company_name": "XIAOMI-W",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01810",
+      "company_name": "XIAOMI-W",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01810",
+      "company_name": "XIAOMI-W",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03328",
+      "company_name": "BANKCOMM",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03328",
+      "company_name": "BANKCOMM",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03328",
+      "company_name": "BANKCOMM",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03328",
+      "company_name": "BANKCOMM",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03328",
+      "company_name": "BANKCOMM",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09999",
+      "company_name": "NTES",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09999",
+      "company_name": "NTES",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00981",
+      "company_name": "SMIC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00981",
+      "company_name": "SMIC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01658",
+      "company_name": "PSBC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01658",
+      "company_name": "PSBC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01658",
+      "company_name": "PSBC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01658",
+      "company_name": "PSBC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01658",
+      "company_name": "PSBC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02359",
+      "company_name": "WUXI APPTEC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02359",
+      "company_name": "WUXI APPTEC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00386",
+      "company_name": "SINOPEC CORP",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00386",
+      "company_name": "SINOPEC CORP",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "营业收入三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00945",
+      "company_name": "MANULIFE-S",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02388",
+      "company_name": "BOC HONG KONG",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00388",
+      "company_name": "HKEX",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00388",
+      "company_name": "HKEX",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00388",
+      "company_name": "HKEX",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00388",
+      "company_name": "HKEX",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00388",
+      "company_name": "HKEX",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02513",
+      "company_name": "Z.AI",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02513",
+      "company_name": "Z.AI",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02513",
+      "company_name": "Z.AI",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-01-08 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02513",
+      "company_name": "Z.AI",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-01-08 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02888",
+      "company_name": "STANCHART",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02888",
+      "company_name": "STANCHART",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02888",
+      "company_name": "STANCHART",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02888",
+      "company_name": "STANCHART",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02888",
+      "company_name": "STANCHART",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02475",
+      "company_name": "LUXSHARE ICT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02475",
+      "company_name": "LUXSHARE ICT",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "09633",
+      "company_name": "NONGFU SPRING",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09633",
+      "company_name": "NONGFU SPRING",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03690",
+      "company_name": "MEITUAN-W",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03690",
+      "company_name": "MEITUAN-W",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03690",
+      "company_name": "MEITUAN-W",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03690",
+      "company_name": "MEITUAN-W",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00998",
+      "company_name": "CITIC BANK",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00998",
+      "company_name": "CITIC BANK",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00998",
+      "company_name": "CITIC BANK",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00998",
+      "company_name": "CITIC BANK",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00998",
+      "company_name": "CITIC BANK",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00728",
+      "company_name": "CHINA TELECOM",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00728",
+      "company_name": "CHINA TELECOM",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06030",
+      "company_name": "CITIC SEC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03993",
+      "company_name": "CMOC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03993",
+      "company_name": "CMOC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00267",
+      "company_name": "CITIC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00992",
+      "company_name": "LENOVO GROUP",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00992",
+      "company_name": "LENOVO GROUP",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00992",
+      "company_name": "LENOVO GROUP",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00992",
+      "company_name": "LENOVO GROUP",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02328",
+      "company_name": "PICC P&C",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02328",
+      "company_name": "PICC P&C",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02328",
+      "company_name": "PICC P&C",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02328",
+      "company_name": "PICC P&C",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02328",
+      "company_name": "PICC P&C",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00016",
+      "company_name": "SHK PPT",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06809",
+      "company_name": "MONTAGE TECH",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-02-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06809",
+      "company_name": "MONTAGE TECH",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-02-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06160",
+      "company_name": "BEONE MEDICINES",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06160",
+      "company_name": "BEONE MEDICINES",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06160",
+      "company_name": "BEONE MEDICINES",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06160",
+      "company_name": "BEONE MEDICINES",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03986",
+      "company_name": "GIGADEVICE",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-01-13 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03986",
+      "company_name": "GIGADEVICE",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-01-13 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "09618",
+      "company_name": "JD-SW",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09618",
+      "company_name": "JD-SW",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02601",
+      "company_name": "CPIC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02601",
+      "company_name": "CPIC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02601",
+      "company_name": "CPIC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02601",
+      "company_name": "CPIC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02601",
+      "company_name": "CPIC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02338",
+      "company_name": "WEICHAI POWER",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02338",
+      "company_name": "WEICHAI POWER",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02338",
+      "company_name": "WEICHAI POWER",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02611",
+      "company_name": "GTHT",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "营业收入三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02378",
+      "company_name": "PRU",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00001",
+      "company_name": "CKH HOLDINGS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01919",
+      "company_name": "COSCO SHIP HOLD",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01919",
+      "company_name": "COSCO SHIP HOLD",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09888",
+      "company_name": "BIDU-SW",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "09888",
+      "company_name": "BIDU-SW",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09888",
+      "company_name": "BIDU-SW",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09961",
+      "company_name": "TRIP.COM-S",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09961",
+      "company_name": "TRIP.COM-S",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00669",
+      "company_name": "TECHTRONIC IND",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00669",
+      "company_name": "TECHTRONIC IND",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00669",
+      "company_name": "TECHTRONIC IND",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00669",
+      "company_name": "TECHTRONIC IND",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01339",
+      "company_name": "PICC GROUP",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01339",
+      "company_name": "PICC GROUP",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01339",
+      "company_name": "PICC GROUP",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01339",
+      "company_name": "PICC GROUP",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01339",
+      "company_name": "PICC GROUP",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01109",
+      "company_name": "CHINA RES LAND",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01109",
+      "company_name": "CHINA RES LAND",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01109",
+      "company_name": "CHINA RES LAND",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01109",
+      "company_name": "CHINA RES LAND",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01378",
+      "company_name": "CHINAHONGQIAO",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01378",
+      "company_name": "CHINAHONGQIAO",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06951",
+      "company_name": "CCTC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06951",
+      "company_name": "CCTC",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "03692",
+      "company_name": "HANSOH PHARMA",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03692",
+      "company_name": "HANSOH PHARMA",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02020",
+      "company_name": "ANTA SPORTS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02020",
+      "company_name": "ANTA SPORTS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02476",
+      "company_name": "VGT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-04-21 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02476",
+      "company_name": "VGT",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-04-21 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "09992",
+      "company_name": "POP MART",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "09992",
+      "company_name": "POP MART",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02269",
+      "company_name": "WUXI BIO",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02269",
+      "company_name": "WUXI BIO",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01347",
+      "company_name": "HUA HONG GRACE",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01347",
+      "company_name": "HUA HONG GRACE",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02714",
+      "company_name": "MUYUAN",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-02-06 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02714",
+      "company_name": "MUYUAN",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-02-06 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00066",
+      "company_name": "MTR CORPORATION",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00066",
+      "company_name": "MTR CORPORATION",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06690",
+      "company_name": "HAIER SMARTHOME",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00002",
+      "company_name": "CLP HOLDINGS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00175",
+      "company_name": "GEELY AUTO",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01801",
+      "company_name": "INNOVENT BIO",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01801",
+      "company_name": "INNOVENT BIO",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01801",
+      "company_name": "INNOVENT BIO",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01801",
+      "company_name": "INNOVENT BIO",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06818",
+      "company_name": "CEB BANK",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06936",
+      "company_name": "SF HOLDING",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06936",
+      "company_name": "SF HOLDING",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00762",
+      "company_name": "CHINA UNICOM",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00762",
+      "company_name": "CHINA UNICOM",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01038",
+      "company_name": "CKI HOLDINGS",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01038",
+      "company_name": "CKI HOLDINGS",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01038",
+      "company_name": "CKI HOLDINGS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01038",
+      "company_name": "CKI HOLDINGS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02423",
+      "company_name": "BEKE-W",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00788",
+      "company_name": "CHINA TOWER",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00788",
+      "company_name": "CHINA TOWER",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "发行股数",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行股数, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01113",
+      "company_name": "CK ASSET",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01898",
+      "company_name": "CHINA COAL",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01898",
+      "company_name": "CHINA COAL",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06886",
+      "company_name": "HTSC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01766",
+      "company_name": "CRRC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01766",
+      "company_name": "CRRC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01816",
+      "company_name": "CGN POWER",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01816",
+      "company_name": "CGN POWER",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00688",
+      "company_name": "CHINA OVERSEAS",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00688",
+      "company_name": "CHINA OVERSEAS",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00688",
+      "company_name": "CHINA OVERSEAS",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00688",
+      "company_name": "CHINA OVERSEAS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00688",
+      "company_name": "CHINA OVERSEAS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02600",
+      "company_name": "CHALCO",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "02600",
+      "company_name": "CHALCO",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "未取得字段：发行后总股本, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "00027",
+      "company_name": "GALAXY ENT",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01336",
+      "company_name": "NCI",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01336",
+      "company_name": "NCI",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01336",
+      "company_name": "NCI",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01336",
+      "company_name": "NCI",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01336",
+      "company_name": "NCI",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01377",
+      "company_name": "DTECH",
+      "field": "当年累计大宗交易笔数",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01377",
+      "company_name": "DTECH",
+      "field": "当年累计大宗交易金额",
+      "applicable": false,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "证券于 2026-07-09 上市，2025 年不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01024",
+      "company_name": "KUAISHOU-W",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01024",
+      "company_name": "KUAISHOU-W",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01024",
+      "company_name": "KUAISHOU-W",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01988",
+      "company_name": "MINSHENG BANK",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03606",
+      "company_name": "FUYAO GLASS",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "03606",
+      "company_name": "FUYAO GLASS",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "毛利率",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "毛利率同比变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "毛利率三年变化（百分点）",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "经营活动现金流三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01776",
+      "company_name": "GF SEC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01888",
+      "company_name": "KB LAMINATES",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01888",
+      "company_name": "KB LAMINATES",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "归母净利润三年 CAGR",
+      "applicable": false,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [],
+      "final_reason": "业务或数学上不适用",
+      "program_error": false,
+      "public_source_unavailable": false
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "发行价",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "发行时总市值",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "市值增长率",
+      "applicable": true,
+      "primary_source": "东方财富",
+      "attempted_fallbacks": [
+        "ETNet"
+      ],
+      "final_reason": "未取得字段：发行价, 发行时总市值",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "01972",
+      "company_name": "SWIREPROPERTIES",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06869",
+      "company_name": "YOFC",
+      "field": "当年累计大宗交易笔数",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    },
+    {
+      "code": "06869",
+      "company_name": "YOFC",
+      "field": "当年累计大宗交易金额",
+      "applicable": true,
+      "primary_source": "ETNet",
+      "attempted_fallbacks": [
+        "AASTOCKS",
+        "HKEX"
+      ],
+      "final_reason": "HKEX Daily Quotations 为滚动公开档案；该证券所需首个交易日=2025-01-02，当前最早可验证日报=2025-02-03；无法证明完整年度，字段留空",
+      "program_error": false,
+      "public_source_unavailable": true
+    }
+  ],
+  "release_gate": {
+    "passed": true,
+    "empty_numeric_columns": [],
+    "rule": "有适用公司的目标字段不得整列无数值"
+  }
+}

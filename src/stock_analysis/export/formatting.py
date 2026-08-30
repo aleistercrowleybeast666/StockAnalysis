@@ -180,7 +180,11 @@ def Formatting_AddHeaderComments(sheet: Worksheet) -> None:
         "M4": "上期归母净利润不为 0 时：(本期-上期)/ABS(上期)。",
         "V4": "仅按发行价×发行后总股本计算；缺任一项时留空，不使用募资额或发行股数替代。",
         "X4": "发行时总市值大于 0 时：最新总市值/发行时总市值-1。",
-        "AB4": "近一月按最近 22 个交易日口径聚合。",
+        "AB4": (
+            "近一月按最近 20 个有效交易日口径聚合。"
+            if sheet.title == "港股"
+            else "近一月按最近 22 个有效交易日口径聚合。"
+        ),
     }
     for address, text in comments.items():
         sheet[address].comment = Comment(text, "StockAnalysis")

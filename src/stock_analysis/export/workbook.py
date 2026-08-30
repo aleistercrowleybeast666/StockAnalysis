@@ -20,6 +20,12 @@ from stock_analysis.domain.enums import (
     TableSortMode,
     WorkbookExportResult,
 )
+from stock_analysis.domain.fields import (
+    FLOW_FIVE_DAY_FIELD,
+    FLOW_ONE_MONTH_A_FIELD,
+    FLOW_ONE_MONTH_HK_FIELD,
+    FlowOneMonthField_Get,
+)
 from stock_analysis.domain.models import AnalysisRecord
 from stock_analysis.export.formatting import (
     Formatting_AddHeaderComments,
@@ -56,39 +62,69 @@ MAIN_HEADERS = [
     "市值增长率",
     "当年累计大宗交易笔数",
     "当年累计大宗交易金额",
-    "近五个交易日资金净额",
-    "近一月资金净额（最近22个交易日）",
+    FLOW_FIVE_DAY_FIELD,
+    FLOW_ONE_MONTH_A_FIELD,
 ]
 
-COVERAGE_FIELDS = (
-    "发行时总市值",
-    "市值增长率",
-    "当年累计大宗交易笔数",
-    "当年累计大宗交易金额",
-    "近五个交易日资金净额",
-    "近一月资金净额（最近22个交易日）",
-)
+_COVERAGE_COMMON_FIELDS = tuple(MAIN_HEADERS[4:-1])
 
+COVERAGE_FIELDS_BY_MARKET = {
+    Market.A_SHARE: (*_COVERAGE_COMMON_FIELDS, FLOW_ONE_MONTH_A_FIELD),
+    Market.HK: (*_COVERAGE_COMMON_FIELDS, FLOW_ONE_MONTH_HK_FIELD),
+}
+
+_FINANCIAL_COVERAGE_FIELDS = set(MAIN_HEADERS[4:17])
+_DERIVED_COVERAGE_FIELDS = {
+    "营业收入同比",
+    "营业收入三年 CAGR",
+    "毛利率",
+    "毛利率同比变化（百分点）",
+    "毛利率三年变化（百分点）",
+    "归母净利率",
+    "归母净利润同比",
+    "归母净利润三年 CAGR",
+    "经营活动现金流同比",
+    "经营活动现金流三年 CAGR",
+    "市值增长率",
+}
 _COVERAGE_FIELD_GROUPS = {
+    **{field: {"年度财务"} for field in _FINANCIAL_COVERAGE_FIELDS},
+    "最新总市值": {"最新行情"},
+    "上市日期": {"上市与发行信息"},
+    "发行价": {"上市与发行信息"},
+    "发行股数": {"上市与发行信息"},
     "发行时总市值": {"上市与发行信息"},
+    "最新可得价格": {"最新行情"},
     "市值增长率": {"上市与发行信息", "最新行情"},
     "当年累计大宗交易笔数": {"大宗交易"},
     "当年累计大宗交易金额": {"大宗交易"},
-    "近五个交易日资金净额": {"资金流"},
-    "近一月资金净额（最近22个交易日）": {"资金流"},
+    FLOW_FIVE_DAY_FIELD: {"资金流"},
+    FLOW_ONE_MONTH_A_FIELD: {"资金流"},
+    FLOW_ONE_MONTH_HK_FIELD: {"资金流"},
 }
 
 _COVERAGE_THRESHOLDS = {
     Market.A_SHARE: {
+        **{field: 0.50 for field in COVERAGE_FIELDS_BY_MARKET[Market.A_SHARE]},
         "发行时总市值": 0.85,
         "市值增长率": 0.85,
         "当年累计大宗交易笔数": 1.0,
         "当年累计大宗交易金额": 1.0,
-        "近五个交易日资金净额": 0.90,
-        "近一月资金净额（最近22个交易日）": 0.90,
+        FLOW_FIVE_DAY_FIELD: 0.90,
+        FLOW_ONE_MONTH_A_FIELD: 0.90,
     },
-    Market.HK: {field: 0.50 for field in COVERAGE_FIELDS},
+    Market.HK: {
+        field: 0.50 for field in COVERAGE_FIELDS_BY_MARKET[Market.HK]
+    },
 }
+
+
+def MainHeaders_Get(market: Market, financial_year: int | None = None) -> list[str]:
+    headers = list(MAIN_HEADERS)
+    headers[-1] = FlowOneMonthField_Get(market)
+    if financial_year is not None:
+        headers[4] = f"{financial_year}年营业收入"
+    return headers
 
 HISTORY_HEADERS = [
     "市场",
@@ -191,6 +227,7 @@ def _MainRow_Values(record: AnalysisRecord) -> list[object | None]:
     block = record.block_trade
     flow = record.flow
     metrics = record.metrics
+    one_month_field = FlowOneMonthField_Get(record.security.market)
     listing_date = (ipo.listing_date if ipo else None) or record.security.listing_date
     return [
         _CellValue(current, "report_end"),
@@ -237,11 +274,11 @@ def _MainRow_Values(record: AnalysisRecord) -> list[object | None]:
             record, "当年累计大宗交易金额", _CellValue(block, "total_amount"), divisor=1e8
         ),
         _StatusValue_Get(
-            record, "近五个交易日资金净额", _CellValue(flow, "five_day_net"), divisor=1e8
+            record, FLOW_FIVE_DAY_FIELD, _CellValue(flow, "five_day_net"), divisor=1e8
         ),
         _StatusValue_Get(
             record,
-            "近一月资金净额（最近22个交易日）",
+            one_month_field,
             _CellValue(flow, "one_month_net"),
             divisor=1e8,
         ),
@@ -353,8 +390,7 @@ def _Main_Write(
         )
     scope += f" 排序：{config.table_sort_mode.value}；“-”表示不适用，空白表示未取得。"
     sheet["A2"] = scope
-    headers = list(MAIN_HEADERS)
-    headers[4] = f"{config.financial_year}年营业收入"
+    headers = MainHeaders_Get(market, config.financial_year)
     for column, header in enumerate(headers, 1):
         sheet.cell(4, column, header)
     for main_row, record in enumerate(market_records, 5):
@@ -376,7 +412,7 @@ def _Coverage_ProvenanceFind(record: AnalysisRecord, field_name: str):
         for item in record.provenance
         if item.field_group in groups or field_name in item.field_statuses
     ]
-    if field_name == "市值增长率":
+    if field_name in _DERIVED_COVERAGE_FIELDS:
         return None
     for item in reversed(matches):
         field_status = item.field_statuses.get(field_name, item.status)
@@ -413,8 +449,10 @@ def _Coverage_BlankReasonNormalize(reason: str) -> str:
         return "ETNet 公开列表未覆盖所选年度完整区间，年度值保持空白"
     if "AASTOCKS" in normalized and "页面未提供" in normalized and "完整区间" in normalized:
         return "AASTOCKS 仅提供当日成交信息，无法验证目标年度完整区间"
-    if "公开 20 日值" in normalized or "严格 22 日" in normalized:
-        return "港股公开源仅有 5/20 日口径，无法验证严格 22 个交易日"
+    if "HKEX Daily Quotations" in normalized and "滚动公开档案" in normalized:
+        return "HKEX 官方滚动日报未覆盖该证券所需的完整年度区间，年度值保持空白"
+    if "20 日请求失败" in normalized:
+        return "港股 20 日公开资金流源请求失败，字段保持空白"
     if "腾讯资金流仅解析到" in normalized:
         return "腾讯旧资金流端点未返回有效历史，已记录为不可用"
     if len(normalized) > 160:
@@ -457,9 +495,10 @@ def _CoverageRows_Build(records: list[AnalysisRecord]) -> list[list[object | Non
             for record in records
             if record.security.market is market and not record.excluded_reason
         ]
-        for field_name in COVERAGE_FIELDS:
-            field_index = MAIN_HEADERS.index(field_name) - 2
-            numeric_count = zero_count = dash_count = blank_count = 0
+        market_headers = MainHeaders_Get(market)
+        for field_name in COVERAGE_FIELDS_BY_MARKET[market]:
+            field_index = market_headers.index(field_name) - 2
+            numeric_count = zero_count = dash_count = blank_count = other_count = 0
             source_counts: Counter[str] = Counter()
             blank_reasons: Counter[str] = Counter()
             for record in market_records:
@@ -471,13 +510,20 @@ def _CoverageRows_Build(records: list[AnalysisRecord]) -> list[list[object | Non
                     numeric_count += 1
                     if float(value) == 0.0:
                         zero_count += 1
-                    if field_name == "市值增长率":
+                    if field_name in _DERIVED_COVERAGE_FIELDS:
                         source_counts["派生计算"] += 1
                     else:
                         provenance = _Coverage_ProvenanceFind(record, field_name)
                         source_counts[
                             provenance.source_name if provenance else "来源记录缺失"
                         ] += 1
+                    continue
+                if value is not None and str(value).strip():
+                    other_count += 1
+                    provenance = _Coverage_ProvenanceFind(record, field_name)
+                    source_counts[
+                        provenance.source_name if provenance else "来源记录缺失"
+                    ] += 1
                     continue
                 blank_count += 1
                 blank_reasons[
@@ -488,7 +534,9 @@ def _CoverageRows_Build(records: list[AnalysisRecord]) -> list[list[object | Non
             company_count = len(market_records)
             applicable_count = max(0, company_count - dash_count)
             coverage_rate = (
-                numeric_count / applicable_count if applicable_count else 0.0
+                (numeric_count + other_count) / applicable_count
+                if applicable_count
+                else 0.0
             )
             reason_text = "；".join(
                 f"{reason}（{count}）"
@@ -503,6 +551,7 @@ def _CoverageRows_Build(records: list[AnalysisRecord]) -> list[list[object | Non
                     dash_count,
                     blank_count,
                     zero_count,
+                    other_count,
                     coverage_rate,
                     *_Coverage_SourceCellsGet(source_counts),
                     reason_text or None,
@@ -543,6 +592,7 @@ def _SourceGuide_Write(
             "- 数",
             "空白数",
             "0 数",
+            "非数值已取得",
             "覆盖率",
             "主成功来源",
             "主源成功数",
@@ -624,14 +674,14 @@ def _SourceGuide_Write(
             "港股",
             "营业收入、营业成本、毛利率、归母净利润、经营现金流",
             "东方财富港股 F10",
-            "AASTOCKS 财务页（仅在结构可验证时）",
-            "港交所年报（未做全市场 PDF 扫描）",
+            "A/H 同一发行人映射（仅明确维护映射）",
+            "AASTOCKS/港交所年报（候选，未做全市场 PDF 扫描）",
             "主源请求失败、字段为空或年度不匹配；备源不可验证时不猜测",
             "非 HKD 报表按报告日公开汇率换算为 HKD",
             "金融企业普通毛利率不适用",
             "全部可靠来源均未取得；核心营业收入缺失时跳过并补位",
-            "公司完整财年；实际报告期另列",
-            "https://emweb.securities.eastmoney.com/",
+            "公司完整财年；港股自身历史优先，缺年时才用明确同一发行人 A 股合并历史",
+            "https://emweb.securities.eastmoney.com/；已验证 03308.HK ↔ 300308.SZ",
         ),
         (
             "A股/港股",
@@ -673,7 +723,7 @@ def _SourceGuide_Write(
             "https://www.aastocks.com/en/stocks/quote/quick-quote.aspx",
         ),
         (
-            "A股/港股",
+            "A股",
             "上市日期、发行价、发行股数",
             "东方财富 F10",
             "证券列表中的上市日期",
@@ -684,6 +734,19 @@ def _SourceGuide_Write(
             "所有可靠来源均未取得",
             "历史上市/发行日期",
             "https://emweb.securities.eastmoney.com/",
+        ),
+        (
+            "港股",
+            "上市日期、发行价、发行股数",
+            "东方财富港股 F10",
+            "ETNet 公司资料页 Listing Date/Price",
+            "HKEXnews/AASTOCKS（候选，未启用全市场正文扫描）",
+            "东方财富上市日期或发行价单字段为空时按字段回退",
+            "ETNet 仅补真实披露的上市日期/上市价；不以当前股本代替发行后总股本",
+            "不适用",
+            "实际尝试的来源均未取得；发行股数不从当前已发行股本推断",
+            "历史上市/发行日期",
+            "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_brief.php",
         ),
         (
             "A股/港股",
@@ -716,13 +779,13 @@ def _SourceGuide_Write(
             "当年累计大宗/大额交易笔数、金额",
             "ETNet Block Trade 年度分页与逐篇明细",
             "AASTOCKS 当日 Block Trades 页面（仅作证据，不写年度）",
-            "无可靠公开年度第二备源",
-            "列表页数上限、年份归档已收缩、明细解析失败或不能证明年度完整",
-            "逐篇读取供应商披露的实际笔数和总金额；只有完整覆盖所选年度才汇总",
+            "HKEX Daily Quotations 官方逐日成交记录",
+            "ETNet 不能跨过年度边界时验证 AASTOCKS，再按 HKEX 交易日历和滚动日报回退",
+            "ETNet 逐篇汇总；HKEX 口径为 P 单笔≥3000万港元、M/X 单笔≥2000万港元；均须完整覆盖证券当年适用交易日",
             "不适用",
-            "无法完成可靠年度汇总时留空；不硬编码 UNSUPPORTED 或虚假 0",
+            "任一适用交易日报缺失即留空；完整覆盖且无记录才写 0",
             "所选交易统计年度",
-            "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_blocktrade.php",
+            "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_blocktrade.php / https://www.hkex.com.hk/eng/stat/smstat/dayquot_12m/",
         ),
         (
             "A股",
@@ -739,15 +802,15 @@ def _SourceGuide_Write(
         ),
         (
             "港股",
-            "近 5/22 个交易日资金净额",
+            "近 5/20 个交易日资金净额",
             "东方财富港股历史资金流（运行级健康探测）",
-            "TradeGo 5 日公开排行",
+            "TradeGo 5/20 日公开排行",
             "AASTOCKS Money Flow 5 日页",
             "历史主源断连、记录不足或无法验证连续同口径",
-            "三个历史样本全部成功才扩散；5 日与 22 日独立判定，公开 20 日值不冒充 22 日",
+            "三个历史样本全部成功才扩散；5 日与 20 日独立判定；同公司优先使用同一供应商",
             "不适用",
-            "无法验证相应窗口；严格 22 日历史主源不稳定时保持空白并回退 5 日",
-            "最近 5/22 个有效交易日",
+            "无法验证相应窗口；5 日成功时不因 20 日缺失而清空",
+            "最近 5/20 个有效交易日",
             "https://quote.eastmoney.com/hk/00700.html / https://data.tradego8.com/indices/MarketMF.aspx / https://www.aastocks.com/en/stocks/analysis/moneyflow.aspx",
         ),
         (
@@ -756,10 +819,10 @@ def _SourceGuide_Write(
             "HKEX 证券名单与代码/名称标准化",
             "公开发行人信息",
             "无可靠自动第二备源",
-            "检测到 -R/-WR/-SWR 或相同发行人的多个柜台时",
-            "双柜台优先保留 HKD 主柜台；无可靠 A/H 映射时不跨代码拼接财务",
+            "检测到 -R/-WR/-SWR，或港股历史缺年且命中明确维护的同一法律发行人映射时",
+            "双柜台优先保留 HKD 主柜台；A/H 映射仅补港股自身缺失年度，不能模糊匹配名称",
             "不适用",
-            "A/H 映射无法可靠确认时，缺失历史财务保持空白",
+            "A/H 映射无法可靠确认时不跨代码拼接；真实历史不足时派生三年指标为 -",
             "证券名单与对应财务年度",
             "同一发行人只输出一次，不把人民币柜台当独立 IPO",
         ),
@@ -792,22 +855,22 @@ def _SourceGuide_Write(
     ]
     for row in rows:
         sheet.append(row)
-    Formatting_AuxiliarySheet(sheet, 15)
+    Formatting_AuxiliarySheet(sheet, 16)
     for row in (1, 2, 3):
-        sheet.merge_cells(start_row=row, start_column=1, end_row=row, end_column=15)
+        sheet.merge_cells(start_row=row, start_column=1, end_row=row, end_column=16)
         sheet.cell(row, 1).alignment = copy(sheet.cell(1, 1).alignment)
     sheet.merge_cells(
         start_row=static_title_row,
         start_column=1,
         end_row=static_title_row,
-        end_column=15,
+        end_column=16,
     )
     sheet.cell(static_title_row, 1).font = Font(bold=True, color="1F2937")
     sheet.cell(static_title_row, 1).alignment = Alignment(
         horizontal="left", vertical="center"
     )
     for header_row in (coverage_header_row, static_header_row):
-        for column in range(1, 16):
+        for column in range(1, 17):
             sheet.cell(header_row, column).fill = copy(sheet.cell(1, 1).fill)
             sheet.cell(header_row, column).font = copy(sheet.cell(1, 1).font)
             sheet.cell(header_row, column).alignment = copy(sheet.cell(1, 1).alignment)
@@ -817,33 +880,37 @@ def _SourceGuide_Write(
     for row in range(coverage_header_row + 1, coverage_last_row + 1):
         market = Market(sheet.cell(row, 1).value)
         field_name = str(sheet.cell(row, 2).value)
-        coverage_rate = float(sheet.cell(row, 8).value or 0.0)
+        coverage_rate = float(sheet.cell(row, 9).value or 0.0)
         threshold = _COVERAGE_THRESHOLDS[market][field_name]
+        company_count = int(sheet.cell(row, 3).value or 0)
+        dash_count = int(sheet.cell(row, 5).value or 0)
+        blank_count = int(sheet.cell(row, 6).value or 0)
+        applicable_count = max(0, company_count - dash_count)
         fill = (
             all_blank_fill
-            if int(sheet.cell(row, 4).value or 0) == 0
+            if applicable_count > 0 and blank_count == applicable_count
             else low_fill
             if coverage_rate < threshold
             else None
         )
         if fill is not None:
-            for column in range(1, 16):
+            for column in range(1, 17):
                 sheet.cell(row, column).fill = copy(fill)
-        sheet.cell(row, 8).number_format = "0.00%"
-        sheet.cell(row, 15).alignment = Alignment(
+        sheet.cell(row, 9).number_format = "0.00%"
+        sheet.cell(row, 16).alignment = Alignment(
             horizontal="left", vertical="top", wrap_text=True
         )
         sheet.row_dimensions[row].height = 60
     for row in range(static_header_row + 1, sheet.max_row + 1):
         sheet.row_dimensions[row].height = 66
-        for column in range(1, 16):
+        for column in range(1, 17):
             sheet.cell(row, column).alignment = Alignment(
                 horizontal="left",
                 vertical="top",
                 wrap_text=True,
             )
     sheet.freeze_panes = "A6"
-    sheet.auto_filter.ref = f"A{coverage_header_row}:O{coverage_last_row}"
+    sheet.auto_filter.ref = f"A{coverage_header_row}:P{coverage_last_row}"
     sheet.column_dimensions["A"].width = 13
     sheet.column_dimensions["B"].width = 34
     sheet.column_dimensions["C"].width = 30
@@ -859,6 +926,7 @@ def _SourceGuide_Write(
     sheet.column_dimensions["M"].width = 30
     sheet.column_dimensions["N"].width = 18
     sheet.column_dimensions["O"].width = 60
+    sheet.column_dimensions["P"].width = 60
 
 
 def _Provenance_Write(sheet, records: list[AnalysisRecord]) -> None:
@@ -1054,12 +1122,15 @@ def Workbook_Validate(path: Path) -> None:
         raise ValueError("工作簿前三张工作表必须可见")
     for sheet_name in ("A股", "港股"):
         sheet = workbook[sheet_name]
+        market = Market.A_SHARE if sheet_name == "A股" else Market.HK
         if sheet.max_column != 28:
             raise ValueError(f"{sheet_name} 主表不是 28 列")
         if [sheet.cell(4, column).value for column in range(1, 29)][0] != "证券代码":
             raise ValueError(f"{sheet_name} 表头不正确")
         if sheet["A3"].value != "公司信息" or sheet["E3"].value != "营业收入":
             raise ValueError(f"{sheet_name} 双层分组表头不正确")
+        if sheet["AB4"].value != FlowOneMonthField_Get(market):
+            raise ValueError(f"{sheet_name} 近一月资金流表头与市场口径不一致")
         for row in sheet.iter_rows():
             for cell in row:
                 if isinstance(cell.value, str) and "#REF!" in cell.value:

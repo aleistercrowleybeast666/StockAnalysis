@@ -38,7 +38,7 @@ try {
     New-Item -ItemType Directory -Path $BuildPath -Force | Out-Null
     & (Join-Path $PSScriptRoot "test_windows.ps1")
     $ValidationStatus = "passed"
-    $ValidationSummary = "离线测试与全部真实网络测试通过。"
+    $ValidationSummary = "Offline tests and all live-network tests passed."
     $PreviousNetworkSetting = $env:RUN_NETWORK_TESTS
     $NetworkReport = Join-Path $BuildPath "network-junit.xml"
     try {
@@ -56,28 +56,28 @@ try {
     }
     if ($NetworkExitCode -ne 0) {
         if (-not (Test-Path -LiteralPath $NetworkReport)) {
-            throw "真实网络测试失败且没有生成 JUnit 报告。"
+            throw "Live-network tests failed without producing a JUnit report."
         }
         [xml]$NetworkXml = Get-Content -LiteralPath $NetworkReport -Raw -Encoding UTF8
         $NetworkSuite = $NetworkXml.testsuites.testsuite
         if ($null -eq $NetworkSuite -or [int]$NetworkSuite.errors -ne 0) {
-            throw "真实网络测试发生基础设施错误，禁止继续生成预览。"
+            throw "Live-network tests hit an infrastructure error; preview build is forbidden."
         }
         $FailedCases = @($NetworkSuite.testcase | Where-Object { $null -ne $_.failure })
         if ($FailedCases.Count -eq 0) {
-            throw "真实网络测试退出失败但 JUnit 中没有断言失败记录。"
+            throw "Live-network tests failed but JUnit contains no assertion failure."
         }
         if (-not $PreviewAfterNetworkFailure) {
-            throw "真实网络测试有 $($FailedCases.Count) 项失败，严格构建停止。"
+            throw "Live-network tests have $($FailedCases.Count) failures; strict build stopped."
         }
-        $FailureNames = ($FailedCases | ForEach-Object { $_.name }) -join "、"
+        $FailureNames = ($FailedCases | ForEach-Object { $_.name }) -join ", "
         $ValidationStatus = "blocked"
         $ValidationSummary = (
-            "真实网络测试 $([int]$NetworkSuite.tests - $FailedCases.Count)/" +
-            "$([int]$NetworkSuite.tests) 通过；失败：$FailureNames。" +
-            "字段覆盖率门禁未解除。"
+            "Live-network tests $([int]$NetworkSuite.tests - $FailedCases.Count)/" +
+            "$([int]$NetworkSuite.tests) passed; failures: $FailureNames. " +
+            "The field-coverage gate remains blocked."
         )
-        Write-Warning "$ValidationSummary 将继续生成 0.4.1 测试预览。"
+        Write-Warning "$ValidationSummary Continuing with a $Version test preview."
     }
     $RuntimeTemp = Join-Path $BuildPath "runtime_tmp"
     New-Item -ItemType Directory -Path $RuntimeTemp -Force | Out-Null

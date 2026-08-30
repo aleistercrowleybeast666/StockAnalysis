@@ -6,7 +6,7 @@ from pathlib import Path
 
 from stock_analysis.config.models import AppConfig
 from stock_analysis.domain.enums import Market, MarketScopeMode, PipelineRunResult
-from stock_analysis.domain.models import Security
+from stock_analysis.domain.models import BatchProgressUpdate, Security
 from stock_analysis.pipeline.runner import PipelineRunner
 from stock_analysis.sources.fixture import FixtureSource
 
@@ -33,6 +33,28 @@ class TimedFixtureSource(FixtureSource):
     def Flow_Fetch(self, security: Security):
         time.sleep(0.28)
         return super().Flow_Fetch(security)
+
+
+class BatchProgressFixtureSource(FixtureSource):
+    def BlockTrades_Fetch(
+        self, securities: Sequence[Security], year: int, progress_callback=None
+    ):
+        results = {
+            security.key: self.BlockTrade_Fetch(security, year)
+            for security in securities
+        }
+        for completed in range(1, 6):
+            if progress_callback is not None:
+                progress_callback(
+                    BatchProgressUpdate(
+                        stage_fraction=completed / 5,
+                        completed=completed,
+                        total=5,
+                        current_company="fixture batch",
+                        message=f"fixture request batch {completed}/5",
+                    )
+                )
+        return results
 
 
 def test_weighted_progress_tracks_injected_wall_clock_midpoint(
@@ -81,3 +103,47 @@ def test_weighted_progress_tracks_injected_wall_clock_midpoint(
         for current, following in zip(ratios, ratios[1:], strict=False)
     ) <= 0.1
     assert ratios[-1] == 1.0
+    total_duration = finish_time - start_time
+    seventy_stamp = next(
+        stamp
+        for stamp, item in planned
+        if item.overall_completed / item.overall_total >= 0.70
+    )
+    ninety_stamp = next(
+        stamp
+        for stamp, item in planned
+        if item.overall_completed / item.overall_total >= 0.90
+    )
+    assert (seventy_stamp - start_time) / total_duration >= 0.30
+    assert (finish_time - ninety_stamp) / total_duration <= 0.30
+
+
+def test_real_batch_updates_advance_determinate_progress(tmp_path: Path) -> None:
+    events = []
+    summary = PipelineRunner(
+        AppConfig(
+            financial_year=2025,
+            trading_year=2025,
+            markets=[Market.A_SHARE, Market.HK],
+            a_share_scope_mode=MarketScopeMode.ALL,
+            hk_scope_mode=MarketScopeMode.ALL,
+            output_directory=str(tmp_path),
+            fixture_mode=True,
+            concurrency=1,
+            request_interval=0,
+        ),
+        BatchProgressFixtureSource(),
+        events.append,
+    ).run(tmp_path / "batch-progress.xlsx")
+
+    assert summary.result is PipelineRunResult.SUCCESS
+    batches = [
+        item
+        for item in events
+        if item.current_company == "fixture batch"
+    ]
+    assert [item.completed for item in batches] == [1, 2, 3, 4, 5]
+    assert all(item.total == 5 for item in batches)
+    ratios = [item.overall_completed / item.overall_total for item in batches]
+    assert ratios == sorted(ratios)
+    assert len(set(ratios)) == 5

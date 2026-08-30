@@ -199,6 +199,17 @@ class RunProgress:
     overall_total: int = 0
 
 
+@dataclass(slots=True, frozen=True)
+class BatchProgressUpdate:
+    """A real request-batch update within a company-oriented pipeline stage."""
+
+    stage_fraction: float
+    completed: int
+    total: int
+    message: str
+    current_company: str = ""
+
+
 @dataclass(slots=True)
 class MarketSelectionStats:
     market: Market

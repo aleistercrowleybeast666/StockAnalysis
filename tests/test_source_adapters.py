@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date, timedelta
 from typing import Any
 
@@ -9,11 +10,12 @@ import pytest
 from stock_analysis.domain.enums import DataStatus, Market
 from stock_analysis.domain.models import Security
 from stock_analysis.sources.aastocks import AastocksSource
-from stock_analysis.sources.base import SourceSchemaError, SourceUnsupportedError
+from stock_analysis.sources.base import SourceError, SourceSchemaError, SourceUnsupportedError
 from stock_analysis.sources.cninfo import CninfoSource
 from stock_analysis.sources.eastmoney import EastmoneySource
 from stock_analysis.sources.etnet import EtnetSource
 from stock_analysis.sources.fx import FxRate
+from stock_analysis.sources.hkex import HkexBlockTradeSource
 from stock_analysis.sources.tencent import TencentQuoteSource
 from stock_analysis.sources.tonghuashun import TonghuashunSource
 from stock_analysis.sources.tradego import TradegoSource
@@ -77,6 +79,44 @@ class MappedBytesClient:
 
     def close(self) -> None:
         return None
+
+
+class _HkexDailyReportClient:
+    def __init__(self, archive_start: date, section: str) -> None:
+        self.archive_start = archive_start
+        self.section = section.encode("latin-1")
+        self.requests: list[str] = []
+
+    def RequestBytes(
+        self, url: str, *, request_id: str, headers: dict[str, str], **_kwargs
+    ) -> bytes:
+        self.requests.append(request_id)
+        matched = re.search(r"d(\d{6})e\.htm", url)
+        assert matched is not None
+        traded_on = date.fromisoformat(
+            f"20{matched.group(1)[:2]}-"
+            f"{matched.group(1)[2:4]}-{matched.group(1)[4:]}"
+        )
+        if headers.get("Range") == "bytes=0-0":
+            if traded_on < self.archive_start:
+                raise SourceError("HKEX 请求失败（HTTP 404）")
+            return b"<"
+        return self.section
+
+
+class _HkexCalendarClient:
+    def RequestJson(self, _url: str, **_kwargs) -> dict[str, Any]:
+        return {
+            "data": {
+                "hkHSI": {
+                    "day": [
+                        ["2025-01-02", "1"],
+                        ["2025-05-20", "1"],
+                        ["2025-05-21", "1"],
+                    ]
+                }
+            }
+        }
 
 
 def test_tonghuashun_post_issue_shares_uses_explicit_listing_row() -> None:
@@ -309,6 +349,49 @@ def test_hk_non_hkd_financials_are_converted() -> None:
     assert period.fx_date == date(2024, 12, 30)
 
 
+def test_verified_ah_mapping_converts_a_share_history_for_hk_security() -> None:
+    client = FakeClient(
+        {
+            "a-financial-300308": {
+                "result": {
+                    "data": [
+                        {
+                            "REPORTDATE": "2022-12-31",
+                            "DATATYPE": "年报",
+                            "TOTAL_OPERATE_INCOME": 1000,
+                            "PARENT_NETPROFIT": 200,
+                            "XSMLL": 40,
+                        }
+                    ]
+                }
+            },
+            "a-cashflow-300308": {
+                "result": {
+                    "data": [
+                        {
+                            "REPORT_DATE": "2022-12-31",
+                            "DATE_TYPE_CODE": "001",
+                            "NETCASH_OPERATE": 180,
+                        }
+                    ]
+                }
+            },
+        }
+    )
+    hk = Security(Market.HK, "HKEX", "03308", "中际旭创")
+    a_share = Security(Market.A_SHARE, "SZSE", "300308", "中际旭创")
+
+    result = EastmoneySource(client, FakeFxSource()).FinancialsMappedAForHk_Fetch(  # type: ignore[arg-type]
+        hk, a_share, {2022}, "03308.HK / 300308.SZ"
+    )
+
+    assert result.value and result.value[0].security_key == hk.key
+    assert result.value[0].currency == "HKD"
+    assert result.value[0].original_currency == "CNY"
+    assert result.value[0].revenue == pytest.approx(900)
+    assert "A/H" in (result.value[0].quality_note or "")
+
+
 def test_a_share_flow_calculates_five_and_twenty_two_days() -> None:
     klines = [
         f"{date(2026, 1, 1) + timedelta(days=index)},{index + 1},0,0"
@@ -325,7 +408,7 @@ def test_a_share_flow_calculates_five_and_twenty_two_days() -> None:
     assert client.calls[0]["endpoint_key"] == "flow-history-a-share-600519"
 
 
-def test_hk_flow_calculates_five_and_twenty_two_days_in_hkd() -> None:
+def test_hk_flow_calculates_five_and_twenty_days_in_hkd() -> None:
     klines = [
         f"{date(2026, 1, 1) + timedelta(days=index)},{index + 1},0,0"
         for index in range(30)
@@ -337,11 +420,11 @@ def test_hk_flow_calculates_five_and_twenty_two_days_in_hkd() -> None:
 
     assert result.value is not None
     assert result.value.five_day_net == 140
-    assert result.value.one_month_net == 429
+    assert result.value.one_month_net == 410
     assert result.value.currency == "HKD"
     assert result.provenance.field_statuses["近五个交易日资金净额"] is DataStatus.OK
     assert (
-        result.provenance.field_statuses["近一月资金净额（最近22个交易日）"]
+        result.provenance.field_statuses["近一月资金净额（最近20个交易日）"]
         is DataStatus.OK
     )
     assert client.calls[0]["params"]["secid"] == "116.00700"
@@ -438,7 +521,7 @@ def test_aastocks_money_flow_parses_five_real_trading_days_only() -> None:
     assert result.value.one_month_net is None
     assert result.provenance.field_statuses["近五个交易日资金净额"] is DataStatus.OK
     assert (
-        result.provenance.field_statuses["近一月资金净额（最近22个交易日）"]
+        result.provenance.field_statuses["近一月资金净额（最近20个交易日）"]
         is DataStatus.MISSING
     )
 
@@ -510,32 +593,48 @@ def test_etnet_block_trade_aggregates_complete_year_details() -> None:
     assert "etnet-block-detail-20251231281" not in client.requests
 
 
-def test_etnet_block_trade_rejects_truncated_ten_page_year() -> None:
-    first_page = b"""
-    <div class="DivArticleList dotLine"><p class="date">28/08/2026 09:01</p>
-    <p><a href="quote_blocktrade_detail.php?newsid=20260828281&amp;page=1&amp;code=700">item</a></p></div>
-    <a href="quote_blocktrade.php?page=10&amp;code=700">10</a>
-    """
-    last_page = b"""
-    <div class="DivArticleList dotLine"><p class="date">03/03/2026 09:01</p>
-    <p><a href="quote_blocktrade_detail.php?newsid=20260303281&amp;page=10&amp;code=700">item</a></p></div>
+def test_etnet_block_trade_continues_past_visible_ten_page_navigation() -> None:
+    payloads = {}
+    for page in range(1, 13):
+        published = "31/12/2025" if page == 12 else f"{29 - page:02d}/08/2026"
+        news_id = f"{20250000000 + page}"
+        payloads[f"etnet-block-list-00700-page-{page}"] = (
+            f'<p class="date">{published} 09:01</p>'
+            f'<a href="quote_blocktrade_detail.php?newsid={news_id}&amp;page={page}&amp;code=700">item</a>'
+        ).encode()
+    client = MappedBytesClient(payloads)
+    security = Security(Market.HK, "HKEX", "00700", "腾讯控股")
+
+    result = EtnetSource(client, concurrency=2)._BlockNewsList_Fetch(  # type: ignore[arg-type]  # noqa: SLF001
+        security, 2026
+    )
+
+    assert result.complete_for_year is True
+    assert result.page_count == 12
+    assert "etnet-block-list-00700-page-11" in client.requests
+    assert "etnet-block-list-00700-page-12" in client.requests
+
+
+def test_etnet_block_trade_stops_on_repeated_page_without_claiming_complete() -> None:
+    page = b"""
+    <p class="date">28/08/2026 09:01</p>
+    <a href="quote_blocktrade_detail.php?newsid=20260828281&amp;page=1&amp;code=700">item</a>
     """
     client = MappedBytesClient(
         {
-            "etnet-block-list-00700-page-1": first_page,
-            "etnet-block-list-00700-page-10": last_page,
+            "etnet-block-list-00700-page-1": page,
+            "etnet-block-list-00700-page-2": page,
         }
     )
     security = Security(Market.HK, "HKEX", "00700", "腾讯控股")
 
-    result = EtnetSource(client, concurrency=2).BlockTrade_Fetch(  # type: ignore[arg-type]
+    result = EtnetSource(client, concurrency=1)._BlockNewsList_Fetch(  # type: ignore[arg-type]  # noqa: SLF001
         security, 2026
     )
 
-    assert result.value is None
-    assert result.provenance.status is DataStatus.MISSING
-    assert "10 页上限" in (result.provenance.missing_reason or "")
-    assert all("detail" not in request for request in client.requests)
+    assert result.complete_for_year is False
+    assert "重复" in result.stop_reason
+    assert "etnet-block-list-00700-page-3" not in client.requests
 
 
 def test_etnet_block_trade_does_not_write_false_zero_for_pruned_past_year() -> None:
@@ -544,7 +643,10 @@ def test_etnet_block_trade_does_not_write_false_zero_for_pruned_past_year() -> N
     <p><a href="quote_blocktrade_detail.php?newsid=20260309281&amp;page=1&amp;code=2">item</a></p></div>
     """
     client = MappedBytesClient(
-        {"etnet-block-list-00002-page-1": current_page}
+        {
+            "etnet-block-list-00002-page-1": current_page,
+            "etnet-block-list-00002-page-2": b"<html>no more records</html>",
+        }
     )
     security = Security(Market.HK, "HKEX", "00002", "中电控股")
 
@@ -556,6 +658,92 @@ def test_etnet_block_trade_does_not_write_false_zero_for_pruned_past_year() -> N
     assert result.provenance.status is DataStatus.MISSING
     assert "无法证明年度区间完整" in (result.provenance.missing_reason or "")
     assert all("detail" not in request for request in client.requests)
+
+
+def test_hkex_block_section_matches_verified_etnet_threshold_sample() -> None:
+    section = """
+    SALES RECORDS OVER $500,000
+      700 TENCENT < P50,900-511.50 P50,000-510.876 P200,000-510.875
+                    P103,740-510.461 P44,460-510.462 P130,300-511.50
+                    P178,900-511.50 P198,900-511.50 P77,700-511.50
+                    X1,000-511.00 >
+    """
+
+    values = HkexBlockTradeSource._BlockSection_Parse(  # noqa: SLF001
+        section, {"00700"}
+    )
+
+    assert values["00700"][0] == 6
+    assert values["00700"][1] == pytest.approx(454_766_924.14)
+
+
+def test_hkex_block_batch_only_writes_complete_post_listing_interval() -> None:
+    section = """
+    SALES RECORDS OVER $500,000
+     3750 CATL             < P100,000-300.00 X100,000-250.00
+                            P50,000-300.00 >
+    AMENDMENT RECORDS FOR TRADE
+    """
+    source = HkexBlockTradeSource(
+        _HkexDailyReportClient(date(2025, 5, 20), section),  # type: ignore[arg-type]
+        _HkexCalendarClient(),  # type: ignore[arg-type]
+        concurrency=2,
+    )
+    old_listing = Security(
+        Market.HK,
+        "HKEX",
+        "00700",
+        "腾讯控股",
+        listing_date=date(2004, 6, 16),
+    )
+    new_listing = Security(
+        Market.HK,
+        "HKEX",
+        "03750",
+        "宁德时代",
+        listing_date=date(2025, 5, 20),
+    )
+
+    progress: list[tuple[int, int]] = []
+    results = source.BlockTrades_Fetch(
+        [old_listing, new_listing],
+        2025,
+        progress_callback=lambda completed, total: progress.append(
+            (completed, total)
+        ),
+    )
+
+    assert results[old_listing.key].value is None
+    assert results[old_listing.key].provenance.status is DataStatus.MISSING
+    assert "最早可验证日报=2025-05-20" in (
+        results[old_listing.key].provenance.missing_reason or ""
+    )
+    assert results[new_listing.key].value is not None
+    assert results[new_listing.key].value.trade_count == 4
+    assert results[new_listing.key].value.total_amount == pytest.approx(110_000_000)
+    assert progress[0][0] == 0
+    assert progress[-1][0] == progress[-1][1]
+    assert [completed for completed, _total in progress] == sorted(
+        completed for completed, _total in progress
+    )
+
+
+def test_etnet_company_profile_supplies_only_verified_listing_fields() -> None:
+    payload = b"""
+    <tr><td>Issued Share Capital</td><td>9,103,146,761</td></tr>
+    <tr><td>Listing Date</td><td>16/06/2004</td></tr>
+    <tr><td>Listing Price &nbsp;(HKD)</td><td>3.700</td></tr>
+    """
+    security = Security(Market.HK, "HKEX", "00700", "腾讯控股")
+
+    result = EtnetSource(FakeBytesClient(payload)).IPO_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.listing_date == date(2004, 6, 16)
+    assert result.value.issue_price == pytest.approx(3.7)
+    assert result.value.issued_shares is None
+    assert result.value.post_issue_total_shares is None
+    assert result.value.issue_market_cap is None
 
 
 def test_post_issue_share_parsers_require_listing_evidence() -> None:
@@ -616,11 +804,14 @@ def test_tencent_flow_fallback_parses_five_days_without_faking_twenty_two() -> N
     assert result.value.one_month_net is None
 
 
-def test_tradego_batch_flow_keeps_unverified_twenty_day_value_out_of_22_day_field() -> None:
+def test_tradego_batch_flow_returns_verified_five_and_twenty_day_values() -> None:
     client = FakeClient(
         {
             "tradego-hk-flow-5-offset-0": {
                 "His": [{"_Code": "E00700", "NetIn": "2.28B"}]
+            },
+            "tradego-hk-flow-20-offset-0": {
+                "His": [{"_Code": "E00700", "NetIn": "7.03B"}]
             },
         }
     )
@@ -632,10 +823,15 @@ def test_tradego_batch_flow_keeps_unverified_twenty_day_value_out_of_22_day_fiel
 
     assert result.value is not None
     assert result.value.five_day_net == pytest.approx(2.28e9)
-    assert result.value.one_month_net is None
+    assert result.value.one_month_net == pytest.approx(7.03e9)
     assert result.provenance.approximate is False
-    assert "20" in (result.provenance.missing_reason or "")
-    assert client.requests == ["tradego-hk-flow-5-offset-0"]
+    assert result.provenance.field_statuses[
+        "近一月资金净额（最近20个交易日）"
+    ] is DataStatus.OK
+    assert client.requests == [
+        "tradego-hk-flow-5-offset-0",
+        "tradego-hk-flow-20-offset-0",
+    ]
 
 
 def test_batch_quotes_fill_one_hundred_companies_without_single_requests() -> None:

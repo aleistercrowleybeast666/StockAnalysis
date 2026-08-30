@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit numeric coverage of the workbook's key market-data fields.
+"""Audit coverage of every visible business field in the two market sheets.
 
 The report intentionally distinguishes a true numeric zero from a dash and a
 blank cell.  This prevents a failed fetch from being mistaken for a legitimate
@@ -21,14 +21,19 @@ from typing import Any
 from openpyxl import load_workbook
 
 MARKET_SHEETS = ("A股", "港股")
-TARGET_FIELDS = (
+COMMON_TARGET_FIELDS = (
     "发行时总市值",
     "市值增长率",
     "当年累计大宗交易笔数",
     "当年累计大宗交易金额",
     "近五个交易日资金净额",
-    "近一月资金净额（最近22个交易日）",
 )
+TARGET_FIELDS_BY_SHEET = {
+    "A股": (*COMMON_TARGET_FIELDS, "近一月资金净额（最近22个交易日）"),
+    "港股": (*COMMON_TARGET_FIELDS, "近一月资金净额（最近20个交易日）"),
+}
+# Kept for callers that build an A-share-compatible fixture.
+TARGET_FIELDS = TARGET_FIELDS_BY_SHEET["A股"]
 CODE_HEADER = "证券代码"
 DASH_VALUES = {"-", "—", "–"}
 
@@ -38,6 +43,7 @@ class FieldCoverage:
     field: str
     company_count: int
     applicable_count: int
+    obtained_count: int
     numeric_count: int
     nonzero_numeric_count: int
     zero_count: int
@@ -129,11 +135,13 @@ def _Field_Audit(sheet: Any, rows: Iterable[int], column: int, field: str) -> Fi
 
     company_count = len(row_list)
     applicable_count = max(0, company_count - dash_count)
-    coverage_rate = numeric_count / applicable_count if applicable_count else 0.0
+    obtained_count = numeric_count + other_text_count
+    coverage_rate = obtained_count / applicable_count if applicable_count else 0.0
     return FieldCoverage(
         field=field,
         company_count=company_count,
         applicable_count=applicable_count,
+        obtained_count=obtained_count,
         numeric_count=numeric_count,
         nonzero_numeric_count=nonzero_numeric_count,
         zero_count=zero_count,
@@ -146,7 +154,140 @@ def _Field_Audit(sheet: Any, rows: Iterable[int], column: int, field: str) -> Fi
     )
 
 
-def Workbook_Audit(path: Path) -> dict[str, Any]:
+def _CellCategory_Get(value: Any) -> str:
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return "blank"
+    if isinstance(value, str) and value.strip() in DASH_VALUES:
+        return "dash"
+    return "numeric" if _Numeric_TryParse(value) is not None else "other"
+
+
+def _HkMissingReasons_Build(
+    workbook: Any,
+    hk_sheet: Any,
+    header_row: int,
+    headers: dict[str, int],
+    fields: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    code_column = headers[CODE_HEADER]
+    name_column = headers.get("公司名称")
+    provenance_by_code: dict[str, list[dict[str, str]]] = {}
+    if "数据来源" in workbook.sheetnames:
+        source_sheet = workbook["数据来源"]
+        source_rows = source_sheet.iter_rows(values_only=True)
+        header_values = next(source_rows, ())
+        source_headers = {
+            str(value).strip(): index
+            for index, value in enumerate(header_values)
+            if value is not None and str(value).strip()
+        }
+        for values in source_rows:
+            market_index = source_headers.get("市场", 0)
+            market = str(values[market_index] or "") if market_index < len(values) else ""
+            if market != "港股":
+                continue
+            code_index = source_headers.get("证券代码", 1)
+            code = str(values[code_index] or "") if code_index < len(values) else ""
+            code = code.zfill(5)
+            provenance_by_code.setdefault(code, []).append(
+                {
+                    key: str(values[column] or "") if column < len(values) else ""
+                    for key, column in source_headers.items()
+                }
+            )
+    matrix: list[dict[str, Any]] = []
+    for row in _DataRows_List(hk_sheet, header_row, code_column):
+        code = str(hk_sheet.cell(row, code_column).value or "").zfill(5)
+        company_name = (
+            str(hk_sheet.cell(row, name_column).value or "")
+            if name_column is not None
+            else ""
+        )
+        records = provenance_by_code.get(code, [])
+        for field in fields:
+            category = _CellCategory_Get(hk_sheet.cell(row, headers[field]).value)
+            if category in {"numeric", "other"}:
+                continue
+            matches = []
+            for record in records:
+                statuses = record.get("字段级状态(JSON)", "")
+                if field in statuses:
+                    matches.append(record)
+                    continue
+                group = record.get("字段组", "")
+                flow_match = (
+                    field
+                    in {"近五个交易日资金净额", "近一月资金净额（最近20个交易日）"}
+                    and group == "资金流"
+                )
+                block_match = (
+                    field.startswith("当年累计大宗交易") and group == "大宗交易"
+                )
+                financial_match = field in {
+                    "营业收入同比",
+                    "营业收入三年 CAGR",
+                    "毛利率",
+                    "毛利率同比变化（百分点）",
+                    "毛利率三年变化（百分点）",
+                    "归母净利润",
+                    "归母净利润率",
+                    "归母净利润同比",
+                    "归母净利润三年 CAGR",
+                    "经营活动现金流净额",
+                    "经营活动现金流同比",
+                    "经营活动现金流三年 CAGR",
+                } and group == "年度财务"
+                financial_match = financial_match or (
+                    field.endswith("年营业收入") and group == "年度财务"
+                )
+                quote_match = field in {"最新总市值", "最新可得价格"} and group == "最新行情"
+                ipo_match = field in {
+                    "发行价",
+                    "发行股数",
+                    "发行时总市值",
+                    "市值增长率",
+                } and group in {"上市与发行信息", "最新行情"}
+                if flow_match or block_match or ipo_match or financial_match or quote_match:
+                    matches.append(record)
+            last = matches[-1] if matches else {}
+            source_names = []
+            for item in matches:
+                combined_name = item.get("来源名", "")
+                source_names.extend(
+                    name.strip() for name in combined_name.split("+") if name.strip()
+                )
+            primary = last.get("主数据源", "") or (source_names[0] if source_names else "")
+            fallback_names = [name for name in source_names if name and name != primary]
+            reason = last.get("缺失原因", "") or (
+                "业务或数学上不适用" if category == "dash" else "未找到字段级来源记录"
+            )
+            error_text = " ".join(
+                [reason, last.get("状态", ""), last.get("来源地址或请求标识", "")]
+            )
+            matrix.append(
+                {
+                    "code": code,
+                    "company_name": company_name,
+                    "field": field,
+                    "applicable": category != "dash",
+                    "primary_source": primary or None,
+                    "attempted_fallbacks": list(dict.fromkeys(fallback_names)),
+                    "final_reason": reason,
+                    "program_error": any(
+                        token in error_text for token in ("错误", "失败", "异常", "解析", "结构")
+                    ),
+                    "public_source_unavailable": any(
+                        token in reason
+                        for token in ("未提供", "未返回", "未取得", "公开", "无法验证", "介绍上市")
+                    ),
+                }
+            )
+    return matrix
+
+
+def Workbook_Audit(
+    path: Path, *, allow_legacy_hk_header: bool = False
+) -> dict[str, Any]:
     workbook = load_workbook(path, read_only=True, data_only=True)
     try:
         sheets: dict[str, Any] = {}
@@ -156,35 +297,57 @@ def Workbook_Audit(path: Path) -> dict[str, Any]:
             sheet = workbook[sheet_name]
             header_row = _HeaderRow_Find(sheet)
             headers = _Headers_Index(sheet, header_row)
-            missing_fields = [field for field in TARGET_FIELDS if field not in headers]
+            numeric_gate_fields = TARGET_FIELDS_BY_SHEET[sheet_name]
+            if (
+                sheet_name == "港股"
+                and allow_legacy_hk_header
+                and numeric_gate_fields[-1] not in headers
+                and TARGET_FIELDS_BY_SHEET["A股"][-1] in headers
+            ):
+                numeric_gate_fields = (
+                    *COMMON_TARGET_FIELDS,
+                    TARGET_FIELDS_BY_SHEET["A股"][-1],
+                )
+            missing_fields = [field for field in numeric_gate_fields if field not in headers]
             if missing_fields:
                 raise ValueError(
                     f"工作表 {sheet_name!r} 缺少目标字段：{', '.join(missing_fields)}"
                 )
             rows = _DataRows_List(sheet, header_row, headers[CODE_HEADER])
+            target_fields = tuple(headers)
             coverages = [
                 _Field_Audit(sheet, rows, headers[field], field)
-                for field in TARGET_FIELDS
+                for field in target_fields
             ]
             sheets[sheet_name] = {
                 "header_row": header_row,
                 "company_count": len(rows),
+                "numeric_gate_fields": list(numeric_gate_fields),
                 "fields": {item.field: asdict(item) for item in coverages},
             }
         empty_numeric_columns = [
             {"market": sheet_name, "field": field_name}
             for sheet_name, sheet_report in sheets.items()
-            for field_name, field_report in sheet_report["fields"].items()
+            for field_name in sheet_report["numeric_gate_fields"]
+            for field_report in (sheet_report["fields"][field_name],)
             if field_report["all_numeric_missing"]
         ]
+        hk_sheet = workbook["港股"]
+        hk_header_row = sheets["港股"]["header_row"]
+        hk_headers = _Headers_Index(hk_sheet, hk_header_row)
+        hk_fields = tuple(list(sheets["港股"]["fields"])[4:])
         return {
-            "schema_version": 2,
+            "schema_version": 3,
             "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "workbook": str(path.resolve()),
             "coverage_definition": (
-                "numeric_count / applicable_count；applicable_count = company_count - dash_count"
+                "obtained_count / applicable_count；obtained_count = numeric_count + other_text_count；"
+                "applicable_count = company_count - dash_count"
             ),
             "sheets": sheets,
+            "hk_missing_reason_matrix": _HkMissingReasons_Build(
+                workbook, hk_sheet, hk_header_row, hk_headers, hk_fields
+            ),
             "release_gate": {
                 "passed": not empty_numeric_columns,
                 "empty_numeric_columns": empty_numeric_columns,
@@ -197,7 +360,7 @@ def Workbook_Audit(path: Path) -> dict[str, Any]:
 
 def _Markdown_Render(report: dict[str, Any]) -> str:
     lines = [
-        "# 工作簿关键字段覆盖率审计",
+        "# 工作簿全字段覆盖率审计",
         "",
         f"- 文件：`{report['workbook']}`",
         f"- 生成时间：{report['generated_at']}",
@@ -214,8 +377,8 @@ def _Markdown_Render(report: dict[str, Any]) -> str:
                 "",
                 f"公司数：{sheet_report['company_count']}",
                 "",
-                "| 字段 | 理论适用 | 数值 | 非零数值 | 零 | `-` | 空白 | 其他文本 | 覆盖率 | 整列空白 | 整列无数值 |",
-                "|---|---:|---:|---:|---:|---:|---:|---:|---:|:---:|:---:|",
+                "| 字段 | 理论适用 | 已取得 | 数值 | 非零数值 | 零 | `-` | 空白 | 其他文本 | 覆盖率 | 整列空白 | 整列无数值 |",
+                "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---:|:---:|",
             ]
         )
         for field, item in sheet_report["fields"].items():
@@ -227,7 +390,7 @@ def _Markdown_Render(report: dict[str, Any]) -> str:
                 "是" if item["all_numeric_missing"] else "否"
             )
             lines.append(
-                "| {field} | {applicable_count} | {numeric_count} | "
+                "| {field} | {applicable_count} | {obtained_count} | {numeric_count} | "
                 "{nonzero_numeric_count} | {zero_count} | {dash_count} | "
                 "{blank_count} | {other_text_count} | {rate:.2%} | "
                 "{all_blank_label} | {all_numeric_missing_label} |".format(**row_values)
@@ -237,6 +400,31 @@ def _Markdown_Render(report: dict[str, Any]) -> str:
         lines.extend(["## 未通过门禁的整列", ""])
         for item in report["release_gate"]["empty_numeric_columns"]:
             lines.append(f"- {item['market']}：{item['field']}")
+        lines.append("")
+    matrix = report.get("hk_missing_reason_matrix") or []
+    if matrix:
+        lines.extend(
+            [
+                "## 港股逐公司缺失原因矩阵",
+                "",
+                "| 代码 | 公司 | 字段 | 适用 | 主源 | 已尝试备用源 | 最终原因 | 程序错误 | 公开来源确无数据 |",
+                "|---|---|---|:---:|---|---|---|:---:|:---:|",
+            ]
+        )
+        for item in matrix:
+            safe = {
+                key: str(value or "").replace("|", "\\|").replace("\n", " ")
+                for key, value in item.items()
+            }
+            safe["fallbacks"] = "、".join(item["attempted_fallbacks"]) or "-"
+            safe["applicable_label"] = "是" if item["applicable"] else "否"
+            safe["program_error_label"] = "是" if item["program_error"] else "否"
+            safe["public_label"] = "是" if item["public_source_unavailable"] else "否"
+            lines.append(
+                "| {code} | {company_name} | {field} | {applicable_label} | "
+                "{primary_source} | {fallbacks} | {final_reason} | "
+                "{program_error_label} | {public_label} |".format(**safe)
+            )
         lines.append("")
     return "\n".join(lines)
 
@@ -271,7 +459,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"文件不存在：{arguments.workbook}", file=sys.stderr)
         return 2
     try:
-        report = Workbook_Audit(arguments.workbook)
+        report = Workbook_Audit(
+            arguments.workbook,
+            allow_legacy_hk_header=arguments.allow_empty_columns,
+        )
     except (OSError, ValueError) as exc:
         print(f"审计失败：{exc}", file=sys.stderr)
         return 1

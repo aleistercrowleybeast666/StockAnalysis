@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import os
 import platform
 import sys
 from datetime import datetime
@@ -38,6 +39,10 @@ def Arguments_Parse() -> argparse.Namespace:
         default="passed",
     )
     parser.add_argument("--validation-summary", default="")
+    parser.add_argument("--architecture-file", type=Path)
+    parser.add_argument("--signing-status", default="not recorded")
+    parser.add_argument("--test-summary", default="passed")
+    parser.add_argument("--smoke-summary", default="passed")
     return parser.parse_args()
 
 
@@ -80,6 +85,29 @@ def main() -> int:
     validation_section = (
         f"\n\n门禁说明：{validation_summary}" if validation_summary else ""
     )
+    architecture_evidence = ""
+    if arguments.architecture_file is not None:
+        architecture_evidence = arguments.architecture_file.read_text(
+            encoding="utf-8", errors="replace"
+        ).strip()
+    macos_section = ""
+    if arguments.platform == "macos":
+        macos_section = f"""
+
+## GitHub Actions 与本机证据
+
+- Workflow run ID：`{os.environ.get("GITHUB_RUN_ID", "local")}`
+- Commit SHA：`{os.environ.get("GITHUB_SHA", "local-working-tree")}`
+- Runner 标签：`{os.environ.get("MACOS_RUNNER_LABEL", "local-mac")}`
+- 预期架构：`{os.environ.get("MACOS_EXPECTED_UNAME", platform.machine())}`
+- 测试：{arguments.test_summary}
+- App smoke：{arguments.smoke_summary}
+- 签名状态：{arguments.signing_status}
+
+```text
+{architecture_evidence or "architecture evidence not provided"}
+```
+"""
 
     report = f"""# StockAnalysis {arguments.version} {platform_name} 构建报告
 
@@ -106,6 +134,7 @@ PyInstaller：{Dependency_Version("pyinstaller")}
 | `{archive.name}` | {archive.stat().st_size:,} bytes | `{archive_hash}` |
 
 哈希同时写入 `{arguments.hash_file.name}`。ZIP 必须完整解压后运行，不得只复制主可执行文件。
+{macos_section}
 """
     arguments.report.write_text(report, encoding="utf-8")
     print(f"release report: {arguments.report.resolve()}")

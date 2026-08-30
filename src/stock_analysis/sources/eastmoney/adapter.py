@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from typing import Any
 
@@ -11,6 +12,11 @@ from stock_analysis.domain.calculations import (
     Calculation_IssueMarketCap,
 )
 from stock_analysis.domain.enums import DataStatus, Market
+from stock_analysis.domain.fields import (
+    FLOW_FIVE_DAY_FIELD,
+    FlowOneMonthDays_Get,
+    FlowOneMonthField_Get,
+)
 from stock_analysis.domain.models import (
     BlockTradeData,
     FinancialPeriod,
@@ -182,7 +188,9 @@ class EastmoneySource(MarketDataSource):
                     code=code.zfill(5) if market is Market.HK else code,
                     name=name,
                     is_st="ST" in name.upper(),
-                    is_financial=Security_FinancialClassify(name, industry),
+                    is_financial=Security_FinancialClassify(
+                        name, industry, security_code=code
+                    ),
                     industry=industry,
                 )
                 if security.key not in seen_keys:
@@ -204,6 +212,76 @@ class EastmoneySource(MarketDataSource):
         if security.market is Market.HK:
             return self._FinancialsHk_Fetch(security, years)
         return self._FinancialsA_Fetch(security, years)
+
+    def FinancialsMappedAForHk_Fetch(
+        self,
+        hk_security: Security,
+        a_share_security: Security,
+        years: set[int],
+        mapping_evidence: str,
+    ) -> SourceValue[list[FinancialPeriod]]:
+        if not years:
+            return SourceValue(
+                [],
+                Provenance_Create(
+                    hk_security,
+                    "年度财务",
+                    self.source_name,
+                    mapping_evidence,
+                    DataStatus.MISSING,
+                    standard_currency="HKD",
+                    missing_reason="A/H 映射没有待补年度",
+                ),
+            )
+        if self._fx_source is None:
+            raise SourceSchemaError("A/H 映射财务需要 CNY/HKD 历史汇率源")
+        source = self._FinancialsA_Fetch(a_share_security, years)
+        mapped: list[FinancialPeriod] = []
+        for period in source.value or []:
+            rate = self._fx_source.Rate_Fetch("CNY", "HKD", period.report_end)
+            mapped.append(
+                replace(
+                    period,
+                    security_key=hk_security.key,
+                    currency="HKD",
+                    revenue=Calculation_ConvertCurrency(period.revenue, rate.rate),
+                    operating_cost=Calculation_ConvertCurrency(
+                        period.operating_cost, rate.rate
+                    ),
+                    parent_net_profit=Calculation_ConvertCurrency(
+                        period.parent_net_profit, rate.rate
+                    ),
+                    operating_cash_flow=Calculation_ConvertCurrency(
+                        period.operating_cash_flow, rate.rate
+                    ),
+                    original_currency="CNY",
+                    fx_rate=rate.rate,
+                    fx_date=rate.rate_date,
+                    quality_note=(
+                        f"A/H 同一发行人历史映射：{mapping_evidence}"
+                    ),
+                )
+            )
+        return SourceValue(
+            mapped,
+            Provenance_Create(
+                hk_security,
+                "年度财务",
+                self.source_name,
+                (
+                    f"A/H 同一发行人映射 {hk_security.code}.HK <- "
+                    f"{a_share_security.code}.{a_share_security.exchange}；"
+                    f"{mapping_evidence}；RPT_LICO_FN_CPD + RPT_DMSK_FN_CASHFLOW"
+                ),
+                DataStatus.OK if mapped else DataStatus.MISSING,
+                original_currency="CNY",
+                standard_currency="HKD",
+                missing_reason=(
+                    None if mapped else "映射后的 A 股代码没有返回待补完整年度"
+                ),
+                primary_source=self.source_name,
+            ),
+        )
 
     def _FinancialsA_Fetch(
         self, security: Security, years: set[int]
@@ -632,7 +710,9 @@ class EastmoneySource(MarketDataSource):
             except SourceError as error:
                 equity_error = str(error)
         issue_market_cap, approximate = Calculation_IssueMarketCap(
-            issue_price, post_issue_total_shares, issued_shares
+            issue_price,
+            post_issue_total_shares,
+            issued_shares if security.market is Market.A_SHARE else None,
         )
         ipo = IPOInfo(
             security_key=security.key,
@@ -900,6 +980,8 @@ class EastmoneySource(MarketDataSource):
         is_hk = security.market is Market.HK
         market_label = "hk" if is_hk else "a-share"
         currency = "HKD" if is_hk else "CNY"
+        one_month_days = FlowOneMonthDays_Get(security.market)
+        one_month_field = FlowOneMonthField_Get(security.market)
         flow_params = {
             "lmt": 30,
             "klt": 101,
@@ -981,13 +1063,15 @@ class EastmoneySource(MarketDataSource):
                         + (f"；历史主源失败：{primary_error}" if primary_error else "")
                     ),
                     field_statuses={
-                        "近五个交易日资金净额": DataStatus.MISSING,
-                        "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
+                        FLOW_FIVE_DAY_FIELD: DataStatus.MISSING,
+                        one_month_field: DataStatus.MISSING,
                     },
                 ),
             )
         one_month_net = (
-            sum(item[1] for item in values[-22:]) if len(values) >= 22 else None
+            sum(item[1] for item in values[-one_month_days:])
+            if len(values) >= one_month_days
+            else None
         )
         value = FlowData(
             security_key=security.key,
@@ -999,7 +1083,8 @@ class EastmoneySource(MarketDataSource):
         missing_reason = None
         if one_month_net is None:
             missing_reason = (
-                f"已取得 5 日资金流；有效历史仅 {len(values)} 日，22 日字段留空"
+                f"已取得 5 日资金流；有效历史仅 {len(values)} 日，"
+                f"{one_month_days} 日字段留空"
             )
             if primary_error:
                 missing_reason += f"；历史主源失败：{primary_error}"
@@ -1015,8 +1100,8 @@ class EastmoneySource(MarketDataSource):
                 standard_currency=currency,
                 missing_reason=missing_reason,
                 field_statuses={
-                    "近五个交易日资金净额": DataStatus.OK,
-                    "近一月资金净额（最近22个交易日）": (
+                    FLOW_FIVE_DAY_FIELD: DataStatus.OK,
+                    one_month_field: (
                         DataStatus.OK
                         if one_month_net is not None
                         else DataStatus.MISSING

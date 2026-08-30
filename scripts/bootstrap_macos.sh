@@ -6,6 +6,6 @@ if [[ ! -x .venv/bin/python ]]; then
   python3.12 -m venv .venv
 fi
 .venv/bin/python -m pip install --upgrade pip setuptools wheel
-.venv/bin/python -m pip install -e '.[dev]'
+.venv/bin/python -m pip install --requirement requirements-lock-macos.txt
+.venv/bin/python -m pip install --no-deps -e .
 .venv/bin/python -c 'import platform,sys,PySide6,PyInstaller; print(sys.version); print(platform.machine()); print(PySide6.__version__); print(PyInstaller.__version__)'
-

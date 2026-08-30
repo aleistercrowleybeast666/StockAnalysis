@@ -66,9 +66,9 @@ class ProgressWidget(QWidget):
         self.bottom_space.setVisible(not checked)
 
     def reset(self) -> None:
-        self.stage_label.setText("准备中")
+        self.stage_label.setText("正在准备证券范围与数据源")
         self.company_label.setText("—")
-        self.count_label.setText("正在准备数据源与证券范围")
+        self.count_label.setText("正在准备证券范围与数据源")
         self._overall_percent = 0
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setFormat("正在准备…")
@@ -80,7 +80,7 @@ class ProgressWidget(QWidget):
         self._overall_percent = self._OverallPercent_Calculate(progress)
         preparing = progress.stage == "证券范围" and progress.total <= 0
         if preparing:
-            self.count_label.setText("正在准备数据源与证券范围，数量确定后计算总进度")
+            self.count_label.setText("正在准备证券范围与数据源，数量确定后计算总进度")
             self.progress_bar.setRange(0, 0)
             self.progress_bar.setFormat("正在准备…")
         else:

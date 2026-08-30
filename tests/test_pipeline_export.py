@@ -85,6 +85,13 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         assert "字段状态摘要" not in headers
         assert "公司状态" not in headers
         assert "最新可得价格" in headers
+        assert headers[-1] == (
+            "近一月资金净额（最近22个交易日）"
+            if sheet_name == "A股"
+            else "近一月资金净额（最近20个交易日）"
+        )
+        assert sheet["AB4"].comment is not None
+        assert ("22" if sheet_name == "A股" else "20") in sheet["AB4"].comment.text
     a_names = [workbook["A股"].cell(row, 2).value for row in range(5, workbook["A股"].max_row + 1)]
     assert a_names[:2] == ["贵州茅台", "宁德时代"]
     assert workbook["A股"]["H8"].value == "-"
@@ -100,9 +107,9 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
     assert "资金流" in source_groups
     source_guide = workbook["数据来源说明"]
     assert source_guide.sheet_state == "visible"
-    assert source_guide.max_column == 15
-    assert source_guide.auto_filter.ref == "A5:O17"
-    assert [source_guide.cell(5, column).value for column in range(1, 16)] == [
+    assert source_guide.max_column == 16
+    assert source_guide.auto_filter.ref == "A5:P53"
+    assert [source_guide.cell(5, column).value for column in range(1, 17)] == [
         "市场",
         "字段",
         "总公司数",
@@ -110,6 +117,7 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         "- 数",
         "空白数",
         "0 数",
+        "非数值已取得",
         "覆盖率",
         "主成功来源",
         "主源成功数",
@@ -119,7 +127,13 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         "第二备源成功数",
         "主要空白原因（次数）",
     ]
-    assert [source_guide.cell(20, column).value for column in range(1, 12)] == [
+    static_header_row = next(
+        row
+        for row in range(1, source_guide.max_row + 1)
+        if source_guide.cell(row, 1).value == "市场"
+        and source_guide.cell(row, 2).value == "字段/字段组"
+    )
+    assert [source_guide.cell(static_header_row, column).value for column in range(1, 12)] == [
         "市场",
         "字段/字段组",
         "主数据源",
@@ -133,8 +147,8 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         "备注/公开入口",
     ]
     assert source_guide["A6"].value == "A股"
-    assert source_guide["B6"].value == "发行时总市值"
-    assert source_guide["H6"].number_format == "0.00%"
+    assert source_guide["B6"].value == "营业收入"
+    assert source_guide["I6"].number_format == "0.00%"
     assert "不读取或写入跨运行缓存" in source_guide["A2"].value
     assert "数据仅供个人分析参考" in source_guide["A2"].value
     assert not getattr(workbook, "_external_links", [])

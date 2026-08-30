@@ -3,7 +3,14 @@ from __future__ import annotations
 from datetime import date
 
 from stock_analysis.domain.enums import DataStatus, Market
-from stock_analysis.domain.models import BlockTradeData, FlowData, Security
+from stock_analysis.domain.models import (
+    BatchProgressUpdate,
+    BlockTradeData,
+    FinancialPeriod,
+    FlowData,
+    IPOInfo,
+    Security,
+)
 from stock_analysis.sources.base import Provenance_Create, SourceError, SourceValue
 from stock_analysis.sources.registry import LiveMarketDataSource
 
@@ -32,8 +39,166 @@ class _FailingHkBlocks:
         raise RuntimeError(f"{security.code}-{year}-模拟失败")
 
 
+class _MissingHkBlockBatch:
+    source_name = "ETNet"
+
+    def BlockTrades_Fetch(self, securities, year):
+        return {
+            security.key: SourceValue(
+                None,
+                Provenance_Create(
+                    security,
+                    "大宗交易",
+                    self.source_name,
+                    f"year={year}",
+                    DataStatus.MISSING,
+                    missing_reason="年度列表不完整",
+                ),
+            )
+            for security in securities
+        }
+
+
+class _MissingHkBlockSingle:
+    source_name = "AASTOCKS"
+
+    def BlockTrade_Fetch(self, security, year):
+        return SourceValue(
+            None,
+            Provenance_Create(
+                security,
+                "大宗交易",
+                self.source_name,
+                f"year={year}",
+                DataStatus.MISSING,
+                missing_reason="只有当日快照",
+            ),
+        )
+
+
+class _SuccessfulHkexBlocks:
+    source_name = "HKEX"
+
+    def BlockTrades_Fetch(self, securities, year, progress_callback=None):
+        if progress_callback is not None:
+            for completed in range(5):
+                progress_callback(completed, 4)
+        return {
+            security.key: SourceValue(
+                BlockTradeData(security.key, year, 3, 90_000_000.0, "HKD"),
+                Provenance_Create(
+                    security,
+                    "大宗交易",
+                    self.source_name,
+                    "official daily reports",
+                    DataStatus.OK,
+                ),
+            )
+            for security in securities
+        }
+
+
 class _Unused:
     configured = False
+
+
+class _EastmoneyMappedFinancials:
+    source_name = "东方财富"
+
+    def Financials_Fetch(self, security, years):
+        period = FinancialPeriod(
+            security.key,
+            date(2025, 12, 31),
+            2025,
+            None,
+            "HKD",
+            100.0,
+            60.0,
+            20.0,
+            18.0,
+        )
+        return SourceValue(
+            [period],
+            Provenance_Create(
+                security, "年度财务", self.source_name, "hk-own", DataStatus.OK
+            ),
+        )
+
+    def FinancialsMappedAForHk_Fetch(
+        self, hk_security, _a_security, years, _evidence
+    ):
+        periods = [
+            FinancialPeriod(
+                hk_security.key,
+                date(year, 12, 31),
+                year,
+                None,
+                "HKD",
+                float(year),
+                1.0,
+                1.0,
+                1.0,
+                original_currency="CNY",
+            )
+            for year in years
+        ]
+        return SourceValue(
+            periods,
+            Provenance_Create(
+                hk_security,
+                "年度财务",
+                self.source_name,
+                "A/H mapping",
+                DataStatus.OK,
+            ),
+        )
+
+
+class _EastmoneyPartialIpo:
+    source_name = "东方财富"
+
+    def IPO_Fetch(self, security):
+        value = IPOInfo(security.key, None, None, 100.0, None, None)
+        return SourceValue(
+            value,
+            Provenance_Create(
+                security,
+                "上市与发行信息",
+                self.source_name,
+                "eastmoney",
+                DataStatus.OK,
+                field_statuses={
+                    "上市日期": DataStatus.MISSING,
+                    "发行价": DataStatus.MISSING,
+                    "发行股数": DataStatus.OK,
+                    "发行后总股本": DataStatus.MISSING,
+                    "发行时总市值": DataStatus.MISSING,
+                },
+            ),
+        )
+
+
+class _EtnetListingIpo:
+    source_name = "ETNet"
+
+    def IPO_Fetch(self, security):
+        value = IPOInfo(
+            security.key, date(2004, 6, 16), 3.7, None, None, None
+        )
+        return SourceValue(
+            value,
+            Provenance_Create(
+                security,
+                "上市与发行信息",
+                self.source_name,
+                "company profile",
+                DataStatus.OK,
+                field_statuses={
+                    "上市日期": DataStatus.OK,
+                    "发行价": DataStatus.OK,
+                },
+            ),
+        )
 
 
 class _FlakyHistoryFlow:
@@ -113,6 +278,69 @@ def test_hk_block_failure_does_not_discard_successful_a_share_batch() -> None:
     assert results[hk.key].provenance.status is DataStatus.ERROR
 
 
+def test_hk_block_fallback_chain_records_every_attempt_and_uses_hkex_value() -> None:
+    source = LiveMarketDataSource(
+        _EastmoneyBlocks(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _MissingHkBlockSingle(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        etnet=_MissingHkBlockBatch(),  # type: ignore[arg-type]
+        hkex_block=_SuccessfulHkexBlocks(),  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=2,
+    )
+    security = Security(Market.HK, "HKEX", "03750", "宁德时代")
+
+    result = source.BlockTrades_Fetch([security], 2025)[security.key]
+
+    assert result.value is not None
+    assert result.value.trade_count == 3
+    assert result.provenance.source_name == "ETNet+AASTOCKS+HKEX"
+    assert result.provenance.primary_source == "ETNet"
+    assert "年度列表不完整" in (result.provenance.missing_reason or "")
+    assert "只有当日快照" in (result.provenance.missing_reason or "")
+
+
+def test_hk_block_progress_reserves_most_work_for_real_daily_report_batches() -> None:
+    source = LiveMarketDataSource(
+        _EastmoneyBlocks(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _MissingHkBlockSingle(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        etnet=_MissingHkBlockBatch(),  # type: ignore[arg-type]
+        hkex_block=_SuccessfulHkexBlocks(),  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=2,
+    )
+    securities = [
+        Security(Market.A_SHARE, "SSE", "600519", "贵州茅台"),
+        Security(Market.HK, "HKEX", "03750", "宁德时代"),
+    ]
+    updates: list[BatchProgressUpdate] = []
+
+    source.BlockTrades_Fetch(
+        securities,
+        2025,
+        progress_callback=lambda update: updates.append(update),  # type: ignore[arg-type]
+    )
+
+    fractions = [update.stage_fraction for update in updates]
+    hkex_updates = [
+        update for update in updates if update.current_company == "HKEX 公开日报"
+    ]
+    assert fractions == sorted(fractions)
+    assert fractions[-1] == 1.0
+    assert hkex_updates[0].stage_fraction == 0.10
+    assert hkex_updates[-1].stage_fraction == 0.98
+    assert len(hkex_updates) == 5
+
+
 def test_a_flow_probe_requires_every_sample_before_fanning_out() -> None:
     securities = [
         Security(Market.A_SHARE, "SSE", f"60000{index}", f"公司{index}")
@@ -174,3 +402,49 @@ def test_hk_flow_probe_requires_every_sample_before_fanning_out() -> None:
     assert fallback.calls == [[security.code for security in securities]]
     assert progressed == [security.code for security in securities]
     assert all(results[security.key].value is not None for security in securities)
+
+
+def test_hk_financial_history_uses_verified_ah_mapping_only_for_missing_years() -> None:
+    source = LiveMarketDataSource(
+        _EastmoneyMappedFinancials(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=1,
+    )
+    security = Security(Market.HK, "HKEX", "03308", "中际旭创")
+
+    result = source.Financials_Fetch(security, {2025, 2024, 2022})
+
+    assert {period.fiscal_year for period in result.value} == {2025, 2024, 2022}
+    assert next(period for period in result.value if period.fiscal_year == 2025).revenue == 100.0
+    assert "A/H" in result.provenance.source_ref
+
+
+def test_hk_ipo_fallback_merges_listing_fields_without_using_current_share_capital() -> None:
+    source = LiveMarketDataSource(
+        _EastmoneyPartialIpo(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        etnet=_EtnetListingIpo(),  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=1,
+    )
+    security = Security(Market.HK, "HKEX", "00700", "腾讯控股")
+
+    result = source.IPO_Fetch(security)
+
+    assert result.value is not None
+    assert result.value.listing_date == date(2004, 6, 16)
+    assert result.value.issue_price == 3.7
+    assert result.value.issued_shares == 100.0
+    assert result.value.post_issue_total_shares is None
+    assert result.value.issue_market_cap is None

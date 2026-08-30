@@ -1,37 +1,41 @@
-# StockAnalysis 0.4.1 测试报告
+# StockAnalysis 0.5.0 测试报告
 
 日期：2026-08-30（Asia/Shanghai）
 
-## 总结
+## 自动化与真实数据
 
-代码检查、103 项离线测试、Top100 真实运行、工作簿结构/视觉检查和 Windows 打包后 smoke 均已完成。真实网络测试为 7/8，通过的 7 项不抵消港股严格 22 日资金流失败；字段覆盖率还有三列 0%，因此发布状态是**阻断（Windows 产物仅供测试预览）**。
-
-## 自动化结果
-
-| 项目 | 结果 | 说明 |
+| 门禁 | 结果 | 证据 |
 |---|---|---|
-| Ruff | 通过 | 全工程 `ruff check .` |
-| compileall | 通过 | Python 3.12，`src` |
-| 离线 pytest | 103 passed，8 deselected | 语句/分支综合覆盖率 79% |
-| 最终定向回归 | 33 passed | 含覆盖率报告写入、进度、ETNet 年度完整性、A/H 流探测及失败隔离 |
-| 进度延迟模拟 | 通过 | 中点 49.5%，最大单步 8.2 个百分点，单调到 100% |
-| 真实网络 pytest | 7 passed，1 failed，102 deselected | 唯一失败：`test_live_eastmoney_hk_five_and_twenty_two_day_flow`；服务端未返回响应，严格 22 日值为空 |
-| Top100 公司级流程 | 200 success | A 股 100 + 港股 100；不代表字段门禁通过 |
-| Top100 字段门禁 | 失败 | 港股年度大宗两列、港股 22 日资金流为 0% |
-| artifact-tool 结构/渲染 | 通过 | A 股、港股、数据来源说明三页已渲染检查；28 列、说明页换行与低覆盖着色正常 |
-| Windows PyInstaller/smoke | 通过 | `--version`、FileVersion、ProductVersion 均 0.4.1；self-test、两次 fixture、中文空格路径、便携日志、GUI 启停通过 |
-| macOS 原生构建 | 未执行 | 无真实 Mac/可触发仓库；不得视为通过 |
+| Ruff / `compileall` | 通过 | 全工程静态检查通过 |
+| 离线 pytest | 通过 | 118 passed，9 deselected；Windows 严格构建覆盖率 80% |
+| 真实网络 pytest | 通过 | 9 passed，118 deselected；覆盖 A/H 名单、行情、财务、发行、大宗交易和 5/22、5/20 日资金流 |
+| 双市场 Top100 | 通过 | 200 家成功、部分缺失 0、失败 0、排除 0；整列数值门禁通过 |
+| 工作簿结构/公式 | 通过 | 三张可见页、四张隐藏审计页；A/H 各 100 行、28 列；无公式错误 |
+| 工作簿视觉 | 通过 | A 股、港股、第三页覆盖表和静态来源矩阵均已渲染检查，无明显裁切或不可读区域 |
+| A 股回归 | 通过 | 表头仍为 22 日；目标字段 100%，22 日资金流 99%；见 `artifacts/A_SHARE_REGRESSION.md` |
+| 港股窗口 | 通过 | 表头和计算均为 5/20 日，两个资金流字段均 100% |
+| 港股金融分类 | 通过 | 毛利率相关字段 72 数值 + 28 `-` + 0 空白 |
+| 港股年度大额交易 | 通过真实性门禁 | 6 个数值（5 非零、1 真零）、9 个不适用、85 个区间不完整空白；不再整列为空 |
+| 进度 | 通过 | 70% 位于墙钟 74.55%；末 10% 占 1.19%；最大跳变 5%；单调到 100% |
 
-## 真实 Top100
+## Windows 打包后验收
 
-- 输出：`artifacts/v3_live_top100_current.xlsx`
-- 运行：48.209 秒；1,140 HTTP、1,104 成功、36 失败、12 重试。
-- A 股重点六列：100%、100%、100%、100%、100%、99%。
-- 港股重点六列：81%、81%、0%、0%、100%、0%。
-- 三个 0% 字段被审计脚本正确返回为发布阻断，没有用 `-` 或 0 填充掩盖。
+严格构建 `scripts/build_windows_onedir.ps1` 通过：
 
-## Windows 预览产物
+- 程序输出版本、FileVersion、ProductVersion 均为 0.5.0；
+- self-test；
+- 两次 fixture 生成和工作簿校验；
+- 中文与空格路径；
+- 复制完整 onedir 后缩减 PATH 运行；
+- EXE/依赖目录同父目录的绿色日志；
+- 无 SQLite/JSON 跨运行结果缓存；
+- GUI 启动并安全结束；
+- ZIP 内容和 SHA-256 复核。
 
-`scripts/build_windows_onedir.ps1` 默认严格停止。只有显式传入 `-PreviewAfterNetworkFailure`，并且 JUnit 证明失败全部是断言失败且基础设施错误数为 0 时，才继续生成带“阻断（测试预览）”标识的产物。本轮符合该条件；它不是正式发布绕过。
+Windows 状态：**通过**。详见 `BUILD_REPORT_Windows.md`。
 
-更详细的进度数据见 `PROGRESS_VALIDATION_REPORT.md`，字段审计见 `artifacts/COVERAGE_FINAL.md`。
+## macOS 原生验收
+
+工作流已配置 `macos-15` arm64 和 `macos-15-intel` x86_64 两个真实 runner。每个 job 会重跑离线套件和 3 项稳定网络 smoke、构建 `.app`、执行 offscreen/fixture/日志/无缓存 smoke、ad-hoc codesign、架构检查和 ZIP 哈希校验。
+
+本报告提交前的状态为：**等待本精确提交的 GitHub Actions 原生构建结果**。真实 run ID、commit SHA、架构证据和哈希将在 `BUILD_REPORT_macOS.md` 及下载后的 `dist/mac` 报告中记录；未取得真实 artifact 前不会声明双平台完成。

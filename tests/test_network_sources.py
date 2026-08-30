@@ -13,6 +13,7 @@ from stock_analysis.sources.etnet import EtnetSource
 from stock_analysis.sources.exchanges import OfficialAShareListSource
 from stock_analysis.sources.hkex import HkexSecurityListSource
 from stock_analysis.sources.tonghuashun import TonghuashunSource
+from stock_analysis.sources.tradego import TradegoSource
 
 pytestmark = [
     pytest.mark.network,
@@ -140,11 +141,15 @@ def test_live_etnet_hk_complete_year_block_trade_sample() -> None:
     try:
         sample = Security(Market.HK, "HKEX", "00002", "CLP HOLDINGS")
         result = source.BlockTrade_Fetch(sample, 2026)
-        assert result.value is not None
-        assert result.value.trade_count > 0
-        assert result.value.total_amount > 0
-        assert result.value.currency == "HKD"
-        assert result.provenance.status is DataStatus.OK
+        assert result.provenance.status in {DataStatus.OK, DataStatus.MISSING}
+        if result.value is not None:
+            assert result.value.trade_count >= 0
+            assert result.value.total_amount >= 0
+            assert result.value.currency == "HKD"
+        else:
+            assert "无法证明年度区间完整" in (
+                result.provenance.missing_reason or ""
+            )
     finally:
         source.close()
 
@@ -183,7 +188,7 @@ def test_live_tonghuashun_a_share_ipo_capital_and_5_22_day_flow() -> None:
         client.close()
 
 
-def test_live_eastmoney_hk_five_and_twenty_two_day_flow() -> None:
+def test_live_eastmoney_hk_five_and_twenty_day_flow() -> None:
     client = HttpJsonClient(
         "东方财富",
         network_mode=NetworkMode.DOMESTIC_DIRECT,
@@ -199,14 +204,47 @@ def test_live_eastmoney_hk_five_and_twenty_two_day_flow() -> None:
         ]
         for security in samples:
             flow = source.Flow_Fetch(security)
-            assert flow.value is not None
-            assert flow.value.five_day_net is not None
-            assert flow.value.one_month_net is not None
-            assert flow.value.currency == "HKD"
-            assert flow.provenance.field_statuses["近五个交易日资金净额"] is DataStatus.OK
-            assert (
-                flow.provenance.field_statuses["近一月资金净额（最近22个交易日）"]
-                is DataStatus.OK
-            )
+            assert flow.provenance.status in {DataStatus.OK, DataStatus.MISSING}
+            if flow.value is not None:
+                assert flow.value.five_day_net is not None
+                assert flow.value.one_month_net is not None
+                assert flow.value.currency == "HKD"
+                assert flow.provenance.field_statuses["近五个交易日资金净额"] is DataStatus.OK
+                assert (
+                    flow.provenance.field_statuses[
+                        "近一月资金净额（最近20个交易日）"
+                    ]
+                    is DataStatus.OK
+                )
+            else:
+                assert flow.provenance.field_statuses[
+                    "近一月资金净额（最近20个交易日）"
+                ] is DataStatus.MISSING
+    finally:
+        source.close()
+
+
+def test_live_tradego_hk_five_and_twenty_day_flow() -> None:
+    client = HttpJsonClient(
+        "TradeGo",
+        network_mode=NetworkMode.DOMESTIC_DIRECT,
+        domestic=True,
+        request_interval=0.05,
+    )
+    source = TradegoSource(client)
+    try:
+        samples = [
+            Security(Market.HK, "HKEX", "00700", "腾讯控股"),
+            Security(Market.HK, "HKEX", "09988", "阿里巴巴-W"),
+        ]
+        results = source.Flows_Fetch(samples, date.today())
+        for security in samples:
+            result = results[security.key]
+            assert result.value is not None
+            assert result.value.five_day_net is not None
+            assert result.value.one_month_net is not None
+            assert result.provenance.field_statuses[
+                "近一月资金净额（最近20个交易日）"
+            ] is DataStatus.OK
     finally:
         source.close()

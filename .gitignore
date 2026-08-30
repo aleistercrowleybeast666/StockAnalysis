@@ -12,6 +12,16 @@ htmlcov/
 .mypy_cache/
 .codex_artifacts/
 outputs/
+artifacts/*
+!artifacts/A_SHARE_REGRESSION.md
+!artifacts/HK_COVERAGE_BASELINE.json
+!artifacts/HK_COVERAGE_BASELINE.md
+!artifacts/HK_COVERAGE_FINAL.json
+!artifacts/HK_COVERAGE_FINAL.md
+!artifacts/top100_0_5_0_release/
+artifacts/top100_0_5_0_release/*
+!artifacts/top100_0_5_0_release/TOP100_RUN.json
+!artifacts/top100_0_5_0_release/股票分析表_Top100_v0.5.0.xlsx
 *.log
 *.sqlite3
 *.sqlite3-*
