@@ -1,0 +1,1047 @@
+{
+  "result": "success",
+  "coverage_gate": {
+    "passed": false,
+    "empty_numeric_columns": [
+      {
+        "market": "港股",
+        "field": "当年累计大宗交易笔数"
+      },
+      {
+        "market": "港股",
+        "field": "当年累计大宗交易金额"
+      },
+      {
+        "market": "港股",
+        "field": "近一月资金净额（最近22个交易日）"
+      }
+    ],
+    "rule": "有适用公司的目标字段不得整列无数值"
+  },
+  "started_at": "2026-08-30T10:08:32.610083+00:00",
+  "finished_at": "2026-08-30T10:09:20.819057+00:00",
+  "output_path": "artifacts\\v3_live_top100_current.xlsx",
+  "record_count": 200,
+  "success_count": 200,
+  "partial_count": 0,
+  "failed_count": 0,
+  "excluded_count": 0,
+  "config": {
+    "financial_year": 2025,
+    "trading_year": 2025,
+    "markets": [
+      "A股",
+      "港股"
+    ],
+    "a_share_scope_mode": "总市值前 N 家",
+    "a_share_top_n": 100,
+    "hk_scope_mode": "总市值前 N 家",
+    "hk_top_n": 100,
+    "include_st": true,
+    "include_financial": true,
+    "table_sort_mode": "按最新总市值",
+    "network_mode": "国内数据源优先直连",
+    "output_directory": "artifacts",
+    "test_mode": false,
+    "fixture_mode": false,
+    "concurrency": 8,
+    "request_interval": 0.0
+  },
+  "performance": {
+    "http_requests": 1140,
+    "http_successes": 1104,
+    "http_failures": 36,
+    "http_elapsed_seconds": 175.655,
+    "retries": 12,
+    "direct_requests": 1122,
+    "proxy_requests": 18,
+    "requests_by_domain": {
+      "push2delay.eastmoney.com": 90,
+      "datacenter-web.eastmoney.com": 205,
+      "datacenter.eastmoney.com": 400,
+      "emweb.securities.eastmoney.com": 100,
+      "push2his.eastmoney.com": 36,
+      "www.hkex.com.hk": 1,
+      "query.sse.com.cn": 2,
+      "www.szse.cn": 1,
+      "www.bse.cn": 17,
+      "www.aastocks.com": 1,
+      "data.tradego8.com": 3,
+      "basic.10jqka.com.cn": 46,
+      "doctor.10jqka.com.cn": 100,
+      "www.etnet.com.hk": 138
+    },
+    "requests_by_endpoint": {
+      "batch-quotes-selected": 83,
+      "quote-single-港股": 1,
+      "financial-income-a-share": 100,
+      "financial-cashflow-a-share": 100,
+      "financial-hk": 100,
+      "ipo-A股": 100,
+      "ipo-capital-history-a-share": 100,
+      "ipo-港股": 100,
+      "ipo-capital-history-hk": 100,
+      "block-trade-selected-a-share-v2": 5,
+      "flow-history-a-share-688825": 6,
+      "flow-delay-a-share-688825": 1,
+      "flow-history-a-share-601398": 6,
+      "flow-delay-a-share-601398": 1,
+      "flow-history-a-share-601939": 6,
+      "flow-delay-a-share-601939": 1,
+      "flow-history-hk-00700": 6,
+      "flow-delay-hk-00700": 1,
+      "flow-history-hk-03750": 6,
+      "flow-delay-hk-03750": 1,
+      "flow-history-hk-00005": 6,
+      "flow-delay-hk-00005": 1,
+      "security-list-hkex": 1,
+      "security-list-sse": 2,
+      "security-list-szse": 1,
+      "security-list-bse": 17,
+      "aastocks-quote-04621": 1,
+      "tradego-hk-flow-5-day": 3,
+      "tonghuashun-equity-a-share": 46,
+      "tonghuashun-doctor-flow-a-share": 100,
+      "etnet-block-list-00700": 2,
+      "etnet-block-list-03750": 3,
+      "etnet-block-list-00005": 2,
+      "etnet-block-list-01398": 2,
+      "etnet-block-list-00939": 3,
+      "etnet-block-list-09988": 6,
+      "etnet-block-list-01288": 1,
+      "etnet-block-list-00857": 1,
+      "etnet-block-list-03988": 1,
+      "etnet-block-list-00941": 1,
+      "etnet-block-list-03968": 1,
+      "etnet-block-list-03308": 1,
+      "etnet-block-list-00883": 1,
+      "etnet-block-list-02318": 4,
+      "etnet-block-list-02899": 2,
+      "etnet-block-list-01088": 1,
+      "etnet-block-list-01211": 2,
+      "etnet-block-list-02628": 1,
+      "etnet-block-list-01299": 2,
+      "etnet-block-list-00300": 1,
+      "etnet-block-list-01810": 2,
+      "etnet-block-list-03328": 1,
+      "etnet-block-list-09999": 3,
+      "etnet-block-list-00981": 1,
+      "etnet-block-list-01658": 1,
+      "etnet-block-list-02359": 1,
+      "etnet-block-list-00386": 1,
+      "etnet-block-list-00945": 1,
+      "etnet-block-list-02388": 1,
+      "etnet-block-list-00388": 3,
+      "etnet-block-list-02513": 1,
+      "etnet-block-list-02888": 1,
+      "etnet-block-list-02475": 1,
+      "etnet-block-list-09633": 1,
+      "etnet-block-list-03690": 3,
+      "etnet-block-list-00998": 1,
+      "etnet-block-list-00728": 1,
+      "etnet-block-list-02259": 2,
+      "etnet-block-list-06030": 1,
+      "etnet-block-list-03993": 1,
+      "etnet-block-list-00267": 1,
+      "etnet-block-list-00992": 2,
+      "etnet-block-list-02328": 2,
+      "etnet-block-list-00016": 2,
+      "etnet-block-list-06809": 1,
+      "etnet-block-list-06160": 2,
+      "etnet-block-list-03986": 1,
+      "etnet-block-list-01276": 1,
+      "etnet-block-list-09618": 2,
+      "etnet-block-list-02601": 1,
+      "etnet-block-list-02338": 2,
+      "etnet-block-list-02611": 1,
+      "etnet-block-list-02378": 1,
+      "etnet-block-list-00001": 1,
+      "etnet-block-list-01919": 1,
+      "etnet-block-list-09888": 2,
+      "etnet-block-list-09961": 2,
+      "etnet-block-list-00669": 3,
+      "etnet-block-list-01339": 1,
+      "etnet-block-list-01109": 1,
+      "etnet-block-list-01378": 1,
+      "etnet-block-list-06951": 1,
+      "etnet-block-list-03692": 1,
+      "etnet-block-list-02020": 2,
+      "etnet-block-list-02476": 1,
+      "etnet-block-list-09992": 1,
+      "etnet-block-list-02269": 1,
+      "etnet-block-list-01347": 1,
+      "etnet-block-list-02714": 1,
+      "etnet-block-list-00066": 1,
+      "etnet-block-list-06690": 1,
+      "etnet-block-list-00002": 1,
+      "etnet-block-list-00175": 1,
+      "etnet-block-list-01801": 1,
+      "etnet-block-list-06818": 1,
+      "etnet-block-list-06936": 1,
+      "etnet-block-list-00762": 1,
+      "etnet-block-list-06031": 1,
+      "etnet-block-list-03288": 1,
+      "etnet-block-list-01038": 1,
+      "etnet-block-list-02423": 1,
+      "etnet-block-list-00788": 1,
+      "etnet-block-list-01113": 1,
+      "etnet-block-list-01898": 1,
+      "etnet-block-list-06886": 1,
+      "etnet-block-list-01766": 1,
+      "etnet-block-list-01816": 1,
+      "etnet-block-list-00688": 1,
+      "etnet-block-list-02600": 1,
+      "etnet-block-list-09973": 1,
+      "etnet-block-list-00027": 1,
+      "etnet-block-list-01336": 1,
+      "etnet-block-list-01377": 1,
+      "etnet-block-list-01024": 2,
+      "etnet-block-list-01988": 1,
+      "etnet-block-list-03606": 1,
+      "etnet-block-list-01776": 1,
+      "etnet-block-list-01888": 1,
+      "etnet-block-list-01972": 1,
+      "etnet-block-list-06869": 1
+    },
+    "run_local_reuse": 0,
+    "stage_seconds": {
+      "证券范围": 7.781,
+      "获取行情与市值": 3.863,
+      "年度财务": 6.908,
+      "上市与发行信息": 6.818,
+      "年度全市场大宗交易": 7.288,
+      "资金流": 14.362,
+      "标准化、计算与校验": 0.016,
+      "生成 Excel": 1.123
+    },
+    "total_seconds": 48.209
+  },
+  "market_stats": {
+    "A股": {
+      "market": "A股",
+      "scope": "总市值前 N 家",
+      "identified_count": 5551,
+      "ranked_count": 5551,
+      "selected_target_count": 100,
+      "candidate_count": 100,
+      "generated_count": 100,
+      "skipped_no_core_financial_count": 0,
+      "skipped_delisted_count": 0
+    },
+    "港股": {
+      "market": "港股",
+      "scope": "总市值前 N 家",
+      "identified_count": 2749,
+      "ranked_count": 2748,
+      "selected_target_count": 100,
+      "candidate_count": 100,
+      "generated_count": 100,
+      "skipped_no_core_financial_count": 0,
+      "skipped_delisted_count": 0
+    }
+  },
+  "issue_count": 0,
+  "top_issues": [],
+  "progress_events": [
+    {
+      "elapsed_seconds": 0.37,
+      "stage": "证券范围",
+      "stage_completed": 0,
+      "stage_total": 0,
+      "overall_percent": null,
+      "message": "正在加载证券列表"
+    },
+    {
+      "elapsed_seconds": 8.151,
+      "stage": "获取行情与市值",
+      "stage_completed": 0,
+      "stage_total": 8300,
+      "overall_percent": 0,
+      "message": "正在批量获取最新行情与总市值"
+    },
+    {
+      "elapsed_seconds": 12.014,
+      "stage": "获取行情与市值",
+      "stage_completed": 8300,
+      "stage_total": 8300,
+      "overall_percent": 8,
+      "message": "行情与市值获取完成，可用于排名 8299 家"
+    },
+    {
+      "elapsed_seconds": 12.053,
+      "stage": "年度财务",
+      "stage_completed": 0,
+      "stage_total": 200,
+      "overall_percent": 8,
+      "message": "正在获取A股候选公司的年度财务数据"
+    },
+    {
+      "elapsed_seconds": 12.416,
+      "stage": "年度财务",
+      "stage_completed": 2,
+      "stage_total": 200,
+      "overall_percent": 9,
+      "message": "年度财务 2/200"
+    },
+    {
+      "elapsed_seconds": 12.712,
+      "stage": "年度财务",
+      "stage_completed": 9,
+      "stage_total": 200,
+      "overall_percent": 10,
+      "message": "年度财务 9/200"
+    },
+    {
+      "elapsed_seconds": 13.076,
+      "stage": "年度财务",
+      "stage_completed": 15,
+      "stage_total": 200,
+      "overall_percent": 11,
+      "message": "年度财务 15/200"
+    },
+    {
+      "elapsed_seconds": 13.412,
+      "stage": "年度财务",
+      "stage_completed": 22,
+      "stage_total": 200,
+      "overall_percent": 12,
+      "message": "年度财务 22/200"
+    },
+    {
+      "elapsed_seconds": 13.648,
+      "stage": "年度财务",
+      "stage_completed": 28,
+      "stage_total": 200,
+      "overall_percent": 13,
+      "message": "年度财务 28/200"
+    },
+    {
+      "elapsed_seconds": 13.951,
+      "stage": "年度财务",
+      "stage_completed": 34,
+      "stage_total": 200,
+      "overall_percent": 14,
+      "message": "年度财务 34/200"
+    },
+    {
+      "elapsed_seconds": 14.186,
+      "stage": "年度财务",
+      "stage_completed": 41,
+      "stage_total": 200,
+      "overall_percent": 15,
+      "message": "年度财务 41/200"
+    },
+    {
+      "elapsed_seconds": 14.553,
+      "stage": "年度财务",
+      "stage_completed": 47,
+      "stage_total": 200,
+      "overall_percent": 16,
+      "message": "年度财务 47/200"
+    },
+    {
+      "elapsed_seconds": 14.891,
+      "stage": "年度财务",
+      "stage_completed": 54,
+      "stage_total": 200,
+      "overall_percent": 17,
+      "message": "年度财务 54/200"
+    },
+    {
+      "elapsed_seconds": 15.217,
+      "stage": "年度财务",
+      "stage_completed": 60,
+      "stage_total": 200,
+      "overall_percent": 18,
+      "message": "年度财务 60/200"
+    },
+    {
+      "elapsed_seconds": 15.397,
+      "stage": "年度财务",
+      "stage_completed": 67,
+      "stage_total": 200,
+      "overall_percent": 19,
+      "message": "年度财务 67/200"
+    },
+    {
+      "elapsed_seconds": 15.695,
+      "stage": "年度财务",
+      "stage_completed": 73,
+      "stage_total": 200,
+      "overall_percent": 20,
+      "message": "年度财务 73/200"
+    },
+    {
+      "elapsed_seconds": 16.095,
+      "stage": "年度财务",
+      "stage_completed": 80,
+      "stage_total": 200,
+      "overall_percent": 21,
+      "message": "年度财务 80/200"
+    },
+    {
+      "elapsed_seconds": 16.289,
+      "stage": "年度财务",
+      "stage_completed": 86,
+      "stage_total": 200,
+      "overall_percent": 22,
+      "message": "年度财务 86/200"
+    },
+    {
+      "elapsed_seconds": 16.728,
+      "stage": "年度财务",
+      "stage_completed": 93,
+      "stage_total": 200,
+      "overall_percent": 23,
+      "message": "年度财务 93/200"
+    },
+    {
+      "elapsed_seconds": 17.188,
+      "stage": "年度财务",
+      "stage_completed": 99,
+      "stage_total": 200,
+      "overall_percent": 24,
+      "message": "年度财务 99/200"
+    },
+    {
+      "elapsed_seconds": 17.363,
+      "stage": "年度财务",
+      "stage_completed": 106,
+      "stage_total": 200,
+      "overall_percent": 25,
+      "message": "年度财务 106/200"
+    },
+    {
+      "elapsed_seconds": 17.519,
+      "stage": "年度财务",
+      "stage_completed": 112,
+      "stage_total": 200,
+      "overall_percent": 26,
+      "message": "年度财务 112/200"
+    },
+    {
+      "elapsed_seconds": 17.661,
+      "stage": "年度财务",
+      "stage_completed": 119,
+      "stage_total": 200,
+      "overall_percent": 27,
+      "message": "年度财务 119/200"
+    },
+    {
+      "elapsed_seconds": 17.779,
+      "stage": "年度财务",
+      "stage_completed": 125,
+      "stage_total": 200,
+      "overall_percent": 28,
+      "message": "年度财务 125/200"
+    },
+    {
+      "elapsed_seconds": 17.852,
+      "stage": "年度财务",
+      "stage_completed": 131,
+      "stage_total": 200,
+      "overall_percent": 29,
+      "message": "年度财务 131/200"
+    },
+    {
+      "elapsed_seconds": 17.952,
+      "stage": "年度财务",
+      "stage_completed": 138,
+      "stage_total": 200,
+      "overall_percent": 30,
+      "message": "年度财务 138/200"
+    },
+    {
+      "elapsed_seconds": 18.017,
+      "stage": "年度财务",
+      "stage_completed": 144,
+      "stage_total": 200,
+      "overall_percent": 31,
+      "message": "年度财务 144/200"
+    },
+    {
+      "elapsed_seconds": 18.142,
+      "stage": "年度财务",
+      "stage_completed": 151,
+      "stage_total": 200,
+      "overall_percent": 32,
+      "message": "年度财务 151/200"
+    },
+    {
+      "elapsed_seconds": 18.241,
+      "stage": "年度财务",
+      "stage_completed": 157,
+      "stage_total": 200,
+      "overall_percent": 33,
+      "message": "年度财务 157/200"
+    },
+    {
+      "elapsed_seconds": 18.331,
+      "stage": "年度财务",
+      "stage_completed": 164,
+      "stage_total": 200,
+      "overall_percent": 34,
+      "message": "年度财务 164/200"
+    },
+    {
+      "elapsed_seconds": 18.421,
+      "stage": "年度财务",
+      "stage_completed": 170,
+      "stage_total": 200,
+      "overall_percent": 35,
+      "message": "年度财务 170/200"
+    },
+    {
+      "elapsed_seconds": 18.505,
+      "stage": "年度财务",
+      "stage_completed": 177,
+      "stage_total": 200,
+      "overall_percent": 36,
+      "message": "年度财务 177/200"
+    },
+    {
+      "elapsed_seconds": 18.62,
+      "stage": "年度财务",
+      "stage_completed": 183,
+      "stage_total": 200,
+      "overall_percent": 37,
+      "message": "年度财务 183/200"
+    },
+    {
+      "elapsed_seconds": 18.712,
+      "stage": "年度财务",
+      "stage_completed": 190,
+      "stage_total": 200,
+      "overall_percent": 38,
+      "message": "年度财务 190/200"
+    },
+    {
+      "elapsed_seconds": 18.798,
+      "stage": "年度财务",
+      "stage_completed": 196,
+      "stage_total": 200,
+      "overall_percent": 39,
+      "message": "年度财务 196/200"
+    },
+    {
+      "elapsed_seconds": 19.309,
+      "stage": "上市与发行信息",
+      "stage_completed": 1,
+      "stage_total": 200,
+      "overall_percent": 39,
+      "message": "上市与发行信息 1/200"
+    },
+    {
+      "elapsed_seconds": 19.398,
+      "stage": "上市与发行信息",
+      "stage_completed": 4,
+      "stage_total": 200,
+      "overall_percent": 40,
+      "message": "上市与发行信息 4/200"
+    },
+    {
+      "elapsed_seconds": 19.71,
+      "stage": "上市与发行信息",
+      "stage_completed": 13,
+      "stage_total": 200,
+      "overall_percent": 41,
+      "message": "上市与发行信息 13/200"
+    },
+    {
+      "elapsed_seconds": 20.239,
+      "stage": "上市与发行信息",
+      "stage_completed": 23,
+      "stage_total": 200,
+      "overall_percent": 42,
+      "message": "上市与发行信息 23/200"
+    },
+    {
+      "elapsed_seconds": 20.743,
+      "stage": "上市与发行信息",
+      "stage_completed": 33,
+      "stage_total": 200,
+      "overall_percent": 43,
+      "message": "上市与发行信息 33/200"
+    },
+    {
+      "elapsed_seconds": 21.216,
+      "stage": "上市与发行信息",
+      "stage_completed": 42,
+      "stage_total": 200,
+      "overall_percent": 44,
+      "message": "上市与发行信息 42/200"
+    },
+    {
+      "elapsed_seconds": 21.712,
+      "stage": "上市与发行信息",
+      "stage_completed": 52,
+      "stage_total": 200,
+      "overall_percent": 45,
+      "message": "上市与发行信息 52/200"
+    },
+    {
+      "elapsed_seconds": 22.121,
+      "stage": "上市与发行信息",
+      "stage_completed": 62,
+      "stage_total": 200,
+      "overall_percent": 46,
+      "message": "上市与发行信息 62/200"
+    },
+    {
+      "elapsed_seconds": 22.57,
+      "stage": "上市与发行信息",
+      "stage_completed": 72,
+      "stage_total": 200,
+      "overall_percent": 47,
+      "message": "上市与发行信息 72/200"
+    },
+    {
+      "elapsed_seconds": 23.022,
+      "stage": "上市与发行信息",
+      "stage_completed": 81,
+      "stage_total": 200,
+      "overall_percent": 48,
+      "message": "上市与发行信息 81/200"
+    },
+    {
+      "elapsed_seconds": 23.464,
+      "stage": "上市与发行信息",
+      "stage_completed": 91,
+      "stage_total": 200,
+      "overall_percent": 49,
+      "message": "上市与发行信息 91/200"
+    },
+    {
+      "elapsed_seconds": 23.792,
+      "stage": "上市与发行信息",
+      "stage_completed": 101,
+      "stage_total": 200,
+      "overall_percent": 50,
+      "message": "上市与发行信息 101/200"
+    },
+    {
+      "elapsed_seconds": 23.952,
+      "stage": "上市与发行信息",
+      "stage_completed": 110,
+      "stage_total": 200,
+      "overall_percent": 51,
+      "message": "上市与发行信息 110/200"
+    },
+    {
+      "elapsed_seconds": 24.189,
+      "stage": "上市与发行信息",
+      "stage_completed": 120,
+      "stage_total": 200,
+      "overall_percent": 52,
+      "message": "上市与发行信息 120/200"
+    },
+    {
+      "elapsed_seconds": 24.372,
+      "stage": "上市与发行信息",
+      "stage_completed": 130,
+      "stage_total": 200,
+      "overall_percent": 53,
+      "message": "上市与发行信息 130/200"
+    },
+    {
+      "elapsed_seconds": 24.581,
+      "stage": "上市与发行信息",
+      "stage_completed": 139,
+      "stage_total": 200,
+      "overall_percent": 54,
+      "message": "上市与发行信息 139/200"
+    },
+    {
+      "elapsed_seconds": 24.828,
+      "stage": "上市与发行信息",
+      "stage_completed": 149,
+      "stage_total": 200,
+      "overall_percent": 55,
+      "message": "上市与发行信息 149/200"
+    },
+    {
+      "elapsed_seconds": 25.019,
+      "stage": "上市与发行信息",
+      "stage_completed": 159,
+      "stage_total": 200,
+      "overall_percent": 56,
+      "message": "上市与发行信息 159/200"
+    },
+    {
+      "elapsed_seconds": 25.219,
+      "stage": "上市与发行信息",
+      "stage_completed": 169,
+      "stage_total": 200,
+      "overall_percent": 57,
+      "message": "上市与发行信息 169/200"
+    },
+    {
+      "elapsed_seconds": 25.382,
+      "stage": "上市与发行信息",
+      "stage_completed": 178,
+      "stage_total": 200,
+      "overall_percent": 58,
+      "message": "上市与发行信息 178/200"
+    },
+    {
+      "elapsed_seconds": 25.598,
+      "stage": "上市与发行信息",
+      "stage_completed": 188,
+      "stage_total": 200,
+      "overall_percent": 59,
+      "message": "上市与发行信息 188/200"
+    },
+    {
+      "elapsed_seconds": 25.785,
+      "stage": "上市与发行信息",
+      "stage_completed": 198,
+      "stage_total": 200,
+      "overall_percent": 60,
+      "message": "上市与发行信息 198/200"
+    },
+    {
+      "elapsed_seconds": 25.79,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 0,
+      "stage_total": 200,
+      "overall_percent": 60,
+      "message": "开始年度全市场大宗交易"
+    },
+    {
+      "elapsed_seconds": 27.324,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 20,
+      "stage_total": 200,
+      "overall_percent": 61,
+      "message": "年度全市场大宗交易 20/200"
+    },
+    {
+      "elapsed_seconds": 27.325,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 48,
+      "stage_total": 200,
+      "overall_percent": 62,
+      "message": "年度全市场大宗交易 48/200"
+    },
+    {
+      "elapsed_seconds": 27.327,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 76,
+      "stage_total": 200,
+      "overall_percent": 63,
+      "message": "年度全市场大宗交易 76/200"
+    },
+    {
+      "elapsed_seconds": 33.071,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 103,
+      "stage_total": 200,
+      "overall_percent": 64,
+      "message": "年度全市场大宗交易 103/200"
+    },
+    {
+      "elapsed_seconds": 33.073,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 131,
+      "stage_total": 200,
+      "overall_percent": 65,
+      "message": "年度全市场大宗交易 131/200"
+    },
+    {
+      "elapsed_seconds": 33.074,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 159,
+      "stage_total": 200,
+      "overall_percent": 66,
+      "message": "年度全市场大宗交易 159/200"
+    },
+    {
+      "elapsed_seconds": 33.076,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 186,
+      "stage_total": 200,
+      "overall_percent": 67,
+      "message": "年度全市场大宗交易 186/200"
+    },
+    {
+      "elapsed_seconds": 33.078,
+      "stage": "资金流",
+      "stage_completed": 0,
+      "stage_total": 200,
+      "overall_percent": 67,
+      "message": "开始资金流"
+    },
+    {
+      "elapsed_seconds": 39.774,
+      "stage": "资金流",
+      "stage_completed": 4,
+      "stage_total": 200,
+      "overall_percent": 68,
+      "message": "资金流 4/200"
+    },
+    {
+      "elapsed_seconds": 39.844,
+      "stage": "资金流",
+      "stage_completed": 11,
+      "stage_total": 200,
+      "overall_percent": 69,
+      "message": "资金流 11/200"
+    },
+    {
+      "elapsed_seconds": 39.889,
+      "stage": "资金流",
+      "stage_completed": 18,
+      "stage_total": 200,
+      "overall_percent": 70,
+      "message": "资金流 18/200"
+    },
+    {
+      "elapsed_seconds": 39.948,
+      "stage": "资金流",
+      "stage_completed": 25,
+      "stage_total": 200,
+      "overall_percent": 71,
+      "message": "资金流 25/200"
+    },
+    {
+      "elapsed_seconds": 40.01,
+      "stage": "资金流",
+      "stage_completed": 32,
+      "stage_total": 200,
+      "overall_percent": 72,
+      "message": "资金流 32/200"
+    },
+    {
+      "elapsed_seconds": 40.093,
+      "stage": "资金流",
+      "stage_completed": 39,
+      "stage_total": 200,
+      "overall_percent": 73,
+      "message": "资金流 39/200"
+    },
+    {
+      "elapsed_seconds": 40.146,
+      "stage": "资金流",
+      "stage_completed": 45,
+      "stage_total": 200,
+      "overall_percent": 74,
+      "message": "资金流 45/200"
+    },
+    {
+      "elapsed_seconds": 40.217,
+      "stage": "资金流",
+      "stage_completed": 52,
+      "stage_total": 200,
+      "overall_percent": 75,
+      "message": "资金流 52/200"
+    },
+    {
+      "elapsed_seconds": 40.291,
+      "stage": "资金流",
+      "stage_completed": 59,
+      "stage_total": 200,
+      "overall_percent": 76,
+      "message": "资金流 59/200"
+    },
+    {
+      "elapsed_seconds": 40.351,
+      "stage": "资金流",
+      "stage_completed": 66,
+      "stage_total": 200,
+      "overall_percent": 77,
+      "message": "资金流 66/200"
+    },
+    {
+      "elapsed_seconds": 40.44,
+      "stage": "资金流",
+      "stage_completed": 73,
+      "stage_total": 200,
+      "overall_percent": 78,
+      "message": "资金流 73/200"
+    },
+    {
+      "elapsed_seconds": 40.509,
+      "stage": "资金流",
+      "stage_completed": 80,
+      "stage_total": 200,
+      "overall_percent": 79,
+      "message": "资金流 80/200"
+    },
+    {
+      "elapsed_seconds": 40.574,
+      "stage": "资金流",
+      "stage_completed": 87,
+      "stage_total": 200,
+      "overall_percent": 80,
+      "message": "资金流 87/200"
+    },
+    {
+      "elapsed_seconds": 40.644,
+      "stage": "资金流",
+      "stage_completed": 94,
+      "stage_total": 200,
+      "overall_percent": 81,
+      "message": "资金流 94/200"
+    },
+    {
+      "elapsed_seconds": 47.435,
+      "stage": "资金流",
+      "stage_completed": 101,
+      "stage_total": 200,
+      "overall_percent": 82,
+      "message": "资金流 101/200"
+    },
+    {
+      "elapsed_seconds": 47.435,
+      "stage": "资金流",
+      "stage_completed": 108,
+      "stage_total": 200,
+      "overall_percent": 83,
+      "message": "资金流 108/200"
+    },
+    {
+      "elapsed_seconds": 47.435,
+      "stage": "资金流",
+      "stage_completed": 115,
+      "stage_total": 200,
+      "overall_percent": 84,
+      "message": "资金流 115/200"
+    },
+    {
+      "elapsed_seconds": 47.436,
+      "stage": "资金流",
+      "stage_completed": 122,
+      "stage_total": 200,
+      "overall_percent": 85,
+      "message": "资金流 122/200"
+    },
+    {
+      "elapsed_seconds": 47.436,
+      "stage": "资金流",
+      "stage_completed": 129,
+      "stage_total": 200,
+      "overall_percent": 86,
+      "message": "资金流 129/200"
+    },
+    {
+      "elapsed_seconds": 47.436,
+      "stage": "资金流",
+      "stage_completed": 136,
+      "stage_total": 200,
+      "overall_percent": 87,
+      "message": "资金流 136/200"
+    },
+    {
+      "elapsed_seconds": 47.437,
+      "stage": "资金流",
+      "stage_completed": 142,
+      "stage_total": 200,
+      "overall_percent": 88,
+      "message": "资金流 142/200"
+    },
+    {
+      "elapsed_seconds": 47.437,
+      "stage": "资金流",
+      "stage_completed": 149,
+      "stage_total": 200,
+      "overall_percent": 89,
+      "message": "资金流 149/200"
+    },
+    {
+      "elapsed_seconds": 47.437,
+      "stage": "资金流",
+      "stage_completed": 156,
+      "stage_total": 200,
+      "overall_percent": 90,
+      "message": "资金流 156/200"
+    },
+    {
+      "elapsed_seconds": 47.438,
+      "stage": "资金流",
+      "stage_completed": 163,
+      "stage_total": 200,
+      "overall_percent": 91,
+      "message": "资金流 163/200"
+    },
+    {
+      "elapsed_seconds": 47.438,
+      "stage": "资金流",
+      "stage_completed": 170,
+      "stage_total": 200,
+      "overall_percent": 92,
+      "message": "资金流 170/200"
+    },
+    {
+      "elapsed_seconds": 47.438,
+      "stage": "资金流",
+      "stage_completed": 177,
+      "stage_total": 200,
+      "overall_percent": 93,
+      "message": "资金流 177/200"
+    },
+    {
+      "elapsed_seconds": 47.439,
+      "stage": "资金流",
+      "stage_completed": 184,
+      "stage_total": 200,
+      "overall_percent": 94,
+      "message": "资金流 184/200"
+    },
+    {
+      "elapsed_seconds": 47.439,
+      "stage": "资金流",
+      "stage_completed": 191,
+      "stage_total": 200,
+      "overall_percent": 95,
+      "message": "资金流 191/200"
+    },
+    {
+      "elapsed_seconds": 47.439,
+      "stage": "资金流",
+      "stage_completed": 198,
+      "stage_total": 200,
+      "overall_percent": 96,
+      "message": "资金流 198/200"
+    },
+    {
+      "elapsed_seconds": 47.44,
+      "stage": "标准化、计算与校验",
+      "stage_completed": 1,
+      "stage_total": 200,
+      "overall_percent": 96,
+      "message": "长鑫科技：success"
+    },
+    {
+      "elapsed_seconds": 47.444,
+      "stage": "标准化、计算与校验",
+      "stage_completed": 61,
+      "stage_total": 200,
+      "overall_percent": 97,
+      "message": "牧原股份：success"
+    },
+    {
+      "elapsed_seconds": 47.452,
+      "stage": "标准化、计算与校验",
+      "stage_completed": 158,
+      "stage_total": 200,
+      "overall_percent": 98,
+      "message": "TECHTRONIC IND：success"
+    },
+    {
+      "elapsed_seconds": 47.456,
+      "stage": "生成 Excel",
+      "stage_completed": 0,
+      "stage_total": 200,
+      "overall_percent": 98,
+      "message": "正在写入 Excel"
+    },
+    {
+      "elapsed_seconds": 48.579,
+      "stage": "完成",
+      "stage_completed": 200,
+      "stage_total": 200,
+      "overall_percent": 100,
+      "message": "输出：artifacts\\v3_live_top100_current.xlsx"
+    }
+  ]
+}

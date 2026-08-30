@@ -1,0 +1,7 @@
+{"kind":"sheet","id":"ws/v8e463","name":"A股","index":0,"range":"A1:AB104","address":"A1:AB104"}
+{"kind":"sheet","id":"ws/4g07pa","name":"港股","index":1,"range":"A1:AB104","address":"A1:AB104"}
+{"kind":"sheet","id":"ws/p7wmjx","name":"数据来源说明","index":2,"range":"A1:K21","address":"A1:K21"}
+{"kind":"sheet","id":"ws/dqo8pr","name":"历史数据","index":3,"range":"A1:AF201","address":"A1:AF201"}
+{"kind":"sheet","id":"ws/nmded0","name":"数据来源","index":4,"range":"A1:M801","address":"A1:M801"}
+{"kind":"sheet","id":"ws/6sz2pg","name":"异常记录","index":5,"range":"A1:L2","address":"A1:L2"}
+{"kind":"sheet","id":"ws/81tv8v","name":"运行信息","index":6,"range":"A1:B28","address":"A1:B28"}

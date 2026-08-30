@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "version": "0.3.2",
+  "checks": {
+    "resources": {
+      "ok": true,
+      "template": "D:\\python_software\\StockAnalysis\\artifacts\\smoke_032_final2\\股票 分析\\StockAnalysis\\_internal\\resources\\templates\\分析表.xlsx",
+      "fixture": "D:\\python_software\\StockAnalysis\\artifacts\\smoke_032_final2\\股票 分析\\StockAnalysis\\_internal\\resources\\fixtures\\market_data.json"
+    },
+    "paths": {
+      "ok": true,
+      "data_root": "C:\\Users\\chdxm\\AppData\\Local\\Temp\\StockAnalysis_selftest_z34kp8_u\\runtime"
+    },
+    "qt": {
+      "ok": true,
+      "plugins": "D:/python_software/StockAnalysis/artifacts/smoke_032_final2/股票 分析/StockAnalysis/_internal/PySide6/plugins"
+    },
+    "database": {
+      "ok": true
+    },
+    "fixture_export": {
+      "ok": true,
+      "rows": 8,
+      "output": "C:\\Users\\chdxm\\AppData\\Local\\Temp\\StockAnalysis_selftest_z34kp8_u\\股票分析 自检.xlsx"
+    }
+  }
+}

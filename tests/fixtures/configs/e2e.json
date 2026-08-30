@@ -1,0 +1,14 @@
+{
+  "financial_year": 2025,
+  "trading_year": 2025,
+  "markets": ["A股", "港股"],
+  "include_st": true,
+  "include_financial": true,
+  "update_mode": "优先缓存",
+  "output_directory": "build/e2e_output",
+  "test_mode": true,
+  "fixture_mode": true,
+  "concurrency": 4,
+  "request_interval": 0.0,
+  "use_system_proxy": true
+}

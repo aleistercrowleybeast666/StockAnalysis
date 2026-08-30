@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-30T13:44:57+08:00",
+  "workbook": "C:\\Users\\chdxm\\Downloads\\股票分析表_20260830_130121.xlsx",
+  "coverage_definition": "numeric_count / applicable_count；applicable_count = company_count - dash_count",
+  "sheets": {
+    "A股": {
+      "header_row": 4,
+      "company_count": 100,
+      "fields": {
+        "发行时总市值": {
+          "field": "发行时总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "市值增长率": {
+          "field": "市值增长率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "当年累计大宗交易笔数": {
+          "field": "当年累计大宗交易笔数",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "当年累计大宗交易金额": {
+          "field": "当年累计大宗交易金额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "近五个交易日资金净额": {
+          "field": "近五个交易日资金净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "近一月资金净额（最近22个交易日）": {
+          "field": "近一月资金净额（最近22个交易日）",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        }
+      }
+    },
+    "港股": {
+      "header_row": 4,
+      "company_count": 100,
+      "fields": {
+        "发行时总市值": {
+          "field": "发行时总市值",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "市值增长率": {
+          "field": "市值增长率",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "当年累计大宗交易笔数": {
+          "field": "当年累计大宗交易笔数",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "当年累计大宗交易金额": {
+          "field": "当年累计大宗交易金额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "近五个交易日资金净额": {
+          "field": "近五个交易日资金净额",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        },
+        "近一月资金净额（最近22个交易日）": {
+          "field": "近一月资金净额（最近22个交易日）",
+          "company_count": 100,
+          "applicable_count": 100,
+          "numeric_count": 0,
+          "nonzero_numeric_count": 0,
+          "zero_count": 0,
+          "dash_count": 0,
+          "blank_count": 100,
+          "other_text_count": 0,
+          "coverage_rate": 0.0,
+          "all_blank": true
+        }
+      }
+    }
+  }
+}

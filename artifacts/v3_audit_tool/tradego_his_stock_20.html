@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+<title>欢迎来到港股大趋势研究世界....</title>
+<link  rel="Stylesheet" href="../Style/Stylesheet.css" />
+<script  type="text/javascript"  src="../script/JScript.js"></script>
+<script  type="text/javascript"  src="../script/jquery.min.js"></script>
+<script>
+
+var _Than=20; //时间天数
+var _PageSize=50; //每页多少条
+var pageFirst=0; //第几条开始
+var _cSort=0;//升降序. 1=升序, 0=降序
+var _sortID=173;//排序列ID.  -1 表示不排序
+
+$(document).ready(function()
+{ 
+    StockMoeny();
+     $("#Main_MF thead th").click(function()
+  {
+     var OID = $(this).attr("id");
+     if(OID==undefined) return;
+     if(_cSort==0) _cSort=1;
+     else _cSort=0;
+     _sortID=OID;StockMoeny();
+  });
+});
+
+function StockMoeny()
+{
+//        var Str = _Than;
+        var Str=_Than+"."+_PageSize+"."+_cSort+"."+pageFirst+"."+_sortID;
+        $.getJSON("../RDS.aspx?callback=?",{code:Str,PkgType:12012,val:1,Meath: Math.random()},
+        function(_Json){
+        var arr = new Array();
+        $.each(_Json.His,function(Index,Content){
+        arr.push("<tr>");
+        //arr.push("<th><a href=\"../HK/Info.aspx?q="+MarketCode(Content._Code,0)+"\">"+Content._Name.substring(0,6)+"</a></th>");
+        arr.push("<th><a href=\"../stock/"+MarketCode(Content._Code,0)+".htm\">"+Content._Name.substring(0,6)+"</a></th>");
+        arr.push("<td>"+Content.InFlow+"</td>");
+        arr.push("<td>"+Content.OutFlow+"</td>");
+        arr.push("<td>"+Content.NetIn+"</td>");
+        arr.push("<td>"+Content.NetPer+"</td>");
+        arr.push("<td>"+Content.fAmount+"</td>");//成交额
+        arr.push("<td>"+Content.InDay+"</td>");
+        arr.push("<td>"+Content.fPhaseChgPer+"</td>");//阶段涨幅
+        arr.push("<td>"+Content.fPhaseHSL+"</td>");//阶段换手
+        if(Content.fChgPer>0){
+            arr.push("<td class=\"red\">"+Content.fPrice+"</td>");//现价
+        }if(Content.fChgPer<0){
+            arr.push("<td class=\"grren\">"+Content.fPrice+"</td>");
+        }
+        arr.push("<td>"+ GetColor2DEC(Content.fChgPer,0) +"</td>");//涨幅
+//      Arr.push("<td>"+ GetColor2DEC(Content.c,0) +"</td>");
+        arr.push("</tr>");
+        });
+         $("#"+_sortID).siblings().removeClass("headerSortUp");	
+         $("#"+_sortID).siblings().removeClass("headerSortDown");	
+         $("#"+_sortID).removeClass("headerSortUp")
+         $("#"+_sortID).removeClass("headerSortDown")
+        $("#Main_MF tbody").children().remove();
+        $(arr.join('')).appendTo("#Main_MF tbody");
+         if(_cSort==0)
+        $("#"+_sortID).addClass("headerSortUp");
+        else   $("#"+_sortID).addClass("headerSortDown");
+         $("#M_Tit").text($("#"+_sortID).attr("title"));
+        });  
+} 
+</script>
+
+<style>
+.Mleft{ width:180px; float:left;}
+.MRight{ margin-left:2px; float:left; width:778px}
+.MLtitle{background:url(../images/treeitembg.gif) no-repeat; height:25px; line-height:25px; color:#003679; font-size:14px; padding-left:10px; font-weight:bold}
+.ML_UL{ margin-left:15px}
+.ML_UL li{  line-height:25px;  padding:0 5px;}
+.ML_UL li ul{ margin-left:4px;}
+.ML_UL li._Parent{background:url(/images/_Down.gif) no-repeat 145px 8px; border-bottom:solid 1px #EAEAEA;   cursor:pointer;  }
+.ML_UL li ul li{ background:none}
+.ML_UL li a{ padding-left:6px;background:url(../images/point.gif) no-repeat 0px 4px}
+.ML_UL li.on{ border-top:#0A5895 2px solid;  background:#ffffff;height:24px; border-bottom:none; color:#333; font-weight:bold}
+.tab_li thead th{ cursor:pointer}
+.red{ color:Red}
+.grren{ color:Green;}
+</style>
+</head>
+<body>
+   <div class="Main HTop"> 
+<div style="float:left">
+<img src="http://data.tradego8.com/Images/logo.gif" />
+</div>
+<div class="Menu">
+<ul>
+<li><a href="http://data.tradego8.com/" class="Foc" target="_blank">首页</a>
+<a href="http://data.tradego8.com/Quote/Default.aspx" target="_blank">行情</a>
+<a href="http://data.tradego8.com/hk/industry.aspx" target="_blank">行业表现</a>
+<a href="http://data.tradego8.com/indices/ShortSelling.aspx" target="_blank">市场沽空</a>
+<!--<a href="http://data.tradego8.com/US/Default.aspx" class="UST" title="全新美股行情" target="_blank">美股行情</a>-->
+<a href="http://data.tradego8.com/ADR.aspx" target="_blank">ADR行情</a>
+<a href="http://data.tradego8.com/CashFlow/Default.aspx" title="港股 资金流向" target="_blank">资金流向</a>
+<a href="http://data.tradego8.com/HK/Broker_Unusual.aspx" title="港股 券商追踪" target="_blank">券商追踪</a>
+<a href="http://data.tradego8.com/HK/HK_Trade.aspx" title="港股 券商成交排名" target="_blank">券商成交排名</a>
+<a href="http://data.tradego8.com/Warrant/Default.aspx" target="_blank">窝轮/牛熊证</a> 
+<a href="http://data.tradego8.com/Warrant/CBBC_List.aspx" target="_blank">牛熊证指南</a>
+<a href="http://data.tradego8.com/Warrant/Warrant_List.aspx" target="_blank">窝轮指南</a>
+<a href="http://data.tradego8.com/CBBC/Quantity.aspx" target="_blank">恒指街货量</a>
+<a href="http://data.tradego8.com/HK/CorrelationPrice.aspx" target="_blank">未平仓合约</a></li>
+<li>
+<a href="http://data.tradego8.com/News/Default.aspx"  title="港股资讯" target="_blank">资讯</a>
+<a href="http://data.tradego8.com/News/Default.aspx?Kind=c00001"  title="港股要闻" target="_blank">港股要闻</a>
+<a href="http://data.tradego8.com/News/Default.aspx?Kind=c00004"  title="港股 个股动态" target="_blank">个股动态</a>
+<a href="http://data.tradego8.com/News/Focus.aspx"  title="港股 个股动态" target="_blank">焦点新闻</a>
+<a href="http://data.tradego8.com/HK/HK_IIS.aspx"  title="港股 焦点新闻 财经要闻" target="_blank">港股公告</a>
+<a href="http://data.tradego8.com/News/Default.aspx?Kind=konson"  title="市场快讯" target="_blank">市场快讯</a>
+<a href="http://ft.iqdii.com/views/eipo/eipo" class="New"  title="新股IPO" target="_blank">新股IPO</a>
+           券商持股异动   券商追踪   股份解码   券商 </li>
+</ul>
+</div>
+</div>
+
+<!--<div class="Main">
+  <a href="http://www.tsci.com.cn/sj/index.html" target="_blank"><img src="http://data.tradego8.com/Images/Data_AD.gif" border="0" /></a></div>-->
+
+<div class="Main">
+<script  type="text/javascript" src="http://data.tradego8.com/script/jquery.cookies.2.2.0.min.js"></script>
+<script  type="text/javascript"  src="http://data.tradego8.com/script/jquery.marquee.js"></script>
+<script  type="text/javascript"  src="http://data.tradego8.com/script/jquery.autocomplete.min.js"></script>
+<link  rel="Stylesheet" href="http://data.tradego8.com/script/jquery.autocomplete.css" />
+<link id="SkinSet" type="text/css" rel="Stylesheet"/>
+<div class="Srcoll"><font class="Srcotit">关键指数：</font><div id="Srcoll" class="Sr_coll"><ul></ul></div></div>
+<form id="SreachCode" name="SreachCode" method="get" action="/StkSelect.aspx" target="_blank" onsubmit="return SendSearchUrl()">
+<div class="TopSreach">
+<div class="sreachFrom"> 
+<table  border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td style="width:60px">     
+<select id="SelectType" class="sBox">
+  <option value="0" selected="selected" >全部</option>
+  <option value="100">港股</option>
+  <option value="800">美股</option>
+</select></td>
+<td><input id="KeyCode" type="text"  name="KeyCode" maxlength="50" class="SInput" onfocus="if(this.value=='代码/拼音') {this.value='';this.style.color='#333';}" value="代码/拼音" /></td>
+<td><input id="Button1"  type="submit" value="Go" class="SetBon"/> </td>
+</tr></table>
+</div><div class="InAd">
+<a href="http://www.tsci.com.cn/da/index.html" target="_blank">把握趋势,成为赢家 港股大趋势免费下载</a>
+<a href="http://www.tsci.com.cn/products.html" target="_blank">2013登上港股快车,投资港股首选 快!</a>
+<a href="https://itunes.apple.com/cn/app/gang-gu-kuai-che2012qi-jian/id508264085?mt=8" target="_blank">iTunes App Store iPad HD版</a>
+<a href="http://data.tradego8.com/News/Focus.aspx" target="_blank">港股每日必读</a>
+</div>
+</div></form>
+<div id="HotStock" class="SubTools"></div> 
+<script> PublicPageLoad();</script>
+<div class="HotInfo">
+<ul><li class="betit"><a href="/hk/industrymore.aspx?q=Block" title="查看更多港股热门行业&#13;按平均行业涨幅%得出" target="_blank">热门行业</a></li><li id="HotBlock" style="width:450px"></li> <li class="betit" style="border-left:1px solid #ccc;"><a href="/hk/industrymore.aspx?q=Hkgn" title="查看更多热门概念 &#13;按平均概念板块涨幅%得出" target="_blank">热门概念</a></li><li id="HoGn" style="width:375px"></li></ul>
+</div>
+<div style="height:3px; overflow:hidden"></div>
+</div>
+<div class="Main"><a href="http://jyb.iqdii.com" target="_blank"><img src="http://www.tsci.com.cn/Sina/guang/images/banner5.jpg" width="960" border="0"></a></div>
+
+
+<div class="Main">
+ <div class="Mleft">
+   <div class="MLtitle"><a href=MarketMF.aspx>市场资金流向</a></div>
+    <ul class="ML_UL">
+       <li><a href="MF_Block.aspx">板块资金净流入排名</a></li>
+       <li><a href="MF_Block.aspx?T=6">板块资金净流入率排名</a></li>
+       <li><a href="MF_Block.aspx?T=3">板块资金流入排名</a></li>
+       <li><a href="MF_Block.aspx?T=4">板块资金流出排名</a></li></ul>
+       <div class="MLtitle">个股资金流向</div>
+       <ul class="ML_UL">
+       <li><a href="MF_Stock.aspx">资金净流入排名</a></li>
+       <li><a href="MF_Stock.aspx?T=103">资金净流入率排名</a></li>
+       <li><a href="MF_Stock.aspx?T=100">资金流入排名</a></li>
+       <li><a href="MF_Stock.aspx?T=101">资金流出排名</a></li>
+       <li><a href="MF_Stock.aspx?T=122">散户净流入排名</a></li>
+       <li><a href="MF_Stock.aspx?T=119">主力净流入排名</a></li>
+       </ul>
+        <div class="MLtitle">个股资金阶段统计</div> 
+         <ul class="ML_UL">
+       <li><a href="MF_His_stock.aspx?Time=3&A=0&T=143">近三日</a>
+       
+            <ul>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=143">资金净流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=145">资金净流入率排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=141">资金流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=142">资金流出排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=144">资金成交额排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=146">资金涨幅排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=3&A=0&T=147">阶段换手率排名</a></li>
+            </ul></li>
+        <li><a href="MF_His_stock.aspx?Time=5&A=0&T=153">近五日</a>
+       
+            <ul>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=153">资金净流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=155">资金净流入率排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=151">资金流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=152">资金流出排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=154">资金成交额排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=156">资金涨幅排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=5&A=0&T=157">阶段换手率排名</a></li>
+            </ul></li>
+             <li><a href="MF_His_stock.aspx?Time=20&A=0&T=173">近二十日</a>
+       
+            <ul>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=173">资金净流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=175">资金净流入率排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=171">资金流入排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=172">资金流出排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=174">资金成交额排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=176">资金涨幅排名</a></li>
+            <li><a href="MF_His_stock.aspx?Time=20&A=0&T=177">阶段换手率排名</a></li>
+            </ul></li>
+       </ul>
+ </div>
+ <div class="Box" style="background:#ffffff">
+<div id="divv" class="TopHead" style="color:#0100A3">
+    <ul><li>
+    近二十日个股资金    
+    <font id="M_Tit">资金阶段</font>排名<li class="more"> </li></ul>
+</div>
+<div class="Hq_Top" style="color:Gray">注：点击每列标题可排序。例如：点击"凈流入"可以按凈流入排序</div>
+<table border="0" cellpadding="0" cellspacing="1" id="Main_MF" class="tab_li">
+<thead><tr>
+  <td>名称</td>
+  
+  
+  <th id="171" title="流入金额">日流入金额</th>
+  <th id="172" title="流出金额">流出金额</th>
+  <th id="173" title="凈流入">凈流入</th>
+  <th id="175" title="凈流入率">凈流入率%</th>
+  <th id="174" title="成交金额">成交金额</th>
+  <th title="累计流入(天)">累计流入(天)</th>
+  <th id="176" title="阶段涨幅%" class="right">阶段涨幅%</th>
+  <th id="177" title="阶段换手率%" class="right">阶段换手率%</th>
+  
+  <th class="right">现价</th>
+  <th class="right">涨幅%</th>
+</tr></thead>
+<tbody></tbody>                      
+</table>
+<div class="Alert"><font id="Block_Update"></font>股份报价有关资料至少延迟15分钟以上</div>
+</div>
+</div>
+ <div class="Main" style="clear:both; height:5px; background:#fff"></div>
+<div class="Main" style="background:#fff">
+<div class="foot">CopyRight ©2012 港信软件（深圳）有限公司 版权所有 <a href="http://www.miibeian.gov.cn/">粵ICP備09047797號</a>
+<br>
+所提供之信息，不能保证其完全实时或完全准确，也不表明证实其描述或赞同其观点。所有内容仅供参考，不构成投资建议。投资者据此操作，风险自担。<br></div></div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "financial_year": 2025,
+  "trading_year": 2025,
+  "markets": ["A股"],
+  "include_st": true,
+  "include_financial": true,
+  "update_mode": "强制刷新",
+  "flow_mode": "快速模式（默认）",
+  "network_mode": "国内数据源优先直连",
+  "output_directory": "D:/python_software/StockAnalysis/artifacts/performance_output",
+  "test_mode": false,
+  "fixture_mode": false,
+  "max_a_share_companies": 10,
+  "max_hk_companies": 0,
+  "concurrency": 4,
+  "request_interval": 0.05
+}

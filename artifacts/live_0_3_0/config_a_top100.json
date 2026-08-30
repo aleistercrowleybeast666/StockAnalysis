@@ -1,0 +1,19 @@
+{
+  "financial_year": 2025,
+  "trading_year": 2025,
+  "markets": ["A股"],
+  "a_share_scope_mode": "总市值前 N 家",
+  "a_share_top_n": 100,
+  "hk_scope_mode": "总市值前 N 家",
+  "hk_top_n": 100,
+  "include_a_share_flow": false,
+  "include_st": true,
+  "include_financial": true,
+  "update_mode": "优先缓存",
+  "network_mode": "国内数据源优先直连",
+  "output_directory": "D:/python_software/StockAnalysis/artifacts/live_0_3_0",
+  "test_mode": false,
+  "fixture_mode": false,
+  "concurrency": 4,
+  "request_interval": 0.05
+}

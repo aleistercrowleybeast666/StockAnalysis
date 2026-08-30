@@ -1,0 +1,47 @@
+name: Build macOS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout dispatched commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Create isolated environment
+        run: ./scripts/bootstrap_macos.sh
+
+      - name: Test, build, smoke, and package app
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ./scripts/build_macos_onedir.sh
+
+      - name: Verify native app and hashes
+        run: |
+          test -x dist/mac/StockAnalysis.app/Contents/MacOS/StockAnalysis
+          test -s dist/mac/StockAnalysis_macOS.zip
+          test -s dist/mac/SHA256SUMS.txt
+          test -s dist/mac/BUILD_REPORT_macOS.md
+          (cd dist/mac && shasum -a 256 -c SHA256SUMS.txt)
+          codesign -dv --verbose=2 dist/mac/StockAnalysis.app || true
+
+      - name: Upload complete macOS distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: StockAnalysis-macOS-${{ github.sha }}
+          path: dist/mac
+          if-no-files-found: error
+          retention-days: 14

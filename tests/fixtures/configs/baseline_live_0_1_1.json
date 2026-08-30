@@ -1,0 +1,16 @@
+{
+  "financial_year": 2024,
+  "trading_year": 2025,
+  "markets": ["A股", "港股"],
+  "include_st": true,
+  "include_financial": true,
+  "update_mode": "强制刷新",
+  "output_directory": "D:/python_software/StockAnalysis/build/baseline_output",
+  "test_mode": false,
+  "fixture_mode": false,
+  "max_a_share_companies": 2,
+  "max_hk_companies": 1,
+  "concurrency": 3,
+  "request_interval": 0.05,
+  "use_system_proxy": true
+}
