@@ -16,6 +16,7 @@ from stock_analysis.sources.eastmoney import EastmoneySource
 from stock_analysis.sources.etnet import EtnetSource
 from stock_analysis.sources.fx import FxRate
 from stock_analysis.sources.hkex import HkexBlockTradeSource
+from stock_analysis.sources.sina import SinaSource
 from stock_analysis.sources.tencent import TencentQuoteSource
 from stock_analysis.sources.tonghuashun import TonghuashunSource
 from stock_analysis.sources.tradego import TradegoSource
@@ -190,6 +191,212 @@ def test_tonghuashun_flow_uses_latest_daily_series_for_5_and_22_days() -> None:
         result.provenance.field_statuses["近一月资金净额（最近22个交易日）"]
         is DataStatus.OK
     )
+
+
+def test_tonghuashun_f10_flow_table_parses_real_rows_and_independent_windows() -> None:
+    start = date(2026, 7, 1)
+    rows = "".join(
+        f"<tr><td>{(start + timedelta(days=index)).isoformat()}</td>"
+        f"<td>10.00</td><td>0.00%</td><td>{index + 1}</td><td>0</td></tr>"
+        for index in range(22)
+    )
+    payload = (
+        "<table><tr><th>日期</th><th>收盘价</th><th>涨跌幅</th>"
+        f"<th>资金净流入</th><th>5日主力净额</th></tr>{rows}</table>"
+    ).encode()
+    security = Security(Market.A_SHARE, "SSE", "600519", "贵州茅台")
+
+    result = TonghuashunSource(FakeBytesClient(payload)).Flow_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.five_day_net == pytest.approx(sum(range(18, 23)) * 10_000)
+    assert result.value.one_month_net == pytest.approx(sum(range(1, 23)) * 10_000)
+    assert "f10.10jqka.com.cn" in result.provenance.source_ref
+
+
+def test_tonghuashun_structured_concepts_and_bse_market_ids() -> None:
+    client = FakeClient(
+        {
+            "tonghuashun-concepts-920001": {
+                "data": {
+                    "conceptInfo": {
+                        "concepts": [
+                            {"conceptName": "人工智能"},
+                            {"conceptName": " 人工智能 "},
+                            {"conceptName": "专精特新"},
+                        ]
+                    }
+                }
+            }
+        }
+    )
+    security = Security(Market.A_SHARE, "BSE", "920001", "北交所公司")
+
+    result = TonghuashunSource(client).Concepts_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value == ("人工智能", "专精特新")
+    assert client.calls[-1]["params"]["marketId"] == "151"
+    assert TonghuashunSource._MarketId_Get(  # noqa: SLF001
+        Security(Market.A_SHARE, "BSE", "430047", "旧北交所代码")
+    ) == "145"
+
+
+def test_tonghuashun_bse_concepts_fall_back_to_official_legacy_code() -> None:
+    client = FakeClient(
+        {
+            "tonghuashun-concepts-920001": {
+                "data": {"conceptInfo": {"concepts": []}}
+            },
+            "tonghuashun-concepts-920001-via-873001": {
+                "data": {
+                    "conceptInfo": {
+                        "concepts": [{"conceptName": "专精特新"}]
+                    }
+                }
+            },
+        }
+    )
+    security = Security(
+        Market.A_SHARE,
+        "BSE",
+        "920001",
+        "纬达光电",
+        legacy_codes=("873001",),
+    )
+
+    result = TonghuashunSource(client).Concepts_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value == ("专精特新",)
+    assert client.requests == [
+        "tonghuashun-concepts-920001",
+        "tonghuashun-concepts-920001-via-873001",
+    ]
+    assert client.calls[-1]["params"] == {"code": "873001", "marketId": "145"}
+    assert "920001->873001" in result.provenance.source_ref
+
+
+def test_tonghuashun_bse_flow_falls_back_to_official_legacy_code() -> None:
+    current_payload = b"<html><body>no historical rows</body></html>"
+    start = date(2026, 7, 1)
+    rows = "".join(
+        f"<tr><td>{(start + timedelta(days=index)).isoformat()}</td>"
+        f"<td>10.00</td><td>0.00%</td><td>{index + 1}</td><td>0</td></tr>"
+        for index in range(22)
+    )
+    legacy_payload = (
+        "<table><tr><th>日期</th><th>收盘价</th><th>涨跌幅</th>"
+        f"<th>资金净流入</th><th>5日主力净额</th></tr>{rows}</table>"
+    ).encode()
+    client = MappedBytesClient(
+        {
+            "tonghuashun-flow-920001": current_payload,
+            "tonghuashun-flow-920001-via-873001": legacy_payload,
+        }
+    )
+    security = Security(
+        Market.A_SHARE,
+        "BSE",
+        "920001",
+        "纬达光电",
+        legacy_codes=("873001",),
+    )
+
+    result = TonghuashunSource(client).Flow_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.security_key == security.key
+    assert result.value.five_day_net == pytest.approx(sum(range(18, 23)) * 10_000)
+    assert result.value.one_month_net == pytest.approx(sum(range(1, 23)) * 10_000)
+    assert client.requests == [
+        "tonghuashun-flow-920001",
+        "tonghuashun-flow-920001-via-873001",
+    ]
+    assert "920001->873001" in result.provenance.source_ref
+
+
+def test_etnet_profile_parses_business_nature_and_related_indexes() -> None:
+    payload = b"""
+    <table>
+      <tr><td>Business Nature</td></tr><tr><td>Online services (Internet)</td></tr>
+      <tr><td>Related Indexes</td></tr><tr>
+        <td><a>Hang Seng Index</a></td><td>Hang Seng TECH Index</td>
+      </tr><tr><td>Major Shareholders</td></tr>
+    </table>
+    """
+    security = Security(Market.HK, "HKEX", "00700", "TENCENT")
+
+    result = EtnetSource(FakeBytesClient(payload)).Profile_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.industry == "Internet"
+    assert result.value.concepts == ("Hang Seng Index", "Hang Seng TECH Index")
+
+
+def test_aastocks_profile_fallback_parses_industry_and_deduplicates_indexes() -> None:
+    payload = b"""
+    <table>
+      <tr><td>Industry</td><td>Banking</td></tr>
+      <tr><td>Related Indexes</td><td><a>Hang Seng Index</a></td>
+      <td><a>Hang Seng Index</a></td><td><a>Hang Seng China Enterprises Index</a></td></tr>
+      <tr><td>Major Shareholders</td></tr>
+    </table>
+    """
+    security = Security(Market.HK, "HKEX", "00005", "HSBC HOLDINGS")
+
+    result = AastocksSource(FakeBytesClient(payload)).Profile_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.industry == "Banking"
+    assert result.value.is_financial is True
+    assert result.value.concepts == (
+        "Hang Seng Index",
+        "Hang Seng China Enterprises Index",
+    )
+
+
+def test_sina_quote_and_related_index_fallbacks() -> None:
+    quote_fields = [""] * 31
+    quote_fields[3] = "12.34"
+    quote_fields[30] = "2026-08-31"
+    quote_payload = f'var hq_str_sh600519="{",".join(quote_fields)}";'.encode("gb18030")
+    security = Security(Market.A_SHARE, "SSE", "600519", "贵州茅台")
+
+    quote = SinaSource(FakeBytesClient(quote_payload)).Quote_Fetch(security)  # type: ignore[arg-type]
+
+    assert quote.value is not None
+    assert quote.value.price == pytest.approx(12.34)
+    assert quote.value.quote_date == date(2026, 8, 31)
+    related_payload = """
+    <table><tr><th>指数名称</th><th>指数代码</th><th>纳入日期</th><th>调出日期</th></tr>
+      <tr><td>白酒概念</td><td>BK0896</td><td>2020-01-01</td><td></td></tr>
+      <tr><td>已调出指数</td><td>000001</td><td>2020-01-01</td><td>2025-01-01</td></tr>
+    </table>
+    """.encode("gb18030")
+    concepts = SinaSource(FakeBytesClient(related_payload)).Concepts_Fetch(security)  # type: ignore[arg-type]
+    assert concepts.value == ("白酒概念",)
+
+
+def test_sina_flow_uses_exact_five_and_twenty_two_trading_day_windows() -> None:
+    rows = [
+        {
+            "opendate": (date(2026, 7, 20) + timedelta(days=index)).isoformat(),
+            "r0_net": str(index + 1),
+        }
+        for index in range(30)
+    ]
+    payload = json.dumps(rows).encode("utf-8")
+    security = Security(Market.A_SHARE, "BSE", "920002", "万达轴承")
+
+    result = SinaSource(FakeBytesClient(payload)).Flow_Fetch(security)  # type: ignore[arg-type]
+
+    assert result.value is not None
+    assert result.value.five_day_net == pytest.approx(sum(range(26, 31)))
+    assert result.value.one_month_net == pytest.approx(sum(range(9, 31)))
+    assert result.value.end_date == date(2026, 8, 18)
+    assert "daima=bj920002" in result.provenance.source_ref
+    assert result.provenance.field_statuses[
+        "近一月资金净额（最近22个交易日）"
+    ] is DataStatus.OK
 
 
 def test_security_list_paginates_and_maps_flags() -> None:

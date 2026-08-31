@@ -319,9 +319,82 @@ class MarketDataSource(ABC):
     def Flow_Fetch(self, security: Security) -> SourceValue[FlowData]: ...
 
     def Quotes_Fetch(
-        self, securities: Sequence[Security]
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
     ) -> dict[str, SourceValue[Quote]]:
-        return {security.key: self.Quote_Fetch(security) for security in securities}
+        results: dict[str, SourceValue[Quote]] = {}
+        for security in securities:
+            results[security.key] = self.Quote_Fetch(security)
+            if progress_callback is not None:
+                progress_callback(security)
+        return results
+
+    def OutputQuote_Fetch(
+        self,
+        security: Security,
+        primary: SourceValue[Quote] | None = None,
+    ) -> SourceValue[Quote]:
+        return primary if primary is not None else self.Quote_Fetch(security)
+
+    def Profiles_Fetch(
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
+    ) -> dict[str, SourceValue[Security]]:
+        results: dict[str, SourceValue[Security]] = {}
+        for security in securities:
+            statuses = {
+                "板块": DataStatus.OK if security.board else DataStatus.MISSING,
+                "行业": DataStatus.OK if security.industry else DataStatus.MISSING,
+            }
+            results[security.key] = SourceValue(
+                security,
+                Provenance_Create(
+                    security,
+                    "板块与行业",
+                    self.source_name,
+                    "证券列表元数据",
+                    (
+                        DataStatus.OK
+                        if security.board or security.industry
+                        else DataStatus.OPTIONAL_MISSING
+                    ),
+                    missing_reason=(
+                        None
+                        if all(status is DataStatus.OK for status in statuses.values())
+                        else "证券列表元数据未同时提供板块和行业"
+                    ),
+                    field_statuses=statuses,
+                ),
+            )
+            if progress_callback is not None:
+                progress_callback(security)
+        return results
+
+    def Concepts_Fetch(
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
+    ) -> dict[str, SourceValue[Security]]:
+        results: dict[str, SourceValue[Security]] = {}
+        for security in securities:
+            status = DataStatus.OK if security.concepts else DataStatus.OPTIONAL_MISSING
+            results[security.key] = SourceValue(
+                security,
+                Provenance_Create(
+                    security,
+                    "概念",
+                    self.source_name,
+                    "证券列表元数据",
+                    status,
+                    missing_reason=None if security.concepts else "证券列表没有概念标签",
+                    field_statuses={"概念": status},
+                ),
+            )
+            if progress_callback is not None:
+                progress_callback(security)
+        return results
 
     def BlockTrades_Fetch(
         self,

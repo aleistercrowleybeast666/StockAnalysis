@@ -22,6 +22,7 @@ _EXCLUDED_PARTS = {
     "old",
     "archive",
     "logs",
+    "outputs",
 }
 _EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".log", ".sqlite3", ".tmp"}
 _REQUIRED_PATHS = (
@@ -63,7 +64,9 @@ def ProjectFiles_List(project_root: Path) -> list[Path]:
         directory_names[:] = [
             name
             for name in directory_names
-            if name not in _EXCLUDED_PARTS and not (current / name).is_symlink()
+            if name not in _EXCLUDED_PARTS
+            and not name.startswith(".tmp_pytest")
+            and not (current / name).is_symlink()
         ]
         for file_name in file_names:
             path = current / file_name

@@ -34,6 +34,7 @@ class HkexSecurityListSource:
                 is_financial=Security_FinancialClassify(
                     row["name"], security_code=row["code"]
                 ),
+                board=row.get("board") or None,
             )
             for row in rows
         ]

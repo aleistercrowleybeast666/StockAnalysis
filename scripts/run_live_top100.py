@@ -26,7 +26,7 @@ from stock_analysis.sources.registry import SourceRegistry_Create
 
 
 def Arguments_Parse() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="运行 A/H 各 Top N 真实网络验收")
+    parser = argparse.ArgumentParser(description="运行 A/H 真实网络验收")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--run-report", type=Path)
     parser.add_argument("--coverage-json", type=Path)
@@ -38,9 +38,20 @@ def Arguments_Parse() -> argparse.Namespace:
     )
     parser.add_argument("--year", type=int, default=date.today().year - 1)
     parser.add_argument("--top-n", type=int, default=100)
+    parser.add_argument(
+        "--all-companies",
+        action="store_true",
+        help="忽略 Top N，按 A/H 各自全部正常上市公司执行全量验收",
+    )
     parser.add_argument("--concurrency", type=int, default=8)
     parser.add_argument("--request-interval", type=float, default=0.0)
     parser.add_argument("--exclude-st", action="store_true")
+    parser.add_argument(
+        "--log-level",
+        choices=("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"),
+        default="INFO",
+        help="控制终端日志详细程度；进度阶段摘要始终输出",
+    )
     return parser.parse_args()
 
 
@@ -138,16 +149,21 @@ def Main_Run() -> int:
     )
     run_report.parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
-        level=logging.INFO,
+        level=getattr(logging, args.log_level),
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    )
+    scope_mode = (
+        MarketScopeMode.ALL
+        if args.all_companies
+        else MarketScopeMode.TOP_MARKET_CAP
     )
     config = AppConfig(
         financial_year=args.year,
         trading_year=args.year,
         markets=[Market.A_SHARE, Market.HK],
-        a_share_scope_mode=MarketScopeMode.TOP_MARKET_CAP,
+        a_share_scope_mode=scope_mode,
         a_share_top_n=args.top_n,
-        hk_scope_mode=MarketScopeMode.TOP_MARKET_CAP,
+        hk_scope_mode=scope_mode,
         hk_top_n=args.top_n,
         include_st=not args.exclude_st,
         include_financial=True,

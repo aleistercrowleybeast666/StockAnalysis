@@ -45,7 +45,8 @@ _ARTIFACT_ALLOWED = {
     "HK_COVERAGE_BASELINE.md",
     "HK_COVERAGE_FINAL.json",
     "HK_COVERAGE_FINAL.md",
-    "top100_0_5_0_release",
+    "top100_0_6_0_release",
+    "full_0_6_0_release",
 }
 
 

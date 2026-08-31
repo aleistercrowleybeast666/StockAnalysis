@@ -1,4 +1,4 @@
-# macOS 原生构建说明（0.5.0）
+# macOS 原生构建说明（0.6.0）
 
 Windows 不能交叉生成可信 `.app`。正式 macOS 产物必须由真实 Darwin 环境构建，并保留 runner、架构、测试、签名和二进制 `file` 证据。
 

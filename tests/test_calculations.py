@@ -98,3 +98,77 @@ def test_financial_company_gross_margin_is_not_applicable() -> None:
     assert record.field_statuses["毛利率同比变化（百分点）"] is DataStatus.NOT_APPLICABLE
     assert record.field_statuses["毛利率三年变化（百分点）"] is DataStatus.NOT_APPLICABLE
     assert record.field_statuses["营业收入三年 CAGR"] is DataStatus.MISSING
+
+
+def test_nonfinancial_nonpositive_revenue_marks_whole_gross_margin_family_not_applicable() -> None:
+    security = Security(Market.A_SHARE, "SSE", "600001", "测试制造公司")
+    current = FinancialPeriod(
+        security.key,
+        date(2025, 12, 31),
+        2025,
+        None,
+        "CNY",
+        0.0,
+        20.0,
+        -5.0,
+        0.0,
+    )
+    previous = FinancialPeriod(
+        security.key,
+        date(2024, 12, 31),
+        2024,
+        None,
+        "CNY",
+        100.0,
+        60.0,
+        5.0,
+        10.0,
+    )
+    base = FinancialPeriod(
+        security.key,
+        date(2022, 12, 31),
+        2022,
+        None,
+        "CNY",
+        80.0,
+        50.0,
+        4.0,
+        8.0,
+    )
+    record = AnalysisRecord(
+        security=security,
+        current=current,
+        previous=previous,
+        three_year_base=base,
+    )
+
+    Metrics_Calculate(record)
+
+    assert record.field_statuses["毛利率"] is DataStatus.NOT_APPLICABLE
+    assert record.field_statuses["毛利率同比变化（百分点）"] is DataStatus.NOT_APPLICABLE
+    assert record.field_statuses["毛利率三年变化（百分点）"] is DataStatus.NOT_APPLICABLE
+    assert record.field_statuses["营业收入三年 CAGR"] is DataStatus.NOT_APPLICABLE
+    assert record.field_statuses["归母净利润三年 CAGR"] is DataStatus.NOT_APPLICABLE
+    assert record.field_statuses["经营活动现金流三年 CAGR"] is DataStatus.NOT_APPLICABLE
+
+
+def test_cagr_history_missing_stays_blank_status_instead_of_not_applicable() -> None:
+    security = Security(Market.HK, "HKEX", "00700", "测试公司")
+    current = FinancialPeriod(
+        security.key,
+        date(2025, 12, 31),
+        2025,
+        None,
+        "HKD",
+        100.0,
+        60.0,
+        10.0,
+        8.0,
+    )
+    record = AnalysisRecord(security=security, current=current)
+
+    Metrics_Calculate(record)
+
+    assert record.field_statuses["营业收入三年 CAGR"] is DataStatus.MISSING
+    assert record.field_statuses["归母净利润三年 CAGR"] is DataStatus.MISSING
+    assert record.field_statuses["经营活动现金流三年 CAGR"] is DataStatus.MISSING

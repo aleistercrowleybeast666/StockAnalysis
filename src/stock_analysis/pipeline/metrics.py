@@ -50,7 +50,10 @@ def Metrics_Calculate(record: AnalysisRecord) -> AnalysisMetrics:
     current_cash = current.operating_cash_flow if current else None
     previous_cash = previous.operating_cash_flow if previous else None
     base_cash = base.operating_cash_flow if base else None
-    if record.security.is_financial:
+    gross_margin_not_applicable = record.security.is_financial or (
+        current_revenue is not None and current_revenue <= 0
+    )
+    if gross_margin_not_applicable:
         current_margin = previous_margin = base_margin = None
     else:
         current_margin = Calculation_GrossMargin(
@@ -101,17 +104,17 @@ def Metrics_Calculate(record: AnalysisRecord) -> AnalysisMetrics:
             ),
             "毛利率": (
                 DataStatus.NOT_APPLICABLE
-                if record.security.is_financial and current_margin is None
+                if gross_margin_not_applicable
                 else _ValueStatus_Get(current_margin)
             ),
             "毛利率同比变化（百分点）": (
                 DataStatus.NOT_APPLICABLE
-                if record.security.is_financial
+                if gross_margin_not_applicable
                 else _ValueStatus_Get(metrics.gross_margin_yoy_change)
             ),
             "毛利率三年变化（百分点）": (
                 DataStatus.NOT_APPLICABLE
-                if record.security.is_financial
+                if gross_margin_not_applicable
                 else _ValueStatus_Get(metrics.gross_margin_three_year_change)
             ),
             "归母净利润": _ValueStatus_Get(current_profit),

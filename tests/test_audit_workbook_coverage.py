@@ -5,6 +5,7 @@ from pathlib import Path
 from openpyxl import Workbook
 
 from scripts.audit_workbook_coverage import (
+    CLASSIFICATION_FIELDS,
     TARGET_FIELDS_BY_SHEET,
     CoverageReports_Write,
     Workbook_Audit,
@@ -19,9 +20,20 @@ def _Workbook_Write(path: Path) -> None:
         sheet.append(["测试标题"])
         sheet.append([])
         sheet.append([])
-        sheet.append(["证券代码", *TARGET_FIELDS_BY_SHEET[sheet_name]])
-        sheet.append(["000001", 10, 0, "-", None, "", "2.5"])
-        sheet.append(["000002", None, 1, 0, "—", 5, "文本"])
+        sheet.append(
+            [
+                "证券代码",
+                "公司名称",
+                *CLASSIFICATION_FIELDS,
+                *TARGET_FIELDS_BY_SHEET[sheet_name],
+            ]
+        )
+        sheet.append(
+            ["000001", "公司一", "主板", "制造业", "标签一", 10, 10, 0, "-", None, "", "2.5"]
+        )
+        sheet.append(
+            ["000002", "公司二", "主板", "制造业", "标签二", 11, None, 1, 0, "—", 5, "文本"]
+        )
     workbook.save(path)
 
 
@@ -33,7 +45,12 @@ def test_workbook_audit_distinguishes_numeric_zero_dash_and_blank(tmp_path: Path
     first = report["sheets"]["A股"]["fields"]
 
     assert report["sheets"]["A股"]["company_count"] == 2
-    assert tuple(first) == ("证券代码", *TARGET_FIELDS_BY_SHEET["A股"])
+    assert tuple(first) == (
+        "证券代码",
+        "公司名称",
+        *CLASSIFICATION_FIELDS,
+        *TARGET_FIELDS_BY_SHEET["A股"],
+    )
     assert first["证券代码"]["obtained_count"] == 2
     assert first["证券代码"]["coverage_rate"] == 1.0
     assert first["市值增长率"]["zero_count"] == 1

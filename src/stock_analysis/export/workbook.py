@@ -38,6 +38,9 @@ from stock_analysis.version import APP_DISPLAY_NAME, APP_INTERNAL_NAME, __versio
 MAIN_HEADERS = [
     "证券代码",
     "公司名称",
+    "板块",
+    "行业",
+    "概念",
     "实际报告期",
     "报表币种",
     "营业收入",
@@ -66,14 +69,17 @@ MAIN_HEADERS = [
     FLOW_ONE_MONTH_A_FIELD,
 ]
 
-_COVERAGE_COMMON_FIELDS = tuple(MAIN_HEADERS[4:-1])
+_COVERAGE_COMMON_FIELDS = (
+    *MAIN_HEADERS[2:5],
+    *MAIN_HEADERS[7:-1],
+)
 
 COVERAGE_FIELDS_BY_MARKET = {
     Market.A_SHARE: (*_COVERAGE_COMMON_FIELDS, FLOW_ONE_MONTH_A_FIELD),
     Market.HK: (*_COVERAGE_COMMON_FIELDS, FLOW_ONE_MONTH_HK_FIELD),
 }
 
-_FINANCIAL_COVERAGE_FIELDS = set(MAIN_HEADERS[4:17])
+_FINANCIAL_COVERAGE_FIELDS = set(MAIN_HEADERS[7:20])
 _DERIVED_COVERAGE_FIELDS = {
     "营业收入同比",
     "营业收入三年 CAGR",
@@ -89,6 +95,9 @@ _DERIVED_COVERAGE_FIELDS = {
 }
 _COVERAGE_FIELD_GROUPS = {
     **{field: {"年度财务"} for field in _FINANCIAL_COVERAGE_FIELDS},
+    "板块": {"板块与行业"},
+    "行业": {"板块与行业", "行业与概念"},
+    "概念": {"概念", "行业与概念"},
     "最新总市值": {"最新行情"},
     "上市日期": {"上市与发行信息"},
     "发行价": {"上市与发行信息"},
@@ -106,6 +115,10 @@ _COVERAGE_FIELD_GROUPS = {
 _COVERAGE_THRESHOLDS = {
     Market.A_SHARE: {
         **{field: 0.50 for field in COVERAGE_FIELDS_BY_MARKET[Market.A_SHARE]},
+        "板块": 0.999,
+        "行业": 0.98,
+        "概念": 0.90,
+        "最新可得价格": 0.99,
         "发行时总市值": 0.85,
         "市值增长率": 0.85,
         "当年累计大宗交易笔数": 1.0,
@@ -114,7 +127,11 @@ _COVERAGE_THRESHOLDS = {
         FLOW_ONE_MONTH_A_FIELD: 0.90,
     },
     Market.HK: {
-        field: 0.50 for field in COVERAGE_FIELDS_BY_MARKET[Market.HK]
+        **{field: 0.50 for field in COVERAGE_FIELDS_BY_MARKET[Market.HK]},
+        "板块": 0.99,
+        "行业": 0.90,
+        "概念": 0.0,
+        "最新可得价格": 0.95,
     },
 }
 
@@ -123,7 +140,7 @@ def MainHeaders_Get(market: Market, financial_year: int | None = None) -> list[s
     headers = list(MAIN_HEADERS)
     headers[-1] = FlowOneMonthField_Get(market)
     if financial_year is not None:
-        headers[4] = f"{financial_year}年营业收入"
+        headers[7] = f"{financial_year}年营业收入"
     return headers
 
 HISTORY_HEADERS = [
@@ -186,6 +203,7 @@ def _Workbook_Prepare():
     second.title = "港股"
     for name in (
         "数据来源说明",
+        "概念明细",
         "历史数据",
         "数据来源",
         "异常记录",
@@ -230,6 +248,9 @@ def _MainRow_Values(record: AnalysisRecord) -> list[object | None]:
     one_month_field = FlowOneMonthField_Get(record.security.market)
     listing_date = (ipo.listing_date if ipo else None) or record.security.listing_date
     return [
+        record.security.board,
+        record.security.industry,
+        "、".join(record.security.concepts[:12]) or None,
         _CellValue(current, "report_end"),
         _CellValue(current, "currency"),
         _StatusValue_Get(record, "营业收入", _CellValue(current, "revenue"), divisor=1e8),
@@ -267,7 +288,7 @@ def _MainRow_Values(record: AnalysisRecord) -> list[object | None]:
         _StatusValue_Get(record, "发行价", _CellValue(ipo, "issue_price")),
         _StatusValue_Get(record, "发行股数", _CellValue(ipo, "issued_shares"), divisor=1e8),
         _StatusValue_Get(record, "发行时总市值", _CellValue(ipo, "issue_market_cap"), divisor=1e8),
-        _StatusValue_Get(record, "最新价", _CellValue(quote, "price")),
+        _StatusValue_Get(record, "最新可得价格", _CellValue(quote, "price")),
         _StatusValue_Get(record, "市值增长率", metrics.market_cap_growth),
         _StatusValue_Get(record, "当年累计大宗交易笔数", _CellValue(block, "trade_count")),
         _StatusValue_Get(
@@ -343,6 +364,32 @@ def _History_Write(sheet, records: list[AnalysisRecord]) -> dict[str, int]:
     return row_map
 
 
+def _ConceptDetails_Write(sheet, records: list[AnalysisRecord]) -> None:
+    headers = ["市场", "证券代码", "公司名称", "序号", "概念/主题标签", "说明"]
+    sheet.append(headers)
+    for record in records:
+        if record.excluded_reason:
+            continue
+        for index, concept in enumerate(record.security.concepts, 1):
+            sheet.append(
+                [
+                    record.security.market.value,
+                    record.security.code,
+                    record.security.name,
+                    index,
+                    concept,
+                    (
+                        "港股为公开页面的主题/相关指数标签，不等同于 A 股概念分类"
+                        if record.security.market is Market.HK
+                        else "A股普通概念标签"
+                    ),
+                ]
+            )
+    Formatting_AuxiliarySheet(sheet, len(headers))
+    sheet.column_dimensions["E"].width = 34
+    sheet.column_dimensions["F"].width = 58
+
+
 def _Main_Write(
     sheet,
     market: Market,
@@ -382,18 +429,26 @@ def _Main_Write(
         f"{quote_date_text}｜金额单位：亿元｜股数单位：亿股"
     )
     if market is Market.A_SHARE:
-        scope = "范围：上交所、深交所、北交所普通 A 股；不含 B 股、基金、债券等非普通股票。"
+        scope = (
+            "范围：上交所、深交所、北交所普通 A 股；不含 B 股、基金、债券等非普通股票。"
+            "概念为公开来源的普通概念标签，主表最多显示 12 个，完整列表见隐藏页“概念明细”。"
+        )
     else:
         scope = (
             "范围：港交所普通股；双柜台证券按发行人去重。"
-            "港股大宗交易和资金流会自动尝试备源，无法验证时留空。"
+            "板块仅按 HKEX 官方名单标注主板/GEM；概念列为公开页面主题/相关指数标签，"
+            "不等同于 A 股概念分类。港股近一月资金净额按最近 20 个有效交易日统计，"
+            "A 股对应字段按最近 22 个有效交易日统计。"
         )
     blank_meaning = "空白表示未取得"
     if market is Market.HK:
         blank_meaning += "（港股发行资料可能因发行时间过早、网站无记录）"
     scope += (
-        f" 排序：{config.table_sort_mode.value}；“-”表示不适用，"
-        f"{blank_meaning}。"
+        f" 排序：{config.table_sort_mode.value}；说明：“-”表示指标在业务或数学上不适用；"
+        f"{blank_meaning}，即程序已尝试当前公开主数据源和备用数据源后仍无法可靠取得；"
+        "0 表示来源已确认实际数值为 0。部分历史发行资料及港股大宗交易受免费公开数据"
+        "历史覆盖限制，可能保持空白；空白不等同于 0。具体数据源、回退顺序、统计口径"
+        "和本次覆盖率见第三页“数据来源说明”。"
     )
     sheet["A2"] = scope
     headers = MainHeaders_Get(market, config.financial_year)
@@ -626,16 +681,16 @@ def _SourceGuide_Write(
     sheet.append(
         [
             "市场",
-            "字段/字段组",
+            "字段",
             "主数据源",
-            "第一备用数据源",
-            "第二备用数据源",
-            "回退触发条件",
-            "计算或统计口径",
-            "“-”适用条件",
-            "空白的含义",
+            "第一备用源",
+            "第二备用源",
+            "回退条件",
+            "计算/统计口径",
+            "不适用“-”条件",
+            "空白含义",
             "时间口径",
-            "备注/公开入口",
+            "备注",
         ]
     )
     rows = [
@@ -667,13 +722,91 @@ def _SourceGuide_Write(
         ),
         (
             "A股",
+            "板块",
+            "上交所、深交所、北交所证券列表元数据",
+            "交易所与证券代码规则",
+            "无",
+            "证券列表未直接提供板块时使用确定性代码规则",
+            "沪市主板、科创板、深市主板、创业板、北交所；批量归类，不逐家公司请求",
+            "不适用",
+            "交易所或代码不在已验证规则内",
+            "本次证券名单",
+            "不根据公司名称或规模猜测",
+        ),
+        (
+            "港股",
+            "板块",
+            "HKEX ListOfSecurities.xlsx",
+            "无",
+            "无",
+            "不使用非官方备源补写板块",
+            "仅按 HKEX 官方名单写主板或 GEM",
+            "不适用",
+            "HKEX 官方字段没有可验证分类时留空",
+            "本次证券名单",
+            "不按代码、名称、市值或规模猜测",
+        ),
+        (
+            "A股",
+            "行业",
+            "交易所证券列表批量元数据",
+            "东方财富证券池结构化行业",
+            "无",
+            "主证券列表行业字段为空时使用已取得的批量元数据",
+            "保留公开来源行业名称，并据此识别金融行业的毛利率不适用规则",
+            "不适用",
+            "批量证券池均未提供行业",
+            "本次证券名单",
+            "不逐家公司访问网页",
+        ),
+        (
+            "港股",
+            "行业",
+            "东方财富港股证券池结构化行业",
+            "ETNet Business Nature",
+            "AASTOCKS 公司资料",
+            "上一级来源行业字段为空或页面结构不可用",
+            "按字段级顺序补全，并据行业更新金融企业识别",
+            "不适用",
+            "三个已实现来源均未取得可验证行业",
+            "本次运行",
+            "公司资料按公司请求，仅对批量元数据缺失者回退",
+        ),
+        (
+            "A股",
+            "概念",
+            "同花顺公司资料结构化概念接口",
+            "新浪财经相关指数/概念页",
+            "无",
+            "同花顺请求失败、结构变化或没有概念标签",
+            "清洗、稳定去重后用“、”连接；主表最多 12 个，完整列表见隐藏页“概念明细”",
+            "不适用",
+            "主备源均没有可验证标签",
+            "本次运行",
+            "同花顺 marketId 已覆盖沪深北含旧北交所代码",
+        ),
+        (
+            "港股",
+            "概念/主题标签",
+            "ETNet Related Indexes",
+            "AASTOCKS 公司资料主题标签",
+            "无",
+            "主源没有标签或页面结构不可用",
+            "清洗、稳定去重后用“、”连接；主表最多 12 个，完整列表见隐藏页",
+            "不适用",
+            "公开页面没有可验证主题/相关指数标签",
+            "本次运行",
+            "港股标签不等同于 A 股概念分类，不为提高覆盖率而猜测",
+        ),
+        (
+            "A股",
             "营业收入、营业成本、毛利率、归母净利润、经营现金流",
             "巨潮资讯（配置官方接口时）",
             "东方财富 F10",
             "未启用未经验证的网页适配器",
             "主源未配置、请求失败、字段为空或年度不匹配",
             "完整年度、合并口径优先；取分析年、上年和三年前数据",
-            "金融企业普通毛利率不适用",
+            "金融企业，或非金融企业所选年度营业收入不大于 0 时，普通毛利率系列不适用",
             "主备源均未取得；核心营业收入缺失时跳过并补位",
             "所选完整年度、上一年、所选年减三",
             "https://www.cninfo.com.cn/ / https://data.eastmoney.com/",
@@ -686,7 +819,7 @@ def _SourceGuide_Write(
             "AASTOCKS/港交所年报（候选，未做全市场 PDF 扫描）",
             "主源请求失败、字段为空或年度不匹配；备源不可验证时不猜测",
             "非 HKD 报表按报告日公开汇率换算为 HKD",
-            "金融企业普通毛利率不适用",
+            "金融企业，或非金融企业所选年度营业收入不大于 0 时，普通毛利率系列不适用",
             "全部可靠来源均未取得；核心营业收入缺失时跳过并补位",
             "公司完整财年；港股自身历史优先，缺年时才用明确同一发行人 A 股合并历史",
             "https://emweb.securities.eastmoney.com/；已验证 03308.HK ↔ 300308.SZ",
@@ -699,8 +832,8 @@ def _SourceGuide_Write(
             "无",
             "基础年度值完整后由 Python 计算",
             "同比按相邻完整年度；CAGR 按本期和三年前；毛利率差为百分点",
-            "历史不足三年或数学上不适用",
-            "理论应有基础值但所有来源均未取得",
+            "CAGR 历史存在但本期或三年前数值不大于 0；毛利率按本表另列规则",
+            "本期、上期或三年前所需历史值未取得",
             "与所选财务年度一致",
             "不依赖 Excel 公式缓存",
         ),
@@ -709,9 +842,9 @@ def _SourceGuide_Write(
             "最新价格、总市值、行情日期",
             "东方财富批量行情",
             "腾讯行情",
-            "无可靠第二备源",
-            "主源请求失败、该证券缺失或没有真实时间字段",
-            "使用来源返回的真实行情时间 f124/时间字段，不用系统日期冒充",
+            "新浪财经行情",
+            "按价格、总市值、行情日期三个字段分别回退；任一字段为空即只补该字段",
+            "保留东方财富已取得的总市值，仅为缺失价格/日期使用备源；不用系统日期冒充",
             "不适用",
             "主备源均未取得；Top N 时无市值者不参与排名",
             "来源实际最近交易日",
@@ -721,10 +854,10 @@ def _SourceGuide_Write(
             "港股",
             "最新价格、总市值、行情日期",
             "东方财富批量行情",
+            "ETNet 实时行情页",
             "AASTOCKS 网页行情",
-            "无可靠第二备源",
-            "主源请求失败、该证券缺失或没有真实时间字段",
-            "使用网页披露的 Last Updated；金额币种 HKD",
+            "按价格、总市值、行情日期三个字段分别回退；任一字段为空即只补该字段",
+            "保留东方财富已取得的总市值；价格与日期使用网页真实 Last Updated；金额币种 HKD",
             "不适用",
             "主备源均未取得；Top N 时无市值者不参与排名",
             "来源实际最近交易日；停牌不冒充当天",
@@ -794,20 +927,20 @@ def _SourceGuide_Write(
             "不适用",
             "任一适用交易日报缺失即留空；完整覆盖且无记录才写 0",
             "所选交易统计年度",
-            "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_blocktrade.php / https://www.hkex.com.hk/eng/stat/smstat/dayquot_12m/",
+            "不得把 ETNet/AASTOCKS 部分历史直接当全年累计；免费公开历史覆盖有限，只有以后接入 HKEX 付费完整历史数据才可提高完整年度覆盖率",
         ),
         (
             "A股",
             "近 5/22 个交易日资金净额",
             "东方财富历史资金流",
-            "同花顺资金面诊股公开历史",
-            "无可靠第二备源",
+            "新浪财经 30 日主力资金历史",
+            "同花顺 F10 资金面历史表；腾讯 5 日资金流",
             "主源请求失败、字段为空、记录不足或结构不匹配",
             "5 日与 22 日独立判定：有至少 5 日即可写 5 日；只有严格 22 日才写 22 日",
             "不适用",
             "对应窗口主备源均失败或记录不足；5 日成功时不因 22 日缺失而清空",
             "最近 5/22 个有效交易日",
-            "https://data.eastmoney.com/zjlx/ / https://doctor.10jqka.com.cn/",
+            "https://data.eastmoney.com/zjlx/ / https://money.finance.sina.com.cn/moneyflow/ / https://f10.10jqka.com.cn/600519/funds/",
         ),
         (
             "港股",
@@ -1093,10 +1226,11 @@ def Workbook_Export(
     _Main_Write(workbook["A股"], Market.A_SHARE, records, row_map, config)
     _Main_Write(workbook["港股"], Market.HK, records, row_map, config)
     _SourceGuide_Write(workbook["数据来源说明"], config, records)
+    _ConceptDetails_Write(workbook["概念明细"], records)
     _Provenance_Write(workbook["数据来源"], records)
     _Issues_Write(workbook["异常记录"], records)
     _RunInfo_Write(workbook["运行信息"], config, output_path, metadata or {})
-    for name in ("历史数据", "数据来源", "异常记录", "运行信息"):
+    for name in ("概念明细", "历史数据", "数据来源", "异常记录", "运行信息"):
         workbook[name].sheet_state = "hidden"
     workbook.active = workbook.sheetnames.index("A股")
     try:
@@ -1118,6 +1252,7 @@ def Workbook_Validate(path: Path) -> None:
         "A股",
         "港股",
         "数据来源说明",
+        "概念明细",
         "历史数据",
         "数据来源",
         "异常记录",
@@ -1132,13 +1267,14 @@ def Workbook_Validate(path: Path) -> None:
     for sheet_name in ("A股", "港股"):
         sheet = workbook[sheet_name]
         market = Market.A_SHARE if sheet_name == "A股" else Market.HK
-        if sheet.max_column != 28:
-            raise ValueError(f"{sheet_name} 主表不是 28 列")
-        if [sheet.cell(4, column).value for column in range(1, 29)][0] != "证券代码":
+        if sheet.max_column != 31:
+            raise ValueError(f"{sheet_name} 主表不是 31 列")
+        headers = [sheet.cell(4, column).value for column in range(1, 32)]
+        if headers[:5] != ["证券代码", "公司名称", "板块", "行业", "概念"]:
             raise ValueError(f"{sheet_name} 表头不正确")
-        if sheet["A3"].value != "公司信息" or sheet["E3"].value != "营业收入":
+        if sheet["A3"].value != "公司信息" or sheet["H3"].value != "营业收入":
             raise ValueError(f"{sheet_name} 双层分组表头不正确")
-        if sheet["AB4"].value != FlowOneMonthField_Get(market):
+        if sheet["AE4"].value != FlowOneMonthField_Get(market):
             raise ValueError(f"{sheet_name} 近一月资金流表头与市场口径不一致")
         for row in sheet.iter_rows():
             for cell in row:
@@ -1146,3 +1282,5 @@ def Workbook_Validate(path: Path) -> None:
                     raise ValueError(f"{sheet_name}!{cell.coordinate} 包含 #REF!")
     if getattr(workbook, "_external_links", []):
         raise ValueError("工作簿包含外部链接")
+    if workbook["概念明细"].sheet_state != "hidden":
+        raise ValueError("概念明细工作表必须隐藏")

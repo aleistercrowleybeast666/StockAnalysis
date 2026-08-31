@@ -81,6 +81,13 @@ def Parser_ParseHkexWorkbook(payload: bytes) -> list[dict[str, str]]:
                 "name": values[index["Name of Securities"]],
                 "category": category,
                 "subcategory": subcategory,
+                "board": (
+                    "GEM"
+                    if "GEM" in subcategory.upper()
+                    else "主板"
+                    if "MAIN BOARD" in subcategory.upper()
+                    else ""
+                ),
             }
             if currency_index is not None and currency_index < len(values):
                 item["currency"] = values[currency_index]

@@ -9,6 +9,7 @@ from stock_analysis.domain.models import (
     FinancialPeriod,
     FlowData,
     IPOInfo,
+    Quote,
     Security,
 )
 from stock_analysis.sources.base import Provenance_Create, SourceError, SourceValue
@@ -100,6 +101,47 @@ class _SuccessfulHkexBlocks:
 
 class _Unused:
     configured = False
+
+
+class _BatchQuoteSource:
+    source_name = "东方财富"
+
+    def Quotes_Fetch(self, securities, progress_callback=None):
+        results = {}
+        for security in securities:
+            results[security.key] = SourceValue(
+                Quote(security.key, date(2026, 8, 31), None, 100.0, "CNY"),
+                Provenance_Create(
+                    security,
+                    "最新行情",
+                    self.source_name,
+                    "batch",
+                    DataStatus.OK,
+                ),
+            )
+            if progress_callback is not None:
+                progress_callback(security)
+        return results
+
+
+class _QuoteFallbackCounter:
+    source_name = "腾讯行情"
+
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def Quote_Fetch(self, security):
+        self.calls.append(security.code)
+        return SourceValue(
+            Quote(security.key, date(2026, 8, 31), 10.0, None, "CNY"),
+            Provenance_Create(
+                security,
+                "最新行情",
+                self.source_name,
+                "fallback",
+                DataStatus.OK,
+            ),
+        )
 
 
 class _EastmoneyMappedFinancials:
@@ -224,6 +266,17 @@ class _IndividualFlowFallback:
     def Flow_Fetch(self, security: Security) -> SourceValue[FlowData]:
         self.calls.append(security.code)
         return _FlowValue_Create(security, one_month_net=22.0)
+
+
+class _FailingIndividualFlowFallback:
+    source_name = "失败逐只资金流备源"
+
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def Flow_Fetch(self, security: Security) -> SourceValue[FlowData]:
+        self.calls.append(security.code)
+        raise SourceError("模拟同花顺 HTTP 403")
 
 
 class _BatchHkFlowFallback:
@@ -372,6 +425,60 @@ def test_a_flow_probe_requires_every_sample_before_fanning_out() -> None:
     assert all(results[security.key].value is not None for security in securities)
 
 
+def test_a_flow_fallback_uses_tencent_after_tonghuashun_error() -> None:
+    security = Security(Market.A_SHARE, "SSE", "600519", "贵州茅台")
+    tonghuashun = _FailingIndividualFlowFallback()
+    tencent = _IndividualFlowFallback()
+    source = LiveMarketDataSource(
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        tencent,  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        tonghuashun,  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=1,
+    )
+
+    result = source._AFlowFallback_Fetch(security)  # noqa: SLF001
+
+    assert result.value is not None
+    assert result.value.five_day_net == 5.0
+    assert tonghuashun.calls == [security.code]
+    assert tencent.calls == [security.code]
+    assert "模拟同花顺 HTTP 403" in result.provenance.source_ref
+
+
+def test_a_flow_fallback_prefers_complete_sina_history() -> None:
+    security = Security(Market.A_SHARE, "BSE", "920002", "万达轴承")
+    sina = _IndividualFlowFallback()
+    tonghuashun = _FailingIndividualFlowFallback()
+    tencent = _IndividualFlowFallback()
+    source = LiveMarketDataSource(
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        tencent,  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        tonghuashun,  # type: ignore[arg-type]
+        sina=sina,  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=1,
+    )
+
+    result = source._AFlowFallback_Fetch(security)  # noqa: SLF001
+
+    assert result.value is not None
+    assert result.value.one_month_net == 22.0
+    assert sina.calls == [security.code]
+    assert tonghuashun.calls == []
+    assert tencent.calls == []
+
+
 def test_hk_flow_probe_requires_every_sample_before_fanning_out() -> None:
     securities = [
         Security(Market.HK, "HKEX", f"0000{index}", f"公司{index}")
@@ -448,3 +555,72 @@ def test_hk_ipo_fallback_merges_listing_fields_without_using_current_share_capit
     assert result.value.issued_shares == 100.0
     assert result.value.post_issue_total_shares is None
     assert result.value.issue_market_cap is None
+
+
+def test_quote_merge_fills_price_field_without_overwriting_primary_market_cap() -> None:
+    security = Security(Market.A_SHARE, "SSE", "600519", "贵州茅台")
+    primary = SourceValue(
+        Quote(security.key, date(2026, 8, 28), None, 1_600_000_000_000.0, "CNY"),
+        Provenance_Create(
+            security,
+            "最新行情",
+            "东方财富",
+            "batch quote",
+            DataStatus.OK,
+            field_statuses={
+                "最新可得价格": DataStatus.MISSING,
+                "最新总市值": DataStatus.OK,
+                "行情日期": DataStatus.OK,
+            },
+        ),
+    )
+    fallback = SourceValue(
+        Quote(security.key, date(2026, 8, 31), 1_300.0, 9.0, "CNY"),
+        Provenance_Create(
+            security,
+            "最新行情",
+            "腾讯行情",
+            "qt.gtimg.cn",
+            DataStatus.OK,
+        ),
+    )
+
+    result = LiveMarketDataSource._QuoteResults_Merge(  # noqa: SLF001
+        security, primary, fallback
+    )
+
+    assert result.value is not None
+    assert result.value.price == 1_300.0
+    assert result.value.market_cap == 1_600_000_000_000.0
+    assert result.value.quote_date == date(2026, 8, 31)
+    assert result.provenance.field_statuses["最新可得价格"] is DataStatus.OK
+    assert result.provenance.field_statuses["最新总市值"] is DataStatus.OK
+
+
+def test_universe_quote_batch_does_not_fan_out_fallback_until_company_is_selected() -> None:
+    fallback = _QuoteFallbackCounter()
+    source = LiveMarketDataSource(
+        _BatchQuoteSource(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        fallback,  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        _Unused(),  # type: ignore[arg-type]
+        sample_mode=True,
+        concurrency=1,
+    )
+    securities = [
+        Security(Market.A_SHARE, "SSE", f"60000{index}", f"公司{index}")
+        for index in range(3)
+    ]
+
+    ranking_quotes = source.Quotes_Fetch(securities)
+
+    assert fallback.calls == []
+    selected = securities[0]
+    output_quote = source.OutputQuote_Fetch(selected, ranking_quotes[selected.key])
+    assert fallback.calls == [selected.code]
+    assert output_quote.value is not None
+    assert output_quote.value.price == 10.0
+    assert output_quote.value.market_cap == 100.0

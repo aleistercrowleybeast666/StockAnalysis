@@ -2,12 +2,17 @@ from __future__ import annotations
 
 import html
 import re
+from dataclasses import replace
 from datetime import date, datetime
 
 from stock_analysis.domain.enums import DataStatus
 from stock_analysis.domain.fields import FLOW_FIVE_DAY_FIELD, FLOW_ONE_MONTH_HK_FIELD
 from stock_analysis.domain.models import BlockTradeData, FlowData, Quote, Security
 from stock_analysis.sources.base import HttpJsonClient, Provenance_Create, SourceValue
+from stock_analysis.sources.normalization import (
+    Security_ConceptsNormalize,
+    Security_FinancialClassify,
+)
 
 
 class AastocksSource:
@@ -15,6 +20,10 @@ class AastocksSource:
     QUOTE_URL = "https://www.aastocks.com/pkages/web/bcomsec/eng/whatshot/quote_v2.asp"
     BLOCK_URL = "https://www.aastocks.com/en/stocks/analysis/blocktrade.aspx"
     FLOW_URL = "https://www.aastocks.com/en/stocks/analysis/moneyflow.aspx"
+    PROFILE_URL = (
+        "https://www.aastocks.com/en/stocks/analysis/"
+        "company-fundamental/company-information"
+    )
 
     def __init__(self, client: HttpJsonClient) -> None:
         self._client = client
@@ -75,6 +84,64 @@ class AastocksSource:
                 original_currency="HKD",
                 standard_currency="HKD",
                 primary_source="东方财富",
+            ),
+        )
+
+    def Profile_Fetch(self, security: Security) -> SourceValue[Security]:
+        payload = self._client.RequestBytes(
+            self.PROFILE_URL,
+            params={"symbol": security.code},
+            request_id=f"aastocks-profile-{security.code}",
+            referer=(
+                "https://www.aastocks.com/en/stocks/analysis/"
+                f"company-fundamental/company-profile?symbol={security.code}"
+            ),
+            endpoint_key="aastocks-company-profile-hk",
+            headers=self._PageHeaders_Get(security.code),
+        )
+        text = html.unescape(payload.decode("utf-8", errors="replace"))
+        industry, concepts = self._Profile_Parse(text)
+        if industry is None and not concepts:
+            return SourceValue(
+                security,
+                Provenance_Create(
+                    security,
+                    "行业与概念",
+                    self.source_name,
+                    f"company-information?symbol={security.code}",
+                    DataStatus.MISSING,
+                    missing_reason="AASTOCKS 公司资料页未解析到行业或相关指数标签",
+                    primary_source="东方财富",
+                    field_statuses={
+                        "行业": DataStatus.MISSING,
+                        "概念": DataStatus.MISSING,
+                    },
+                ),
+            )
+        selected_industry = security.industry or industry
+        enriched = replace(
+            security,
+            industry=selected_industry,
+            is_financial=Security_FinancialClassify(
+                security.name,
+                selected_industry,
+                security_code=security.code,
+            ),
+            concepts=concepts or security.concepts,
+        )
+        return SourceValue(
+            enriched,
+            Provenance_Create(
+                security,
+                "行业与概念",
+                self.source_name,
+                f"company-information?symbol={security.code}",
+                DataStatus.OK,
+                primary_source="东方财富",
+                field_statuses={
+                    "行业": DataStatus.OK if selected_industry else DataStatus.MISSING,
+                    "概念": DataStatus.OK if concepts else DataStatus.MISSING,
+                },
             ),
         )
 
@@ -204,6 +271,36 @@ class AastocksSource:
                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140 Safari/537.36"
             ),
         }
+
+    @classmethod
+    def _Profile_Parse(cls, text: str) -> tuple[str | None, tuple[str, ...]]:
+        industry = None
+        industry_match = re.search(
+            r"(?:Business\s+Nature|Industry)\s*</(?:td|th)>\s*"
+            r"<(?:td|th)[^>]*>(.*?)</(?:td|th)>",
+            text,
+            re.I | re.S,
+        )
+        if industry_match:
+            value = cls._HtmlText_Get(industry_match.group(1))
+            industry = value or None
+        section_match = re.search(
+            r"(?:Related\s+Indexes|Related\s+Indices|Constituent\s+Indexes)"
+            r"(.*?)(?:Major\s+Shareholders|Related\s+Stocks|</table>)",
+            text,
+            re.I | re.S,
+        )
+        values: list[str] = []
+        if section_match:
+            for fragment in re.findall(
+                r"<(?:a|td)[^>]*>(.*?)</(?:a|td)>",
+                section_match.group(1),
+                re.I | re.S,
+            ):
+                value = cls._HtmlText_Get(fragment)
+                if value and "Index" in value:
+                    values.append(value)
+        return industry, Security_ConceptsNormalize(values)
 
     @classmethod
     def _FlowHistory_Parse(cls, text: str) -> list[tuple[date, float]]:

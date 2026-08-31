@@ -7,6 +7,7 @@ from collections.abc import Callable, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from datetime import UTC, datetime
+from math import ceil
 from pathlib import Path
 from typing import Any
 
@@ -57,6 +58,9 @@ class PipelineRunner:
     _STAGE_TIME_WEIGHTS = {
         "获取行情与市值": 8,
         "年度财务": 30,
+        "补全入选公司行情": 4,
+        "板块与行业": 3,
+        "概念": 8,
         "上市与发行信息": 20,
         "年度全市场大宗交易": 10,
         "资金流": 25,
@@ -64,7 +68,8 @@ class PipelineRunner:
         "生成 Excel": 2,
     }
     _OVERALL_WORK_UNITS = 100_000
-    _HK_ARCHIVE_SCAN_MAX_WEIGHT = 60
+    _HK_ARCHIVE_ESTIMATED_TRADING_DAYS = 250
+    _HK_ARCHIVE_DAILY_REPORT_COST = 3
 
     def __init__(
         self,
@@ -236,37 +241,44 @@ class PipelineRunner:
         stage_company_counts = {
             "获取行情与市值": len(securities),
             "年度财务": planned_company_count,
+            "补全入选公司行情": planned_company_count,
+            "板块与行业": planned_company_count,
+            "概念": planned_company_count,
             "上市与发行信息": planned_company_count,
             "年度全市场大宗交易": planned_company_count,
             "资金流": planned_company_count,
             "标准化、计算与校验": planned_company_count,
             "生成 Excel": planned_company_count,
         }
-        stage_weights = dict(self._STAGE_TIME_WEIGHTS)
+        stage_workloads = {
+            stage: self._STAGE_TIME_WEIGHTS[stage] * count
+            for stage, count in stage_company_counts.items()
+            if count > 0
+        }
+        stage_workloads["获取行情与市值"] = (
+            self._STAGE_TIME_WEIGHTS["获取行情与市值"]
+            * max(1, ceil(len(securities) / 100))
+        )
         planned_hk_count = planned_market_counts.get(Market.HK, 0)
         if (
             not self._config.fixture_mode
             and planned_hk_count > 0
             and self._config.financial_year < datetime.now().year
         ):
-            archive_scan_weight = min(
-                self._HK_ARCHIVE_SCAN_MAX_WEIGHT,
-                round(planned_hk_count * 0.6),
+            stage_workloads["年度全市场大宗交易"] += (
+                self._HK_ARCHIVE_ESTIMATED_TRADING_DAYS
+                * self._HK_ARCHIVE_DAILY_REPORT_COST
             )
-            stage_weights["年度全市场大宗交易"] += archive_scan_weight
-        active_weights = {
-            stage: stage_weights[stage]
-            for stage, count in stage_company_counts.items()
-            if count > 0
-        }
-        weight_total = sum(active_weights.values()) or 1
+        workload_total = sum(stage_workloads.values()) or 1
         self._stage_company_totals = dict(stage_company_counts)
         self._overall_work_totals = {}
         allocated = 0
-        active_stages = list(active_weights)
+        active_stages = list(stage_workloads)
         for stage in active_stages[:-1]:
             units = round(
-                self._OVERALL_WORK_UNITS * active_weights[stage] / weight_total
+                self._OVERALL_WORK_UNITS
+                * stage_workloads[stage]
+                / workload_total
             )
             self._overall_work_totals[stage] = units
             allocated += units
@@ -278,8 +290,9 @@ class PipelineRunner:
             stage: 0 for stage in self._overall_work_totals
         }
         self._logger.info(
-            "总进度计划建立：证券池=%s，预计处理公司=%s，阶段权重=%s；"
-            "准备证券范围不预占固定百分比，阶段内部按公司完成比例推进",
+            "总进度计划建立：证券池=%s，预计处理公司=%s，阶段工作量=%s；"
+            "准备证券范围不预占固定百分比，总进度按批量请求数、入选公司数和"
+            "历史交易日报扫描量动态规划，阶段内部按实际完成比例推进",
             len(securities),
             planned_company_count,
             self._overall_work_totals,
@@ -319,6 +332,9 @@ class PipelineRunner:
         records: Sequence[AnalysisRecord],
     ) -> None:
         active_count = len(active_records)
+        self._WorkPlan_StageTotalSet("补全入选公司行情", active_count)
+        self._WorkPlan_StageTotalSet("板块与行业", active_count)
+        self._WorkPlan_StageTotalSet("概念", active_count)
         self._WorkPlan_StageTotalSet("上市与发行信息", active_count)
         self._WorkPlan_StageTotalSet("年度全市场大宗交易", active_count)
         self._WorkPlan_StageTotalSet("资金流", active_count)
@@ -558,6 +574,11 @@ class PipelineRunner:
     def _Attribute_Assign(attribute: str) -> ValueAssign:
         return lambda record, value: setattr(record, attribute, value)
 
+    @staticmethod
+    def _Security_Assign(record: AnalysisRecord, value: Any | None) -> None:
+        if isinstance(value, Security):
+            record.security = value
+
     def _DirectFieldStatuses_Add(self, record: AnalysisRecord) -> None:
         quote = record.quote
         ipo = record.ipo
@@ -565,8 +586,11 @@ class PipelineRunner:
         flow = record.flow
         one_month_field = FlowOneMonthField_Get(record.security.market)
         field_values = {
+            "板块": record.security.board,
+            "行业": record.security.industry,
+            "概念": record.security.concepts or None,
             "最新总市值": quote.market_cap if quote else None,
-            "最新价": quote.price if quote else None,
+            "最新可得价格": quote.price if quote else None,
             "上市日期": (ipo.listing_date if ipo else None)
             or record.security.listing_date,
             "发行价": ipo.issue_price if ipo else None,
@@ -672,7 +696,29 @@ class PipelineRunner:
             0,
             "正在批量获取最新行情与总市值",
         )
-        results = self._coordinator.Quotes_Fetch(securities)
+        reported_keys: set[str] = set()
+
+        def progress_report(security: Security) -> None:
+            if security.key in reported_keys:
+                return
+            previous_units = self._overall_work_completed.get(stage, 0)
+            reported_keys.add(security.key)
+            completed_count = len(reported_keys)
+            self._WorkPlan_StageProgressSet(stage, completed_count)
+            if self._overall_work_completed.get(stage, 0) <= previous_units:
+                return
+            self._Progress_Emit(
+                stage,
+                security.name,
+                completed_count,
+                len(securities),
+                0,
+                0,
+                0,
+                f"批量行情与市值 {completed_count}/{len(securities)}",
+            )
+
+        results = self._coordinator.Quotes_Fetch(securities, progress_report)
         valid_count = sum(
             result.value is not None
             and result.value.market_cap is not None
@@ -1019,6 +1065,30 @@ class PipelineRunner:
                 market_stats[market] = stats
             records = active_records + skipped_records
             self._WorkPlan_DownstreamTotalsUpdate(active_records, records)
+            self._ParallelStage_Run(
+                "补全入选公司行情",
+                active_records,
+                self._coordinator.OutputQuote_Fetch,
+                self._Attribute_Assign("quote"),
+            )
+            self._BatchStage_Run(
+                "板块与行业",
+                active_records,
+                lambda progress_callback: self._coordinator.Profiles_Fetch(
+                    [record.security for record in active_records],
+                    progress_callback,
+                ),
+                self._Security_Assign,
+            )
+            self._BatchStage_Run(
+                "概念",
+                active_records,
+                lambda progress_callback: self._coordinator.Concepts_Fetch(
+                    [record.security for record in active_records],
+                    progress_callback,
+                ),
+                self._Security_Assign,
+            )
             self._ParallelStage_Run(
                 "上市与发行信息",
                 active_records,

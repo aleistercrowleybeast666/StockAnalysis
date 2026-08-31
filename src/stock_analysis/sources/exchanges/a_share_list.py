@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import logging
+from dataclasses import replace
 from datetime import date, datetime
 from typing import Any
 
 from stock_analysis.domain.enums import Market
 from stock_analysis.domain.models import Security
 from stock_analysis.sources.base import HttpJsonClient, SourceError, SourceSchemaError
-from stock_analysis.sources.normalization import Security_FinancialClassify
+from stock_analysis.sources.normalization import (
+    Security_AShareBoardGet,
+    Security_FinancialClassify,
+)
 from stock_analysis.sources.parsers import (
+    Parser_ParseHtmlTable,
     Parser_ParseJsonOrJsonp,
     Parser_ParseSzseStockWorkbook,
 )
@@ -55,6 +61,7 @@ def _Security_Create(
         is_st="ST" in normalized_name.upper(),
         is_financial=_Financial_Check(normalized_name, normalized_industry),
         industry=normalized_industry or None,
+        board=Security_AShareBoardGet(exchange, normalized_code),
     )
 
 
@@ -66,9 +73,11 @@ class OfficialAShareListSource:
     SZSE_REFERER = "https://www.szse.cn/market/product/stock/list/index.html"
     BSE_URL = "https://www.bse.cn/nqxxController/nqxxCnzq.do"
     BSE_REFERER = "https://www.bse.cn/nq/listedcompany.html"
+    BSE_CODE_MAPPING_URL = "https://www.bse.cn/service/code_mapping.html"
 
     def __init__(self, client: HttpJsonClient) -> None:
         self._client = client
+        self._logger = logging.getLogger("stock_analysis.sources.bse")
 
     def _Sse_Fetch(self) -> list[Security]:
         result: list[Security] = []
@@ -153,7 +162,42 @@ class OfficialAShareListSource:
             raise SourceSchemaError("北交所股票列表结构异常")
         return parsed[0]
 
+    def _BseCodeMapping_Fetch(self) -> dict[str, str]:
+        payload = self._client.RequestBytes(
+            self.BSE_CODE_MAPPING_URL,
+            request_id="bse-a-share-code-mapping",
+            referer="https://www.bse.cn/",
+            endpoint_key="security-code-mapping-bse",
+        )
+        rows = Parser_ParseHtmlTable(payload.decode("utf-8", errors="replace"))
+        mapping: dict[str, str] = {}
+        for row in rows:
+            if len(row) < 5:
+                continue
+            old_code = str(row[3]).strip()
+            new_code = str(row[4]).strip()
+            if (
+                len(old_code) == 6
+                and old_code.isdigit()
+                and len(new_code) == 6
+                and new_code.isdigit()
+                and new_code.startswith("92")
+                and old_code != new_code
+            ):
+                mapping[new_code] = old_code
+        if not mapping:
+            raise SourceSchemaError("北交所新旧代码对照表没有解析到有效映射")
+        return mapping
+
     def _Bse_Fetch(self) -> list[Security]:
+        try:
+            legacy_code_by_current = self._BseCodeMapping_Fetch()
+        except SourceError as error:
+            legacy_code_by_current = {}
+            self._logger.warning(
+                "北交所官方新旧代码对照表不可用；证券名单继续，但旧代码备源回退不可用：%s",
+                error,
+            )
         result: list[Security] = []
         page = 0
         total_pages = 1
@@ -177,7 +221,13 @@ class OfficialAShareListSource:
                     row.get("xxhyzl"),
                 )
                 if security is not None:
-                    result.append(security)
+                    legacy_code = legacy_code_by_current.get(security.code)
+                    result.append(
+                        replace(
+                            security,
+                            legacy_codes=(legacy_code,) if legacy_code else (),
+                        )
+                    )
             page += 1
         return result
 

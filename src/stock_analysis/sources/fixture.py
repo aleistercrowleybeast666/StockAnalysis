@@ -47,6 +47,9 @@ class FixtureSource(MarketDataSource):
             is_st=bool(row.get("is_st", False)),
             is_financial=bool(row.get("is_financial", False)),
             industry=row.get("industry"),
+            board=row.get("board"),
+            concepts=tuple(str(item) for item in row.get("concepts", [])),
+            legacy_codes=tuple(str(item) for item in row.get("legacy_codes", [])),
         )
 
     def Financials_Fetch(

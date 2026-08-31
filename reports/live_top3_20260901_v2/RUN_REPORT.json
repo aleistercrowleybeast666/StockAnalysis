@@ -1,0 +1,999 @@
+{
+  "result": "success",
+  "started_at": "2026-08-31T17:12:03.241468+00:00",
+  "finished_at": "2026-08-31T17:14:41.506443+00:00",
+  "output_path": "C:\\Windows\\Temp\\stockanalysis_live_top3_20260901_v2\\股票分析表_Top3.xlsx",
+  "record_count": 6,
+  "success_count": 6,
+  "partial_count": 0,
+  "failed_count": 0,
+  "excluded_count": 0,
+  "config": {
+    "financial_year": 2025,
+    "trading_year": 2025,
+    "markets": [
+      "A股",
+      "港股"
+    ],
+    "a_share_scope_mode": "总市值前 N 家",
+    "a_share_top_n": 3,
+    "hk_scope_mode": "总市值前 N 家",
+    "hk_top_n": 3,
+    "include_st": true,
+    "include_financial": true,
+    "table_sort_mode": "按最新总市值",
+    "network_mode": "国内数据源优先直连",
+    "output_directory": "C:\\Windows\\Temp\\stockanalysis_live_top3_20260901_v2",
+    "test_mode": false,
+    "fixture_mode": false,
+    "concurrency": 8,
+    "request_interval": 0.0
+  },
+  "performance": {
+    "http_requests": 413,
+    "http_successes": 374,
+    "http_failures": 39,
+    "http_elapsed_seconds": 853.542,
+    "retries": 12,
+    "direct_requests": 395,
+    "proxy_requests": 18,
+    "requests_by_domain": {
+      "push2delay.eastmoney.com": 124,
+      "datacenter-web.eastmoney.com": 7,
+      "datacenter.eastmoney.com": 12,
+      "emweb.securities.eastmoney.com": 3,
+      "push2his.eastmoney.com": 36,
+      "www.hkex.com.hk": 176,
+      "query.sse.com.cn": 2,
+      "www.szse.cn": 1,
+      "www.bse.cn": 17,
+      "web.ifzq.gtimg.cn": 1,
+      "www.aastocks.com": 3,
+      "data.tradego8.com": 2,
+      "stockpage.10jqka.com.cn": 3,
+      "basic.10jqka.com.cn": 1,
+      "f10.10jqka.com.cn": 3,
+      "content.etnet.com.hk": 3,
+      "www.etnet.com.hk": 19
+    },
+    "requests_by_endpoint": {
+      "security-list-港股": 34,
+      "batch-quotes-selected": 84,
+      "financial-income-a-share": 3,
+      "financial-cashflow-a-share": 3,
+      "financial-hk": 3,
+      "ipo-A股": 3,
+      "ipo-港股": 3,
+      "ipo-capital-history-a-share": 3,
+      "ipo-capital-history-hk": 3,
+      "block-trade-selected-a-share-v2": 1,
+      "flow-history-a-share-688825": 6,
+      "flow-delay-a-share-688825": 1,
+      "flow-history-a-share-601398": 6,
+      "flow-delay-a-share-601398": 1,
+      "flow-history-a-share-601939": 6,
+      "flow-delay-a-share-601939": 1,
+      "flow-history-hk-00700": 6,
+      "flow-delay-hk-00700": 1,
+      "flow-history-hk-03750": 6,
+      "flow-delay-hk-03750": 1,
+      "flow-history-hk-00005": 6,
+      "flow-delay-hk-00005": 1,
+      "security-list-hkex": 1,
+      "hkex-daily-quotation-probe": 8,
+      "hkex-daily-quotation-block-section": 167,
+      "security-list-sse": 2,
+      "security-list-szse": 1,
+      "security-list-bse": 17,
+      "hk-hsi-trading-calendar": 1,
+      "aastocks-block-00700": 1,
+      "aastocks-block-03750": 1,
+      "aastocks-block-00005": 1,
+      "tradego-hk-flow-5-day": 1,
+      "tradego-hk-flow-20-day": 1,
+      "tonghuashun-company-profile-concepts-a-share": 3,
+      "tonghuashun-equity-a-share": 1,
+      "tonghuashun-f10-funds-a-share": 3,
+      "etnet-company-profile-hk": 3,
+      "etnet-company-00005": 1,
+      "etnet-block-list-00700": 11,
+      "etnet-block-list-03750": 4,
+      "etnet-block-list-00005": 3
+    },
+    "classification": {
+      "source_counts": {
+        "板块/行业:沪深北交易所证券列表": 3,
+        "板块/行业:HKEX+东方财富": 3,
+        "行业/概念:ETNet": 3,
+        "概念:同花顺": 3
+      },
+      "batch_metadata_hits": 6,
+      "company_fallbacks": 0,
+      "profile_cache_entries": 3,
+      "company_count": 6,
+      "http_requests": 6,
+      "http_requests_per_company": 1.0
+    },
+    "run_local_reuse": 0,
+    "stage_seconds": {
+      "证券范围": 12.621,
+      "获取行情与市值": 4.134,
+      "年度财务": 0.612,
+      "补全入选公司行情": 0.001,
+      "板块与行业": 0.002,
+      "概念": 0.187,
+      "上市与发行信息": 0.363,
+      "年度全市场大宗交易": 127.534,
+      "资金流": 12.342,
+      "标准化、计算与校验": 0.001,
+      "生成 Excel": 0.4
+    },
+    "total_seconds": 158.265
+  },
+  "market_stats": {
+    "A股": {
+      "market": "A股",
+      "scope": "总市值前 N 家",
+      "identified_count": 5551,
+      "ranked_count": 5551,
+      "selected_target_count": 3,
+      "candidate_count": 3,
+      "generated_count": 3,
+      "skipped_no_core_financial_count": 0,
+      "skipped_delisted_count": 0
+    },
+    "港股": {
+      "market": "港股",
+      "scope": "总市值前 N 家",
+      "identified_count": 2751,
+      "ranked_count": 2750,
+      "selected_target_count": 3,
+      "candidate_count": 3,
+      "generated_count": 3,
+      "skipped_no_core_financial_count": 0,
+      "skipped_delisted_count": 0
+    }
+  },
+  "issue_count": 0,
+  "top_issues": [],
+  "progress_events": [
+    {
+      "elapsed_seconds": 0.395,
+      "stage": "证券范围",
+      "stage_completed": 0,
+      "stage_total": 0,
+      "overall_percent": null,
+      "message": "正在加载证券列表"
+    },
+    {
+      "elapsed_seconds": 13.017,
+      "stage": "获取行情与市值",
+      "stage_completed": 0,
+      "stage_total": 8302,
+      "overall_percent": 0,
+      "message": "正在批量获取最新行情与总市值"
+    },
+    {
+      "elapsed_seconds": 13.11,
+      "stage": "获取行情与市值",
+      "stage_completed": 127,
+      "stage_total": 8302,
+      "overall_percent": 1,
+      "message": "批量行情与市值 127/8302"
+    },
+    {
+      "elapsed_seconds": 13.212,
+      "stage": "获取行情与市值",
+      "stage_completed": 380,
+      "stage_total": 8302,
+      "overall_percent": 2,
+      "message": "批量行情与市值 380/8302"
+    },
+    {
+      "elapsed_seconds": 13.349,
+      "stage": "获取行情与市值",
+      "stage_completed": 633,
+      "stage_total": 8302,
+      "overall_percent": 3,
+      "message": "批量行情与市值 633/8302"
+    },
+    {
+      "elapsed_seconds": 13.448,
+      "stage": "获取行情与市值",
+      "stage_completed": 885,
+      "stage_total": 8302,
+      "overall_percent": 4,
+      "message": "批量行情与市值 885/8302"
+    },
+    {
+      "elapsed_seconds": 13.612,
+      "stage": "获取行情与市值",
+      "stage_completed": 1138,
+      "stage_total": 8302,
+      "overall_percent": 5,
+      "message": "批量行情与市值 1138/8302"
+    },
+    {
+      "elapsed_seconds": 13.712,
+      "stage": "获取行情与市值",
+      "stage_completed": 1391,
+      "stage_total": 8302,
+      "overall_percent": 6,
+      "message": "批量行情与市值 1391/8302"
+    },
+    {
+      "elapsed_seconds": 13.847,
+      "stage": "获取行情与市值",
+      "stage_completed": 1644,
+      "stage_total": 8302,
+      "overall_percent": 7,
+      "message": "批量行情与市值 1644/8302"
+    },
+    {
+      "elapsed_seconds": 13.939,
+      "stage": "获取行情与市值",
+      "stage_completed": 1896,
+      "stage_total": 8302,
+      "overall_percent": 8,
+      "message": "批量行情与市值 1896/8302"
+    },
+    {
+      "elapsed_seconds": 14.076,
+      "stage": "获取行情与市值",
+      "stage_completed": 2149,
+      "stage_total": 8302,
+      "overall_percent": 9,
+      "message": "批量行情与市值 2149/8302"
+    },
+    {
+      "elapsed_seconds": 14.21,
+      "stage": "获取行情与市值",
+      "stage_completed": 2402,
+      "stage_total": 8302,
+      "overall_percent": 10,
+      "message": "批量行情与市值 2402/8302"
+    },
+    {
+      "elapsed_seconds": 14.308,
+      "stage": "获取行情与市值",
+      "stage_completed": 2655,
+      "stage_total": 8302,
+      "overall_percent": 11,
+      "message": "批量行情与市值 2655/8302"
+    },
+    {
+      "elapsed_seconds": 14.44,
+      "stage": "获取行情与市值",
+      "stage_completed": 2907,
+      "stage_total": 8302,
+      "overall_percent": 12,
+      "message": "批量行情与市值 2907/8302"
+    },
+    {
+      "elapsed_seconds": 14.535,
+      "stage": "获取行情与市值",
+      "stage_completed": 3160,
+      "stage_total": 8302,
+      "overall_percent": 13,
+      "message": "批量行情与市值 3160/8302"
+    },
+    {
+      "elapsed_seconds": 14.676,
+      "stage": "获取行情与市值",
+      "stage_completed": 3413,
+      "stage_total": 8302,
+      "overall_percent": 14,
+      "message": "批量行情与市值 3413/8302"
+    },
+    {
+      "elapsed_seconds": 14.776,
+      "stage": "获取行情与市值",
+      "stage_completed": 3666,
+      "stage_total": 8302,
+      "overall_percent": 15,
+      "message": "批量行情与市值 3666/8302"
+    },
+    {
+      "elapsed_seconds": 14.914,
+      "stage": "获取行情与市值",
+      "stage_completed": 3918,
+      "stage_total": 8302,
+      "overall_percent": 16,
+      "message": "批量行情与市值 3918/8302"
+    },
+    {
+      "elapsed_seconds": 15.042,
+      "stage": "获取行情与市值",
+      "stage_completed": 4171,
+      "stage_total": 8302,
+      "overall_percent": 17,
+      "message": "批量行情与市值 4171/8302"
+    },
+    {
+      "elapsed_seconds": 15.19,
+      "stage": "获取行情与市值",
+      "stage_completed": 4424,
+      "stage_total": 8302,
+      "overall_percent": 18,
+      "message": "批量行情与市值 4424/8302"
+    },
+    {
+      "elapsed_seconds": 15.283,
+      "stage": "获取行情与市值",
+      "stage_completed": 4677,
+      "stage_total": 8302,
+      "overall_percent": 19,
+      "message": "批量行情与市值 4677/8302"
+    },
+    {
+      "elapsed_seconds": 15.419,
+      "stage": "获取行情与市值",
+      "stage_completed": 4929,
+      "stage_total": 8302,
+      "overall_percent": 20,
+      "message": "批量行情与市值 4929/8302"
+    },
+    {
+      "elapsed_seconds": 15.523,
+      "stage": "获取行情与市值",
+      "stage_completed": 5182,
+      "stage_total": 8302,
+      "overall_percent": 21,
+      "message": "批量行情与市值 5182/8302"
+    },
+    {
+      "elapsed_seconds": 15.658,
+      "stage": "获取行情与市值",
+      "stage_completed": 5435,
+      "stage_total": 8302,
+      "overall_percent": 22,
+      "message": "批量行情与市值 5435/8302"
+    },
+    {
+      "elapsed_seconds": 15.751,
+      "stage": "获取行情与市值",
+      "stage_completed": 5688,
+      "stage_total": 8302,
+      "overall_percent": 23,
+      "message": "批量行情与市值 5688/8302"
+    },
+    {
+      "elapsed_seconds": 15.883,
+      "stage": "获取行情与市值",
+      "stage_completed": 5940,
+      "stage_total": 8302,
+      "overall_percent": 24,
+      "message": "批量行情与市值 5940/8302"
+    },
+    {
+      "elapsed_seconds": 15.98,
+      "stage": "获取行情与市值",
+      "stage_completed": 6193,
+      "stage_total": 8302,
+      "overall_percent": 25,
+      "message": "批量行情与市值 6193/8302"
+    },
+    {
+      "elapsed_seconds": 16.116,
+      "stage": "获取行情与市值",
+      "stage_completed": 6446,
+      "stage_total": 8302,
+      "overall_percent": 26,
+      "message": "批量行情与市值 6446/8302"
+    },
+    {
+      "elapsed_seconds": 16.215,
+      "stage": "获取行情与市值",
+      "stage_completed": 6699,
+      "stage_total": 8302,
+      "overall_percent": 27,
+      "message": "批量行情与市值 6699/8302"
+    },
+    {
+      "elapsed_seconds": 16.348,
+      "stage": "获取行情与市值",
+      "stage_completed": 6951,
+      "stage_total": 8302,
+      "overall_percent": 28,
+      "message": "批量行情与市值 6951/8302"
+    },
+    {
+      "elapsed_seconds": 16.594,
+      "stage": "获取行情与市值",
+      "stage_completed": 7204,
+      "stage_total": 8302,
+      "overall_percent": 29,
+      "message": "批量行情与市值 7204/8302"
+    },
+    {
+      "elapsed_seconds": 16.701,
+      "stage": "获取行情与市值",
+      "stage_completed": 7457,
+      "stage_total": 8302,
+      "overall_percent": 30,
+      "message": "批量行情与市值 7457/8302"
+    },
+    {
+      "elapsed_seconds": 16.836,
+      "stage": "获取行情与市值",
+      "stage_completed": 7710,
+      "stage_total": 8302,
+      "overall_percent": 31,
+      "message": "批量行情与市值 7710/8302"
+    },
+    {
+      "elapsed_seconds": 16.937,
+      "stage": "获取行情与市值",
+      "stage_completed": 7962,
+      "stage_total": 8302,
+      "overall_percent": 32,
+      "message": "批量行情与市值 7962/8302"
+    },
+    {
+      "elapsed_seconds": 17.078,
+      "stage": "获取行情与市值",
+      "stage_completed": 8215,
+      "stage_total": 8302,
+      "overall_percent": 33,
+      "message": "批量行情与市值 8215/8302"
+    },
+    {
+      "elapsed_seconds": 17.197,
+      "stage": "年度财务",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 33,
+      "message": "正在获取A股候选公司的年度财务数据"
+    },
+    {
+      "elapsed_seconds": 17.51,
+      "stage": "年度财务",
+      "stage_completed": 1,
+      "stage_total": 6,
+      "overall_percent": 34,
+      "message": "年度财务 1/6"
+    },
+    {
+      "elapsed_seconds": 17.55,
+      "stage": "年度财务",
+      "stage_completed": 2,
+      "stage_total": 6,
+      "overall_percent": 36,
+      "message": "年度财务 2/6"
+    },
+    {
+      "elapsed_seconds": 17.637,
+      "stage": "年度财务",
+      "stage_completed": 3,
+      "stage_total": 6,
+      "overall_percent": 37,
+      "message": "年度财务 3/6"
+    },
+    {
+      "elapsed_seconds": 17.779,
+      "stage": "年度财务",
+      "stage_completed": 4,
+      "stage_total": 6,
+      "overall_percent": 39,
+      "message": "年度财务 4/6"
+    },
+    {
+      "elapsed_seconds": 17.788,
+      "stage": "年度财务",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 40,
+      "message": "年度财务 5/6"
+    },
+    {
+      "elapsed_seconds": 17.829,
+      "stage": "年度财务",
+      "stage_completed": 6,
+      "stage_total": 6,
+      "overall_percent": 42,
+      "message": "年度财务 6/6"
+    },
+    {
+      "elapsed_seconds": 17.83,
+      "stage": "补全入选公司行情",
+      "stage_completed": 1,
+      "stage_total": 6,
+      "overall_percent": 42,
+      "message": "补全入选公司行情 1/6"
+    },
+    {
+      "elapsed_seconds": 17.831,
+      "stage": "补全入选公司行情",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 43,
+      "message": "补全入选公司行情 5/6"
+    },
+    {
+      "elapsed_seconds": 17.831,
+      "stage": "板块与行业",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 43,
+      "message": "开始板块与行业"
+    },
+    {
+      "elapsed_seconds": 17.832,
+      "stage": "板块与行业",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 44,
+      "message": "板块与行业 5/6"
+    },
+    {
+      "elapsed_seconds": 17.833,
+      "stage": "概念",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 44,
+      "message": "开始概念"
+    },
+    {
+      "elapsed_seconds": 17.991,
+      "stage": "概念",
+      "stage_completed": 3,
+      "stage_total": 6,
+      "overall_percent": 45,
+      "message": "概念 3/6"
+    },
+    {
+      "elapsed_seconds": 18.017,
+      "stage": "概念",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 46,
+      "message": "概念 5/6"
+    },
+    {
+      "elapsed_seconds": 18.169,
+      "stage": "上市与发行信息",
+      "stage_completed": 1,
+      "stage_total": 6,
+      "overall_percent": 47,
+      "message": "上市与发行信息 1/6"
+    },
+    {
+      "elapsed_seconds": 18.214,
+      "stage": "上市与发行信息",
+      "stage_completed": 2,
+      "stage_total": 6,
+      "overall_percent": 48,
+      "message": "上市与发行信息 2/6"
+    },
+    {
+      "elapsed_seconds": 18.353,
+      "stage": "上市与发行信息",
+      "stage_completed": 3,
+      "stage_total": 6,
+      "overall_percent": 49,
+      "message": "上市与发行信息 3/6"
+    },
+    {
+      "elapsed_seconds": 18.364,
+      "stage": "上市与发行信息",
+      "stage_completed": 4,
+      "stage_total": 6,
+      "overall_percent": 50,
+      "message": "上市与发行信息 4/6"
+    },
+    {
+      "elapsed_seconds": 18.372,
+      "stage": "上市与发行信息",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 51,
+      "message": "上市与发行信息 5/6"
+    },
+    {
+      "elapsed_seconds": 18.383,
+      "stage": "上市与发行信息",
+      "stage_completed": 6,
+      "stage_total": 6,
+      "overall_percent": 52,
+      "message": "上市与发行信息 6/6"
+    },
+    {
+      "elapsed_seconds": 18.383,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 52,
+      "message": "开始年度全市场大宗交易"
+    },
+    {
+      "elapsed_seconds": 18.487,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 3,
+      "stage_total": 6,
+      "overall_percent": 53,
+      "message": "A 股年度大宗交易批量完成 3 家"
+    },
+    {
+      "elapsed_seconds": 19.134,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 3,
+      "stage_total": 3,
+      "overall_percent": 55,
+      "message": "ETNet 港股年度大额交易深分页完成 3 家"
+    },
+    {
+      "elapsed_seconds": 19.513,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 3,
+      "stage_total": 3,
+      "overall_percent": 56,
+      "message": "AASTOCKS 港股大额交易回退完成 3 家"
+    },
+    {
+      "elapsed_seconds": 50.941,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 3,
+      "stage_total": 156,
+      "overall_percent": 57,
+      "message": "HKEX 港股年度大宗交易公开日报 3/156"
+    },
+    {
+      "elapsed_seconds": 53.051,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 8,
+      "stage_total": 156,
+      "overall_percent": 58,
+      "message": "HKEX 港股年度大宗交易公开日报 8/156"
+    },
+    {
+      "elapsed_seconds": 56.038,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 12,
+      "stage_total": 156,
+      "overall_percent": 59,
+      "message": "HKEX 港股年度大宗交易公开日报 12/156"
+    },
+    {
+      "elapsed_seconds": 59.07,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 17,
+      "stage_total": 156,
+      "overall_percent": 60,
+      "message": "HKEX 港股年度大宗交易公开日报 17/156"
+    },
+    {
+      "elapsed_seconds": 61.207,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 21,
+      "stage_total": 156,
+      "overall_percent": 61,
+      "message": "HKEX 港股年度大宗交易公开日报 21/156"
+    },
+    {
+      "elapsed_seconds": 63.57,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 26,
+      "stage_total": 156,
+      "overall_percent": 62,
+      "message": "HKEX 港股年度大宗交易公开日报 26/156"
+    },
+    {
+      "elapsed_seconds": 67.053,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 30,
+      "stage_total": 156,
+      "overall_percent": 63,
+      "message": "HKEX 港股年度大宗交易公开日报 30/156"
+    },
+    {
+      "elapsed_seconds": 69.716,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 35,
+      "stage_total": 156,
+      "overall_percent": 64,
+      "message": "HKEX 港股年度大宗交易公开日报 35/156"
+    },
+    {
+      "elapsed_seconds": 72.949,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 39,
+      "stage_total": 156,
+      "overall_percent": 65,
+      "message": "HKEX 港股年度大宗交易公开日报 39/156"
+    },
+    {
+      "elapsed_seconds": 75.12,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 44,
+      "stage_total": 156,
+      "overall_percent": 66,
+      "message": "HKEX 港股年度大宗交易公开日报 44/156"
+    },
+    {
+      "elapsed_seconds": 78.114,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 48,
+      "stage_total": 156,
+      "overall_percent": 67,
+      "message": "HKEX 港股年度大宗交易公开日报 48/156"
+    },
+    {
+      "elapsed_seconds": 81.448,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 53,
+      "stage_total": 156,
+      "overall_percent": 68,
+      "message": "HKEX 港股年度大宗交易公开日报 53/156"
+    },
+    {
+      "elapsed_seconds": 84.218,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 57,
+      "stage_total": 156,
+      "overall_percent": 69,
+      "message": "HKEX 港股年度大宗交易公开日报 57/156"
+    },
+    {
+      "elapsed_seconds": 86.212,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 62,
+      "stage_total": 156,
+      "overall_percent": 70,
+      "message": "HKEX 港股年度大宗交易公开日报 62/156"
+    },
+    {
+      "elapsed_seconds": 88.678,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 66,
+      "stage_total": 156,
+      "overall_percent": 71,
+      "message": "HKEX 港股年度大宗交易公开日报 66/156"
+    },
+    {
+      "elapsed_seconds": 94.175,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 71,
+      "stage_total": 156,
+      "overall_percent": 72,
+      "message": "HKEX 港股年度大宗交易公开日报 71/156"
+    },
+    {
+      "elapsed_seconds": 96.869,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 75,
+      "stage_total": 156,
+      "overall_percent": 73,
+      "message": "HKEX 港股年度大宗交易公开日报 75/156"
+    },
+    {
+      "elapsed_seconds": 98.819,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 79,
+      "stage_total": 156,
+      "overall_percent": 74,
+      "message": "HKEX 港股年度大宗交易公开日报 79/156"
+    },
+    {
+      "elapsed_seconds": 103.077,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 84,
+      "stage_total": 156,
+      "overall_percent": 75,
+      "message": "HKEX 港股年度大宗交易公开日报 84/156"
+    },
+    {
+      "elapsed_seconds": 105.666,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 88,
+      "stage_total": 156,
+      "overall_percent": 76,
+      "message": "HKEX 港股年度大宗交易公开日报 88/156"
+    },
+    {
+      "elapsed_seconds": 108.902,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 93,
+      "stage_total": 156,
+      "overall_percent": 77,
+      "message": "HKEX 港股年度大宗交易公开日报 93/156"
+    },
+    {
+      "elapsed_seconds": 112.222,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 97,
+      "stage_total": 156,
+      "overall_percent": 78,
+      "message": "HKEX 港股年度大宗交易公开日报 97/156"
+    },
+    {
+      "elapsed_seconds": 116.592,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 102,
+      "stage_total": 156,
+      "overall_percent": 79,
+      "message": "HKEX 港股年度大宗交易公开日报 102/156"
+    },
+    {
+      "elapsed_seconds": 118.595,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 106,
+      "stage_total": 156,
+      "overall_percent": 80,
+      "message": "HKEX 港股年度大宗交易公开日报 106/156"
+    },
+    {
+      "elapsed_seconds": 121.616,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 111,
+      "stage_total": 156,
+      "overall_percent": 81,
+      "message": "HKEX 港股年度大宗交易公开日报 111/156"
+    },
+    {
+      "elapsed_seconds": 124.644,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 115,
+      "stage_total": 156,
+      "overall_percent": 82,
+      "message": "HKEX 港股年度大宗交易公开日报 115/156"
+    },
+    {
+      "elapsed_seconds": 126.558,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 120,
+      "stage_total": 156,
+      "overall_percent": 83,
+      "message": "HKEX 港股年度大宗交易公开日报 120/156"
+    },
+    {
+      "elapsed_seconds": 129.118,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 124,
+      "stage_total": 156,
+      "overall_percent": 84,
+      "message": "HKEX 港股年度大宗交易公开日报 124/156"
+    },
+    {
+      "elapsed_seconds": 132.175,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 129,
+      "stage_total": 156,
+      "overall_percent": 85,
+      "message": "HKEX 港股年度大宗交易公开日报 129/156"
+    },
+    {
+      "elapsed_seconds": 134.139,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 133,
+      "stage_total": 156,
+      "overall_percent": 86,
+      "message": "HKEX 港股年度大宗交易公开日报 133/156"
+    },
+    {
+      "elapsed_seconds": 136.555,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 138,
+      "stage_total": 156,
+      "overall_percent": 87,
+      "message": "HKEX 港股年度大宗交易公开日报 138/156"
+    },
+    {
+      "elapsed_seconds": 139.51,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 142,
+      "stage_total": 156,
+      "overall_percent": 88,
+      "message": "HKEX 港股年度大宗交易公开日报 142/156"
+    },
+    {
+      "elapsed_seconds": 142.324,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 147,
+      "stage_total": 156,
+      "overall_percent": 89,
+      "message": "HKEX 港股年度大宗交易公开日报 147/156"
+    },
+    {
+      "elapsed_seconds": 143.652,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 151,
+      "stage_total": 156,
+      "overall_percent": 90,
+      "message": "HKEX 港股年度大宗交易公开日报 151/156"
+    },
+    {
+      "elapsed_seconds": 145.916,
+      "stage": "年度全市场大宗交易",
+      "stage_completed": 156,
+      "stage_total": 156,
+      "overall_percent": 91,
+      "message": "HKEX 港股年度大宗交易公开日报 156/156"
+    },
+    {
+      "elapsed_seconds": 145.917,
+      "stage": "资金流",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 91,
+      "message": "开始资金流"
+    },
+    {
+      "elapsed_seconds": 151.976,
+      "stage": "资金流",
+      "stage_completed": 1,
+      "stage_total": 6,
+      "overall_percent": 93,
+      "message": "资金流 1/6"
+    },
+    {
+      "elapsed_seconds": 151.99,
+      "stage": "资金流",
+      "stage_completed": 2,
+      "stage_total": 6,
+      "overall_percent": 94,
+      "message": "资金流 2/6"
+    },
+    {
+      "elapsed_seconds": 152.184,
+      "stage": "资金流",
+      "stage_completed": 3,
+      "stage_total": 6,
+      "overall_percent": 95,
+      "message": "资金流 3/6"
+    },
+    {
+      "elapsed_seconds": 158.259,
+      "stage": "资金流",
+      "stage_completed": 4,
+      "stage_total": 6,
+      "overall_percent": 96,
+      "message": "资金流 4/6"
+    },
+    {
+      "elapsed_seconds": 158.259,
+      "stage": "资金流",
+      "stage_completed": 5,
+      "stage_total": 6,
+      "overall_percent": 98,
+      "message": "资金流 5/6"
+    },
+    {
+      "elapsed_seconds": 158.259,
+      "stage": "资金流",
+      "stage_completed": 6,
+      "stage_total": 6,
+      "overall_percent": 99,
+      "message": "资金流 6/6"
+    },
+    {
+      "elapsed_seconds": 158.259,
+      "stage": "标准化、计算与校验",
+      "stage_completed": 1,
+      "stage_total": 6,
+      "overall_percent": 99,
+      "message": "长鑫科技：success"
+    },
+    {
+      "elapsed_seconds": 158.26,
+      "stage": "生成 Excel",
+      "stage_completed": 0,
+      "stage_total": 6,
+      "overall_percent": 99,
+      "message": "正在写入 Excel"
+    },
+    {
+      "elapsed_seconds": 158.66,
+      "stage": "完成",
+      "stage_completed": 6,
+      "stage_total": 6,
+      "overall_percent": 100,
+      "message": "输出：C:\\Windows\\Temp\\stockanalysis_live_top3_20260901_v2\\股票分析表_Top3.xlsx"
+    }
+  ],
+  "coverage_gate": {
+    "passed": true,
+    "empty_numeric_columns": [],
+    "low_coverage_fields": [],
+    "rule": "有适用公司的目标字段不得整列无数值；板块/行业/概念/最新价格须达到市场覆盖率阈值"
+  }
+}

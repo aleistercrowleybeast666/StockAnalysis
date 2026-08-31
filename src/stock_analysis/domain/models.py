@@ -25,6 +25,9 @@ class Security:
     is_st: bool = False
     is_financial: bool = False
     industry: str | None = None
+    board: str | None = None
+    concepts: tuple[str, ...] = ()
+    legacy_codes: tuple[str, ...] = ()
 
     @property
     def key(self) -> str:

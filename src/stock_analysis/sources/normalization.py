@@ -124,6 +124,41 @@ def Security_ExchangeFromCode(code: str) -> str:
     return "UNKNOWN"
 
 
+def Security_AShareBoardGet(exchange: str, code: str) -> str | None:
+    """Return the listing board, never an industry or theme classification."""
+
+    normalized_exchange = str(exchange or "").upper()
+    normalized_code = re.sub(r"\D", "", str(code or ""))
+    if normalized_exchange == "BSE":
+        return "北交所"
+    if normalized_exchange == "SSE":
+        return "科创板" if normalized_code.startswith("68") else "沪市主板"
+    if normalized_exchange == "SZSE":
+        return "创业板" if normalized_code.startswith(("300", "301")) else "深市主板"
+    return None
+
+
+def Security_ConceptsNormalize(
+    values: list[str] | tuple[str, ...], *, maximum: int | None = None
+) -> tuple[str, ...]:
+    """Clean and stably deduplicate concept labels."""
+
+    result: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        text = re.sub(r"\s+", " ", str(value or "")).strip(" 、,，;；|/\t\r\n")
+        if not text:
+            continue
+        identity = text.casefold()
+        if identity in seen:
+            continue
+        seen.add(identity)
+        result.append(text)
+        if maximum is not None and len(result) >= maximum:
+            break
+    return tuple(result)
+
+
 def Security_Secucode(security_code: str, market: Market) -> str:
     if market is Market.HK:
         return f"{Security_NormalizeCode(security_code, market)}.HK"

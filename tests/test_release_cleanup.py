@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
+from scripts.collect_macos_action_artifacts import (
+    Archive_Reassemble,
+    FileHash_Get,
+    Metadata_Copy,
+)
 from scripts.package_full_project import ProjectArchive_Create
 from scripts.release_cleanup import (
     CURRENT_RELEASE_ASSETS,
@@ -104,3 +110,54 @@ def test_full_project_archive_includes_required_tree_and_excludes_runtime_data(
     assert not any(name.startswith(".venv/") for name in names)
     assert not any(name.startswith("artifacts/") for name in names)
     assert "src.zip" not in names
+
+
+def test_macos_action_parts_are_reassembled_and_crc_checked(tmp_path: Path) -> None:
+    download_root = tmp_path / "download"
+    output_root = tmp_path / "dist" / "mac"
+    source = tmp_path / "StockAnalysis_macOS_arm64.zip"
+    with ZipFile(source, "w") as archive:
+        archive.writestr("StockAnalysis.app/Contents/MacOS/StockAnalysis", b"binary")
+    payload = source.read_bytes()
+    midpoint = len(payload) // 2
+    part_names = [
+        "StockAnalysis_macOS_arm64.zip.part-00",
+        "StockAnalysis_macOS_arm64.zip.part-01",
+    ]
+    parts = [payload[:midpoint], payload[midpoint:]]
+    for name, value in zip(part_names, parts, strict=True):
+        path = download_root / name / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(value)
+    digest = FileHash_Get(source)
+    manifest = {
+        "archive": source.name,
+        "architecture": "arm64",
+        "chunk_count": 2,
+        "size": len(payload),
+        "sha256": digest,
+        "parts": [
+            {"name": name, "size": len(value)}
+            for name, value in zip(part_names, parts, strict=True)
+        ],
+    }
+    manifest_path = download_root / "metadata" / "TRANSFER_MANIFEST_arm64.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    for pattern in (
+        "ARCHITECTURE_arm64.txt",
+        "BUILD_REPORT_macOS_arm64.md",
+        "requirements-lock-macos-arm64-resolved.txt",
+        "SHA256SUMS_arm64.txt",
+    ):
+        _Touch(download_root / "metadata" / pattern)
+
+    archive, parsed, entry_count = Archive_Reassemble(
+        download_root, output_root, "arm64"
+    )
+    Metadata_Copy(download_root, output_root, "arm64")
+
+    assert parsed["sha256"] == digest
+    assert FileHash_Get(archive) == digest
+    assert entry_count == 1
+    assert (output_root / "BUILD_REPORT_macOS_arm64.md").is_file()

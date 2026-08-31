@@ -79,7 +79,9 @@ class FetchCoordinator:
         )
 
     def Quotes_Fetch(
-        self, securities: Sequence[Security]
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
     ) -> dict[str, SourceValue[Quote]]:
         results: dict[str, SourceValue[Quote]] = {}
         missing: list[Security] = []
@@ -89,16 +91,98 @@ class FetchCoordinator:
                 if key in self._values:
                     self._reuse_count += 1
                     results[security.key] = cast(SourceValue[Quote], self._values[key])
+                    if progress_callback is not None:
+                        progress_callback(security)
                 else:
                     missing.append(security)
         if missing:
-            fetched = self._source.Quotes_Fetch(missing)
+            fetcher = self._source.Quotes_Fetch
+            if "progress_callback" in signature(fetcher).parameters:
+                fetched = fetcher(missing, progress_callback)
+            else:
+                fetched = fetcher(missing)
+                if progress_callback is not None:
+                    for security in missing:
+                        progress_callback(security)
             with self._lock:
                 for security in missing:
                     value = fetched.get(security.key)
                     if value is None:
                         continue
                     self._values[f"quote:{security.key}"] = value
+                    results[security.key] = value
+        return results
+
+    def OutputQuote_Fetch(self, security: Security) -> SourceValue[Quote]:
+        with self._lock:
+            primary = cast(
+                SourceValue[Quote] | None,
+                self._values.get(f"quote:{security.key}"),
+            )
+        return self._Value_Fetch(
+            f"output-quote:{security.key}",
+            lambda: self._source.OutputQuote_Fetch(security, primary),
+        )
+
+    def Profiles_Fetch(
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
+    ) -> dict[str, SourceValue[Security]]:
+        return self._SecurityBatch_Fetch(
+            "profile",
+            securities,
+            self._source.Profiles_Fetch,
+            progress_callback,
+        )
+
+    def Concepts_Fetch(
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
+    ) -> dict[str, SourceValue[Security]]:
+        return self._SecurityBatch_Fetch(
+            "concepts",
+            securities,
+            self._source.Concepts_Fetch,
+            progress_callback,
+        )
+
+    def _SecurityBatch_Fetch(
+        self,
+        key_prefix: str,
+        securities: Sequence[Security],
+        fetcher: Callable[..., dict[str, SourceValue[Security]]],
+        progress_callback: Callable[[Security], None] | None,
+    ) -> dict[str, SourceValue[Security]]:
+        results: dict[str, SourceValue[Security]] = {}
+        missing: list[Security] = []
+        with self._lock:
+            for security in securities:
+                key = f"{key_prefix}:{security.key}"
+                if key in self._values:
+                    self._reuse_count += 1
+                    results[security.key] = cast(
+                        SourceValue[Security], self._values[key]
+                    )
+                    if progress_callback is not None:
+                        progress_callback(security)
+                else:
+                    missing.append(security)
+        if missing:
+            if "progress_callback" in signature(fetcher).parameters:
+                fetched = fetcher(missing, progress_callback)
+            else:
+                fetched = fetcher(missing)
+                if progress_callback is not None:
+                    for security in missing:
+                        progress_callback(security)
+            with self._lock:
+                for security in missing:
+                    value = fetched.get(security.key)
+                    if value is None:
+                        continue
+                    self._values[f"{key_prefix}:{security.key}"] = value
                     results[security.key] = value
         return results
 

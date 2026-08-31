@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stock-analysis"
-version = "0.5.0"
+version = "0.6.0"
 description = "Local desktop generator for A-share and Hong Kong stock analysis workbooks"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"

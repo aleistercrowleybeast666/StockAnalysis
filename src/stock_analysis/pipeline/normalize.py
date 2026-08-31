@@ -47,6 +47,11 @@ def Security_Decode(data: dict[str, Any]) -> Security:
         is_st=bool(data.get("is_st", False)),
         is_financial=bool(data.get("is_financial", False)),
         industry=data.get("industry"),
+        board=data.get("board"),
+        concepts=tuple(str(item) for item in data.get("concepts", []) if str(item).strip()),
+        legacy_codes=tuple(
+            str(item) for item in data.get("legacy_codes", []) if str(item).strip()
+        ),
     )
 
 

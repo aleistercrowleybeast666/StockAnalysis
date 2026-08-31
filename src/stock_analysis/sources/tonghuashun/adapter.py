@@ -9,15 +9,22 @@ from stock_analysis.domain.models import FlowData, Security
 from stock_analysis.sources.base import (
     HttpJsonClient,
     Provenance_Create,
+    SourceError,
+    SourceSchemaError,
     SourceValue,
 )
+from stock_analysis.sources.normalization import Security_ConceptsNormalize
 from stock_analysis.sources.parsers import Parser_ParseHtmlTable
 
 
 class TonghuashunSource:
     source_name = "同花顺"
     EQUITY_URL = "https://basic.10jqka.com.cn/{code}/equity.html"
-    FLOW_URL = "https://doctor.10jqka.com.cn/{code}/"
+    FLOW_URL = "https://f10.10jqka.com.cn/{code}/funds/"
+    CONCEPT_URL = (
+        "https://stockpage.10jqka.com.cn/stock_page/api/v1/"
+        "stockpage/company/profile"
+    )
 
     def __init__(self, client: HttpJsonClient) -> None:
         self._client = client
@@ -76,12 +83,46 @@ class TonghuashunSource:
     def Flow_Fetch(self, security: Security) -> SourceValue[FlowData]:
         if security.market is not Market.A_SHARE:
             return self._FlowMissing_Create(security, "同花顺该适配器仅用于 A 股资金流")
-        url = self.FLOW_URL.format(code=security.code)
+        missing_results: list[SourceValue[FlowData]] = []
+        errors: list[str] = []
+        for request_code in self._RequestCodes_Get(security):
+            try:
+                result = self._FlowCode_Fetch(security, request_code)
+            except SourceError as error:
+                errors.append(f"{request_code}：{error}")
+                continue
+            if result.value is not None:
+                return result
+            missing_results.append(result)
+        reasons = [
+            (
+                f"{result.provenance.source_ref}："
+                f"{result.provenance.missing_reason or '未返回有效资金流'}"
+            )
+            for result in missing_results
+        ]
+        reasons.extend(errors)
+        if not missing_results:
+            raise SourceError("；".join(reasons) or "同花顺资金流查询失败")
+        return self._FlowMissing_Create(
+            security,
+            "当前代码及北交所官方旧代码均无有效历史；" + "；".join(reasons),
+        )
+
+    def _FlowCode_Fetch(
+        self, security: Security, request_code: str
+    ) -> SourceValue[FlowData]:
+        url = self.FLOW_URL.format(code=request_code)
+        request_id = (
+            f"tonghuashun-flow-{security.code}"
+            if request_code == security.code
+            else f"tonghuashun-flow-{security.code}-via-{request_code}"
+        )
         payload = self._client.RequestBytes(
             url,
-            request_id=f"tonghuashun-flow-{security.code}",
-            referer=f"https://stockpage.10jqka.com.cn/{security.code}/Funds/",
-            endpoint_key="tonghuashun-doctor-flow-a-share",
+            request_id=request_id,
+            referer=f"https://stockpage.10jqka.com.cn/{request_code}/funds/",
+            endpoint_key="tonghuashun-f10-funds-a-share",
             headers={
                 "Accept": "text/html,application/xhtml+xml",
                 "User-Agent": (
@@ -90,12 +131,13 @@ class TonghuashunSource:
                 ),
             },
         )
-        text = payload.decode("gb18030", errors="replace")
+        text = payload.decode("utf-8", errors="replace")
         values = self._FlowHistory_Parse(text)
         if len(values) < 5:
             return self._FlowMissing_Create(
                 security,
                 f"同花顺资金面公开页仅解析到 {len(values)} 个有效交易日",
+                request_code=request_code,
             )
         five_day_net = sum(amount for _day, amount in values[-5:])
         one_month_net = (
@@ -127,8 +169,13 @@ class TonghuashunSource:
                 "资金流",
                 self.source_name,
                 (
-                    f"{url}；资金面诊股每日资金净值；"
+                    f"{url}；历史资金数据一览；"
                     f"截止={values[-1][0].isoformat()}；页面单位=万元"
+                    + (
+                        f"；北交所官方新旧代码映射={security.code}->{request_code}"
+                        if request_code != security.code
+                        else ""
+                    )
                 ),
                 DataStatus.OK,
                 original_currency="CNY",
@@ -136,6 +183,95 @@ class TonghuashunSource:
                 missing_reason=missing_reason,
                 primary_source="东方财富",
                 field_statuses=field_statuses,
+            ),
+        )
+
+    def Concepts_Fetch(self, security: Security) -> SourceValue[tuple[str, ...]]:
+        if security.market is not Market.A_SHARE:
+            return self._ConceptsMissing_Create(security, "同花顺概念仅用于 A 股")
+        missing_results: list[SourceValue[tuple[str, ...]]] = []
+        errors: list[str] = []
+        for request_code in self._RequestCodes_Get(security):
+            try:
+                result = self._ConceptsCode_Fetch(security, request_code)
+            except SourceError as error:
+                errors.append(f"{request_code}：{error}")
+                continue
+            if result.value:
+                return result
+            missing_results.append(result)
+        reasons = [
+            result.provenance.missing_reason or "未返回常规概念"
+            for result in missing_results
+        ]
+        reasons.extend(errors)
+        if not missing_results:
+            raise SourceError("；".join(reasons) or "同花顺概念查询失败")
+        return self._ConceptsMissing_Create(
+            security,
+            "当前代码及北交所官方旧代码均无有效概念；" + "；".join(reasons),
+        )
+
+    def _ConceptsCode_Fetch(
+        self, security: Security, request_code: str
+    ) -> SourceValue[tuple[str, ...]]:
+        market_id = self._MarketId_Get(security, request_code)
+        request_id = (
+            f"tonghuashun-concepts-{security.code}"
+            if request_code == security.code
+            else f"tonghuashun-concepts-{security.code}-via-{request_code}"
+        )
+        payload = self._client.RequestJson(
+            self.CONCEPT_URL,
+            params={"code": request_code, "marketId": market_id},
+            request_id=request_id,
+            referer=(
+                f"https://stockpage.10jqka.com.cn/{request_code}/corporate-profile/"
+            ),
+            endpoint_key="tonghuashun-company-profile-concepts-a-share",
+            headers={
+                "Accept": "application/json,text/plain,*/*",
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140 Safari/537.36"
+                ),
+            },
+        )
+        data = payload.get("data")
+        concept_info = data.get("conceptInfo") if isinstance(data, dict) else None
+        rows = concept_info.get("concepts") if isinstance(concept_info, dict) else None
+        values = Security_ConceptsNormalize(
+            [
+                str(row.get("conceptName") or "")
+                for row in rows or []
+                if isinstance(row, dict)
+            ]
+        )
+        if not values:
+            return self._ConceptsMissing_Create(
+                security,
+                "同花顺公司资料接口未返回常规概念",
+                request_code=request_code,
+            )
+        return SourceValue(
+            values,
+            Provenance_Create(
+                security,
+                "概念",
+                self.source_name,
+                (
+                    "stock_page/api/v1/stockpage/company/profile；"
+                    f"查询代码={request_code}；marketId={market_id}；"
+                    "conceptInfo.concepts"
+                    + (
+                        f"；北交所官方新旧代码映射={security.code}->{request_code}"
+                        if request_code != security.code
+                        else ""
+                    )
+                ),
+                DataStatus.OK,
+                primary_source=self.source_name,
+                field_statuses={"概念": DataStatus.OK},
             ),
         )
 
@@ -167,7 +303,49 @@ class TonghuashunSource:
         return number * multiplier[match.group(2)]
 
     @staticmethod
+    def _RequestCodes_Get(security: Security) -> tuple[str, ...]:
+        result = [security.code]
+        for code in security.legacy_codes:
+            normalized = str(code).strip()
+            if (
+                len(normalized) == 6
+                and normalized.isdigit()
+                and normalized not in result
+            ):
+                result.append(normalized)
+        return tuple(result)
+
+    @staticmethod
+    def _MarketId_Get(security: Security, request_code: str | None = None) -> str:
+        if security.exchange == "SSE":
+            return "17"
+        if security.exchange == "SZSE":
+            return "33"
+        code = request_code or security.code
+        return "151" if code.startswith("92") else "145"
+
+    @staticmethod
     def _FlowHistory_Parse(text: str) -> list[tuple[date, float]]:
+        table_values: dict[date, float] = {}
+        try:
+            table_rows = Parser_ParseHtmlTable(text)
+        except SourceSchemaError:
+            table_rows = []
+        for row in table_rows:
+            if len(row) < 5:
+                continue
+            day_text = re.sub(r"\D", "", row[0])
+            if len(day_text) != 8:
+                continue
+            try:
+                item_date = datetime.strptime(day_text, "%Y%m%d").date()
+                amount_wan = float(row[3].replace(",", "").strip())
+            except (TypeError, ValueError):
+                continue
+            table_values[item_date] = amount_wan * 10_000.0
+        if len(table_values) >= 5:
+            return sorted(table_values.items())
+
         candidates: list[list[tuple[date, float]]] = []
         for array_text in re.findall(r"\[[^\[\]]*\]", text, re.S):
             if '"date"' not in array_text or '"field"' not in array_text:
@@ -213,15 +391,20 @@ class TonghuashunSource:
         )
 
     def _FlowMissing_Create(
-        self, security: Security, reason: str
+        self,
+        security: Security,
+        reason: str,
+        *,
+        request_code: str | None = None,
     ) -> SourceValue[FlowData]:
+        code = request_code or security.code
         return SourceValue(
             None,
             Provenance_Create(
                 security,
                 "资金流",
                 self.source_name,
-                f"doctor.10jqka.com.cn/{security.code}/",
+                f"f10.10jqka.com.cn/{code}/funds/",
                 DataStatus.MISSING,
                 standard_currency="CNY",
                 missing_reason=reason,
@@ -230,5 +413,30 @@ class TonghuashunSource:
                     "近五个交易日资金净额": DataStatus.MISSING,
                     "近一月资金净额（最近22个交易日）": DataStatus.MISSING,
                 },
+            ),
+        )
+
+    def _ConceptsMissing_Create(
+        self,
+        security: Security,
+        reason: str,
+        *,
+        request_code: str | None = None,
+    ) -> SourceValue[tuple[str, ...]]:
+        code = request_code or security.code
+        return SourceValue(
+            None,
+            Provenance_Create(
+                security,
+                "概念",
+                self.source_name,
+                (
+                    "stock_page/api/v1/stockpage/company/profile；"
+                    f"查询代码={code}；marketId={self._MarketId_Get(security, code)}"
+                ),
+                DataStatus.MISSING,
+                missing_reason=reason,
+                primary_source=self.source_name,
+                field_statuses={"概念": DataStatus.MISSING},
             ),
         )

@@ -56,32 +56,36 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         "A股",
         "港股",
         "数据来源说明",
+        "概念明细",
         "历史数据",
         "数据来源",
         "异常记录",
         "运行信息",
     ]
     assert workbook.active.title == "A股"
-    for sheet_name in ("历史数据", "数据来源", "异常记录", "运行信息"):
+    for sheet_name in ("概念明细", "历史数据", "数据来源", "异常记录", "运行信息"):
         assert workbook[sheet_name].sheet_state == "hidden"
     for sheet_name in ("A股", "港股"):
         sheet = workbook[sheet_name]
-        assert sheet.max_column == 28
-        assert sheet.freeze_panes == "E5"
-        assert sheet.auto_filter.ref.startswith("A4:AB")
+        assert sheet.max_column == 31
+        assert sheet.freeze_panes == "H5"
+        assert sheet.auto_filter.ref.startswith("A4:AE")
         assert sheet["A3"].value == "公司信息"
-        assert sheet["E3"].value == "营业收入"
-        assert sheet["R3"].value == "上市发行与市场交易"
+        assert sheet["H3"].value == "营业收入"
+        assert sheet["U3"].value == "上市发行与市场交易"
         assert sheet["A4"].value == "证券代码"
-        assert sheet["V4"].value == "发行时总市值"
-        assert sheet["J4"].value == "毛利率三年变化（百分点）"
-        assert sheet["E5"].data_type == "n"
-        assert isinstance(sheet["E5"].value, (int, float))
-        assert sheet["Z5"].number_format == "#,##0.00;-#,##0.00;0.00"
-        assert sheet["AA5"].number_format == "#,##0.00;-#,##0.00;0.00"
-        assert sheet["E4"].fill.fgColor.rgb.endswith("E2F0D9")
-        assert sheet["R4"].fill.fgColor.rgb.endswith("DDEBF7")
-        headers = [sheet.cell(4, column).value for column in range(1, 29)]
+        assert sheet["C4"].value == "板块"
+        assert sheet["D4"].value == "行业"
+        assert sheet["E4"].value == "概念"
+        assert sheet["Y4"].value == "发行时总市值"
+        assert sheet["M4"].value == "毛利率三年变化（百分点）"
+        assert sheet["H5"].data_type == "n"
+        assert isinstance(sheet["H5"].value, (int, float))
+        assert sheet["AC5"].number_format == "#,##0.00;-#,##0.00;0.00"
+        assert sheet["AD5"].number_format == "#,##0.00;-#,##0.00;0.00"
+        assert sheet["H4"].fill.fgColor.rgb.endswith("E2F0D9")
+        assert sheet["U4"].fill.fgColor.rgb.endswith("DDEBF7")
+        headers = [sheet.cell(4, column).value for column in range(1, 32)]
         assert "字段状态摘要" not in headers
         assert "公司状态" not in headers
         assert "最新可得价格" in headers
@@ -90,16 +94,27 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
             if sheet_name == "A股"
             else "近一月资金净额（最近20个交易日）"
         )
-        assert sheet["AB4"].comment is not None
-        assert ("22" if sheet_name == "A股" else "20") in sheet["AB4"].comment.text
+        assert sheet["AE4"].comment is not None
+        assert ("22" if sheet_name == "A股" else "20") in sheet["AE4"].comment.text
+        assert "主备" in sheet["AD4"].comment.text
+        assert sheet["E4"].comment is not None
+        for coordinate in ("W4", "X4", "Y4", "AA4"):
+            assert "老上市" in sheet[coordinate].comment.text
+        for coordinate in ("K4", "L4", "M4"):
+            assert "空白表示指标理论上适用" in sheet[coordinate].comment.text
+        for coordinate in ("J4", "Q4", "T4"):
+            assert "数学上不适用" in sheet[coordinate].comment.text
+        if sheet_name == "港股":
+            assert "空白不代表没有交易" in sheet["AB4"].comment.text
+            assert "空白不代表没有交易" in sheet["AC4"].comment.text
     a_names = [workbook["A股"].cell(row, 2).value for row in range(5, workbook["A股"].max_row + 1)]
     assert a_names[:2] == ["贵州茅台", "宁德时代"]
-    assert workbook["A股"]["H8"].value == "-"
-    assert workbook["港股"]["V7"].value is None
-    assert workbook["港股"]["Y5"].value == 0
-    assert workbook["港股"]["Z5"].value == 0
-    assert workbook["港股"]["AA5"].value == 0
-    assert "空白表示未取得。" in workbook["A股"]["A2"].value
+    assert workbook["A股"]["K8"].value == "-"
+    assert workbook["港股"]["Y7"].value is None
+    assert workbook["港股"]["AB5"].value == 0
+    assert workbook["港股"]["AC5"].value == 0
+    assert workbook["港股"]["AD5"].value == 0
+    assert "空白表示未取得" in workbook["A股"]["A2"].value
     assert (
         "空白表示未取得（港股发行资料可能因发行时间过早、网站无记录）"
         in workbook["港股"]["A2"].value
@@ -110,10 +125,20 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         for row in range(2, workbook["数据来源"].max_row + 1)
     }
     assert "资金流" in source_groups
+    assert "板块与行业" in source_groups
+    assert "概念" in source_groups
+    concept_details = workbook["概念明细"]
+    assert concept_details.sheet_state == "hidden"
+    assert concept_details.max_row > 1
+    assert len(str(workbook["A股"]["E5"].value).split("、")) == 12
+    assert sum(
+        concept_details.cell(row, 2).value == "600519"
+        for row in range(2, concept_details.max_row + 1)
+    ) == 15
     source_guide = workbook["数据来源说明"]
     assert source_guide.sheet_state == "visible"
     assert source_guide.max_column == 16
-    assert source_guide.auto_filter.ref == "A5:P53"
+    assert source_guide.auto_filter.ref == "A5:P59"
     assert [source_guide.cell(5, column).value for column in range(1, 17)] == [
         "市场",
         "字段",
@@ -136,23 +161,24 @@ def test_fixture_pipeline_creates_valid_workbook(tmp_path: Path) -> None:
         row
         for row in range(1, source_guide.max_row + 1)
         if source_guide.cell(row, 1).value == "市场"
-        and source_guide.cell(row, 2).value == "字段/字段组"
+        and source_guide.cell(row, 2).value == "字段"
+        and source_guide.cell(row, 3).value == "主数据源"
     )
     assert [source_guide.cell(static_header_row, column).value for column in range(1, 12)] == [
         "市场",
-        "字段/字段组",
+        "字段",
         "主数据源",
-        "第一备用数据源",
-        "第二备用数据源",
-        "回退触发条件",
-        "计算或统计口径",
-        "“-”适用条件",
-        "空白的含义",
+        "第一备用源",
+        "第二备用源",
+        "回退条件",
+        "计算/统计口径",
+        "不适用“-”条件",
+        "空白含义",
         "时间口径",
-        "备注/公开入口",
+        "备注",
     ]
     assert source_guide["A6"].value == "A股"
-    assert source_guide["B6"].value == "营业收入"
+    assert source_guide["B6"].value == "板块"
     assert source_guide["I6"].number_format == "0.00%"
     assert "不读取或写入跨运行缓存" in source_guide["A2"].value
     assert "港股发行资料可能因发行时间过早、网站无记录" in source_guide["A2"].value

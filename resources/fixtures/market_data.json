@@ -1,16 +1,16 @@
 {
   "securities": {
     "A股": [
-      {"exchange": "SSE", "code": "600519", "name": "贵州茅台", "listing_date": "2001-08-27"},
-      {"exchange": "SZSE", "code": "000001", "name": "平安银行", "listing_date": "1991-04-03", "is_financial": true},
-      {"exchange": "SZSE", "code": "300750", "name": "宁德时代", "listing_date": "2018-06-11"},
-      {"exchange": "SSE", "code": "688981", "name": "中芯国际", "listing_date": "2020-07-16"}
+      {"exchange": "SSE", "code": "600519", "name": "贵州茅台", "listing_date": "2001-08-27", "board": "沪市主板", "industry": "白酒", "concepts": ["白酒概念", "贵州国资改革", "高股息", "消费升级", "沪股通", "融资融券", "MSCI概念", "上证50", "央视50", "大盘蓝筹", "品牌价值", "国企改革", "现金分红", "价值投资", "食品饮料"]},
+      {"exchange": "SZSE", "code": "000001", "name": "平安银行", "listing_date": "1991-04-03", "is_financial": true, "board": "深市主板", "industry": "银行", "concepts": ["跨境支付", "融资融券"]},
+      {"exchange": "SZSE", "code": "300750", "name": "宁德时代", "listing_date": "2018-06-11", "board": "创业板", "industry": "电池", "concepts": ["动力电池", "储能", "新能源汽车"]},
+      {"exchange": "SSE", "code": "688981", "name": "中芯国际", "listing_date": "2020-07-16", "board": "科创板", "industry": "半导体", "concepts": ["芯片概念", "先进封装", "国产替代"]}
     ],
     "港股": [
-      {"exchange": "HKEX", "code": "00700", "name": "腾讯控股", "listing_date": "2004-06-16"},
-      {"exchange": "HKEX", "code": "00941", "name": "中国移动", "listing_date": "1997-10-23"},
-      {"exchange": "HKEX", "code": "09988", "name": "阿里巴巴-W", "listing_date": "2019-11-26"},
-      {"exchange": "HKEX", "code": "00005", "name": "汇丰控股", "listing_date": "1980-01-02", "is_financial": true}
+      {"exchange": "HKEX", "code": "00700", "name": "腾讯控股", "listing_date": "2004-06-16", "board": "主板", "industry": "互联网服务", "concepts": ["恒生指数", "恒生科技指数"]},
+      {"exchange": "HKEX", "code": "00941", "name": "中国移动", "listing_date": "1997-10-23", "board": "主板", "industry": "电讯服务", "concepts": ["恒生指数", "国企指数"]},
+      {"exchange": "HKEX", "code": "09988", "name": "阿里巴巴-W", "listing_date": "2019-11-26", "board": "主板", "industry": "电子商贸及互联网服务", "concepts": ["恒生科技指数", "恒生中国企业指数"]},
+      {"exchange": "HKEX", "code": "00005", "name": "汇丰控股", "listing_date": "1980-01-02", "is_financial": true, "board": "主板", "industry": "银行", "concepts": ["恒生指数", "金融股"]}
     ]
   },
   "financials": {

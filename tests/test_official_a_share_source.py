@@ -44,6 +44,14 @@ class FakeOfficialListClient:
             output = io.BytesIO()
             workbook.save(output)
             return output.getvalue()
+        if "code_mapping" in url:
+            return """
+            <table>
+              <tr><th>序号</th><th>证券简称</th><th>上市日期</th><th>旧代码</th><th>新代码</th></tr>
+              <tr><td>1</td><td>北交样例1</td><td>2024/1/1</td><td>832001</td><td>920001</td></tr>
+              <tr><td>2</td><td>北交样例2</td><td>2024/1/2</td><td>832002</td><td>920002</td></tr>
+            </table>
+            """.encode()
         form = data or {}
         page = int(form["page"])
         payload = {
@@ -77,3 +85,5 @@ def test_official_a_share_list_combines_three_exchanges() -> None:
     assert {security.exchange for security in securities} == {"SSE", "SZSE", "BSE"}
     assert securities[0].is_financial is True
     assert securities[1].listing_date is not None
+    assert securities[-2].legacy_codes == ("832001",)
+    assert securities[-1].legacy_codes == ("832002",)

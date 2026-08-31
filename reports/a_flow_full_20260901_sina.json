@@ -1,0 +1,119 @@
+{
+  "date": "2026-09-01",
+  "company_count": 5552,
+  "five_day_count": 5551,
+  "five_day_coverage": 0.99982,
+  "twenty_two_day_count": 5536,
+  "twenty_two_day_coverage": 0.997118,
+  "bse_company_count": 339,
+  "bse_five_day_count": 339,
+  "bse_twenty_two_day_count": 333,
+  "source_counts": {
+    "新浪财经": 5551,
+    "腾讯行情": 1
+  },
+  "top_missing_reasons": [
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 15 日，22 日字段留空",
+      "count": 3
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 20 日，22 日字段留空",
+      "count": 2
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 8 日，22 日字段留空",
+      "count": 2
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 17 日，22 日字段留空",
+      "count": 2
+    },
+    {
+      "reason": "新浪财经：新浪主力资金历史仅返回 0 个有效交易日；同花顺：601123：同花顺 请求失败（HTTP 403）；腾讯资金流：腾讯资金流仅解析到 0 个有效交易日",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 18 日，22 日字段留空",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 10 日，22 日字段留空",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 5 日，22 日字段留空",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 9 日，22 日字段留空",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 13 日，22 日字段留空",
+      "count": 1
+    },
+    {
+      "reason": "已取得 5 日资金流；有效历史仅 21 日，22 日字段留空",
+      "count": 1
+    }
+  ],
+  "performance": {
+    "http_requests": 5626,
+    "http_successes": 5592,
+    "http_failures": 34,
+    "http_elapsed_seconds": 509.487,
+    "retries": 6,
+    "direct_requests": 5617,
+    "proxy_requests": 9,
+    "requests_by_domain": {
+      "push2his.eastmoney.com": 18,
+      "push2delay.eastmoney.com": 3,
+      "query.sse.com.cn": 2,
+      "www.szse.cn": 1,
+      "www.bse.cn": 18,
+      "qt.gtimg.cn": 16,
+      "f10.10jqka.com.cn": 16,
+      "vip.stock.finance.sina.com.cn": 5552
+    },
+    "requests_by_endpoint": {
+      "flow-history-a-share-000001": 6,
+      "flow-delay-a-share-000001": 1,
+      "flow-history-a-share-000002": 6,
+      "flow-delay-a-share-000002": 1,
+      "flow-history-a-share-000006": 6,
+      "flow-delay-a-share-000006": 1,
+      "security-list-sse": 2,
+      "security-list-szse": 1,
+      "security-code-mapping-bse": 1,
+      "security-list-bse": 17,
+      "tencent-flow-a-share-001232": 1,
+      "tencent-flow-a-share-301655": 1,
+      "tencent-flow-a-share-301707": 1,
+      "tencent-flow-a-share-301717": 1,
+      "tencent-flow-a-share-601123": 1,
+      "tencent-flow-a-share-603468": 1,
+      "tencent-flow-a-share-688826": 1,
+      "tencent-flow-a-share-688828": 1,
+      "tencent-flow-a-share-688835": 1,
+      "tencent-flow-a-share-688836": 1,
+      "tencent-flow-a-share-920059": 1,
+      "tencent-flow-a-share-920093": 1,
+      "tencent-flow-a-share-920107": 1,
+      "tencent-flow-a-share-920138": 1,
+      "tencent-flow-a-share-920165": 1,
+      "tencent-flow-a-share-920288": 1,
+      "tonghuashun-f10-funds-a-share": 16,
+      "sina-a-share-30-day-main-flow": 5552
+    },
+    "classification": {
+      "source_counts": {},
+      "batch_metadata_hits": 0,
+      "company_fallbacks": 0,
+      "profile_cache_entries": 0,
+      "company_count": 0,
+      "http_requests": 0,
+      "http_requests_per_company": 0.0
+    }
+  }
+}

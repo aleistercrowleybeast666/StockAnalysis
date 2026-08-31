@@ -147,3 +147,39 @@ def test_real_batch_updates_advance_determinate_progress(tmp_path: Path) -> None
     ratios = [item.overall_completed / item.overall_total for item in batches]
     assert ratios == sorted(ratios)
     assert len(set(ratios)) == 5
+
+
+def test_top_n_work_plan_uses_quote_batches_and_dynamic_archive_scan_work(
+    tmp_path: Path,
+) -> None:
+    config = AppConfig(
+        financial_year=2025,
+        trading_year=2025,
+        markets=[Market.A_SHARE, Market.HK],
+        a_share_scope_mode=MarketScopeMode.TOP_MARKET_CAP,
+        a_share_top_n=3,
+        hk_scope_mode=MarketScopeMode.TOP_MARKET_CAP,
+        hk_top_n=3,
+        output_directory=str(tmp_path),
+        fixture_mode=False,
+    )
+    universe = [
+        *[
+            Security(Market.A_SHARE, "SSE", f"{600000 + index:06d}", f"A{index}")
+            for index in range(5_551)
+        ],
+        *[
+            Security(Market.HK, "HKEX", f"{index + 1:05d}", f"H{index}")
+            for index in range(2_751)
+        ],
+    ]
+    runner = PipelineRunner(config, FixtureSource())
+
+    runner._WorkPlan_Initialize(universe)  # noqa: SLF001
+    totals = runner._overall_work_totals  # noqa: SLF001
+
+    assert 20_000 < totals["获取行情与市值"] < 50_000
+    assert totals["年度全市场大宗交易"] > totals["年度财务"]
+    assert "补全入选公司行情" in totals
+    assert "证券范围" not in totals
+    assert sum(totals.values()) == runner._OVERALL_WORK_UNITS  # noqa: SLF001

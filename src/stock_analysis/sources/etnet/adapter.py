@@ -3,17 +3,21 @@ from __future__ import annotations
 import html
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 
 from stock_analysis.domain.calculations import Calculation_IssueMarketCap
 from stock_analysis.domain.enums import DataStatus
-from stock_analysis.domain.models import BlockTradeData, IPOInfo, Security
+from stock_analysis.domain.models import BlockTradeData, IPOInfo, Quote, Security
 from stock_analysis.sources.base import (
     HttpJsonClient,
     Provenance_Create,
     SourceError,
     SourceValue,
+)
+from stock_analysis.sources.normalization import (
+    Security_ConceptsNormalize,
+    Security_FinancialClassify,
 )
 
 
@@ -50,6 +54,7 @@ class EtnetSource:
         "quote_blocktrade_detail.php"
     )
     COMPANY_URL = "https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_brief.php"
+    PROFILE_URL = "https://content.etnet.com.hk/content/cpy/eng/company_info.php"
     _ARCHIVE_SAFETY_PAGE_LIMIT = 250
     _DETAIL_PATTERN = re.compile(
         r"(?:<p[^>]*class=['\"]date['\"][^>]*>|"
@@ -254,6 +259,133 @@ class EtnetSource:
             ),
         )
 
+    def Quote_Fetch(self, security: Security) -> SourceValue[Quote]:
+        payload = self._client.RequestBytes(
+            self.COMPANY_URL,
+            params={"code": str(int(security.code))},
+            request_id=f"etnet-quote-{security.code}",
+            referer=(
+                "https://www.etnet.com.hk/www/eng/stocks/realtime/"
+                f"quote.php?code={int(security.code)}"
+            ),
+            endpoint_key="etnet-quote-hk",
+            headers=self._PageHeaders_Get(),
+        )
+        text = html.unescape(payload.decode("utf-8", errors="replace"))
+        price_match = re.search(
+            r"\bNominal\b.*?<span[^>]*class=['\"]HeaderTxt[^'\"]*['\"][^>]*>"
+            r"\s*([\d,.]+)",
+            text,
+            re.I | re.S,
+        )
+        date_match = re.search(
+            r"Real\s*time\s*quote\s*last\s*updated:\s*"
+            r"(\d{2}/\d{2}/\d{4})\s+\d{2}:\d{2}",
+            text,
+            re.I,
+        )
+        price = self._Number_Parse(price_match.group(1)) if price_match else None
+        quote_date = None
+        if date_match:
+            try:
+                quote_date = datetime.strptime(date_match.group(1), "%d/%m/%Y").date()
+            except ValueError:
+                quote_date = None
+        if price is None or quote_date is None:
+            return SourceValue(
+                None,
+                Provenance_Create(
+                    security,
+                    "最新行情",
+                    self.source_name,
+                    f"quote_ci_brief.php?code={int(security.code)}",
+                    DataStatus.MISSING,
+                    standard_currency="HKD",
+                    missing_reason="ETNet 行情页没有同时返回 Nominal 和真实更新时间",
+                    primary_source="东方财富",
+                    field_statuses={
+                        "最新可得价格": DataStatus.MISSING,
+                        "行情日期": DataStatus.MISSING,
+                    },
+                ),
+            )
+        return SourceValue(
+            Quote(security.key, quote_date, price, None, "HKD"),
+            Provenance_Create(
+                security,
+                "最新行情",
+                self.source_name,
+                f"quote_ci_brief.php?code={int(security.code)}（Nominal、页面更新时间）",
+                DataStatus.OK,
+                original_currency="HKD",
+                standard_currency="HKD",
+                primary_source="东方财富",
+                field_statuses={
+                    "最新可得价格": DataStatus.OK,
+                    "最新总市值": DataStatus.MISSING,
+                    "行情日期": DataStatus.OK,
+                },
+            ),
+        )
+
+    def Profile_Fetch(self, security: Security) -> SourceValue[Security]:
+        payload = self._client.RequestBytes(
+            self.PROFILE_URL,
+            params={"code": str(int(security.code))},
+            request_id=f"etnet-profile-{security.code}",
+            referer="https://content.etnet.com.hk/",
+            endpoint_key="etnet-company-profile-hk",
+            headers=self._PageHeaders_Get(),
+        )
+        text = html.unescape(payload.decode("utf-8", errors="replace"))
+        industry, concepts = self._Profile_Parse(text)
+        if industry is None and not concepts:
+            return SourceValue(
+                security,
+                Provenance_Create(
+                    security,
+                    "行业与概念",
+                    self.source_name,
+                    f"content/cpy/eng/company_info.php?code={int(security.code)}",
+                    DataStatus.MISSING,
+                    missing_reason="ETNet 公司资料页未解析到 Business Nature 或 Related Indexes",
+                    primary_source="东方财富",
+                    field_statuses={
+                        "行业": DataStatus.MISSING,
+                        "概念": DataStatus.MISSING,
+                    },
+                ),
+            )
+        selected_industry = security.industry or industry
+        enriched = replace(
+            security,
+            industry=selected_industry,
+            is_financial=Security_FinancialClassify(
+                security.name,
+                selected_industry,
+                security_code=security.code,
+            ),
+            concepts=concepts or security.concepts,
+        )
+        return SourceValue(
+            enriched,
+            Provenance_Create(
+                security,
+                "行业与概念",
+                self.source_name,
+                (
+                    f"content/cpy/eng/company_info.php?code={int(security.code)}；"
+                    "Business Nature / Related Indexes"
+                ),
+                DataStatus.OK,
+                primary_source="东方财富",
+                field_statuses={
+                    "行业": DataStatus.OK if selected_industry else DataStatus.MISSING,
+                    "概念": DataStatus.OK if concepts else DataStatus.MISSING,
+                },
+            ),
+        )
+
     def _BlockNewsPage_Fetch(self, security: Security, page: int) -> str:
         payload = self._client.RequestBytes(
             self.BLOCK_LIST_URL,
@@ -428,6 +560,38 @@ class EtnetSource:
             for value in re.findall(r"quote_blocktrade\.php\?page=(\d+)", text, re.I)
         ]
         return max(pages, default=1)
+
+    @classmethod
+    def _Profile_Parse(cls, text: str) -> tuple[str | None, tuple[str, ...]]:
+        industry_match = re.search(
+            r"Business\s+Nature\s*</td>\s*</tr>\s*<tr>\s*"
+            r"<td[^>]*>(.*?)</td>",
+            text,
+            re.I | re.S,
+        )
+        industry = None
+        if industry_match:
+            industry_text = cls._HtmlText_Get(industry_match.group(1))
+            english_match = re.search(r"\(([^()]+)\)\s*$", industry_text)
+            industry = (
+                english_match.group(1).strip()
+                if english_match
+                else industry_text.strip() or None
+            )
+        related_match = re.search(
+            r"Related\s+Indexes\s*</td>\s*</tr>\s*"
+            r"(.*?)"
+            r"(?:Major\s+Shareholders|Related\s+Stocks|</table>\s*</td>\s*</tr>)",
+            text,
+            re.I | re.S,
+        )
+        concepts: list[str] = []
+        if related_match:
+            for cell in re.findall(r"<td[^>]*>(.*?)</td>", related_match.group(1), re.I | re.S):
+                value = cls._HtmlText_Get(cell)
+                if value and "Related Indexes" not in value:
+                    concepts.append(value)
+        return industry, Security_ConceptsNormalize(concepts)
 
     @staticmethod
     def _Number_Parse(value: str) -> float | None:

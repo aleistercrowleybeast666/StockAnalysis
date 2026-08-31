@@ -5,13 +5,16 @@ from datetime import date
 
 import pytest
 
+from stock_analysis.config.models import AppConfig
 from stock_analysis.domain.enums import DataStatus, Market, NetworkMode
 from stock_analysis.domain.models import Security
-from stock_analysis.sources.base import HttpJsonClient
+from stock_analysis.sources.base import HttpJsonClient, SourceError
 from stock_analysis.sources.eastmoney import EastmoneySource
 from stock_analysis.sources.etnet import EtnetSource
 from stock_analysis.sources.exchanges import OfficialAShareListSource
 from stock_analysis.sources.hkex import HkexSecurityListSource
+from stock_analysis.sources.registry import SourceRegistry_Create
+from stock_analysis.sources.sina import SinaSource
 from stock_analysis.sources.tonghuashun import TonghuashunSource
 from stock_analysis.sources.tradego import TradegoSource
 
@@ -60,6 +63,7 @@ def test_live_hk_representative_sample_and_official_list() -> None:
         securities = HkexSecurityListSource(hkex_client).SecurityList_Fetch(limit=3)
         assert len(securities) == 3
         assert all(item.market is Market.HK for item in securities)
+        assert all(item.board in {"主板", "GEM"} for item in securities)
         sample = Security(Market.HK, "HKEX", "00700", "腾讯控股")
         financials = source.Financials_Fetch(sample, {2024})
         assert financials.value is not None
@@ -175,7 +179,15 @@ def test_live_tonghuashun_a_share_ipo_capital_and_5_22_day_flow() -> None:
         assert capital.value > 20_000_000_000
 
         maotai = Security(Market.A_SHARE, "SSE", "600519", "贵州茅台")
-        flow = source.Flow_Fetch(maotai)
+        concepts = source.Concepts_Fetch(maotai)
+        assert concepts.value is not None
+        assert len(concepts.value) >= 1
+        try:
+            flow = source.Flow_Fetch(maotai)
+        except SourceError as error:
+            if "HTTP 403" in str(error) or "HTTP 429" in str(error):
+                pytest.skip(f"同花顺公开资金页当前限流，组合源会回退新浪：{error}")
+            raise
         assert flow.value is not None
         assert flow.value.five_day_net is not None
         assert flow.value.one_month_net is not None
@@ -186,6 +198,110 @@ def test_live_tonghuashun_a_share_ipo_capital_and_5_22_day_flow() -> None:
         )
     finally:
         client.close()
+
+
+def test_live_sina_a_share_and_bse_five_twenty_two_day_flow() -> None:
+    client = HttpJsonClient(
+        "新浪财经",
+        network_mode=NetworkMode.DOMESTIC_DIRECT,
+        domestic=True,
+        request_interval=0.05,
+    )
+    source = SinaSource(client)
+    try:
+        samples = [
+            Security(Market.A_SHARE, "SZSE", "300033", "同花顺"),
+            Security(Market.A_SHARE, "BSE", "920002", "万达轴承"),
+        ]
+        for security in samples:
+            flow = source.Flow_Fetch(security)
+            assert flow.value is not None
+            assert flow.value.five_day_net is not None
+            assert flow.value.one_month_net is not None
+            assert flow.value.end_date <= date.today()
+            assert flow.provenance.field_statuses[
+                "近一月资金净额（最近22个交易日）"
+            ] is DataStatus.OK
+    finally:
+        source.close()
+
+
+def test_live_bse_current_920_codes_concepts_and_five_twenty_two_day_flow() -> None:
+    official_client = HttpJsonClient(
+        "沪深北交易所官方证券列表",
+        network_mode=NetworkMode.DOMESTIC_DIRECT,
+        domestic=True,
+        request_interval=0.05,
+    )
+    official_source = OfficialAShareListSource(official_client)
+    sample_codes = {"920000", "920001", "920047", "920110", "920239"}
+    securities = official_source.SecurityList_Fetch()
+    samples = [item for item in securities if item.code in sample_codes]
+    assert {item.code for item in samples} == sample_codes
+    assert all(item.legacy_codes for item in samples)
+    source = SourceRegistry_Create(
+        AppConfig(
+            financial_year=2025,
+            trading_year=2025,
+            markets=[Market.A_SHARE],
+            fixture_mode=False,
+            concurrency=5,
+            request_interval=0,
+        )
+    )
+    try:
+        concepts = source.Concepts_Fetch(samples)
+        flows = source.Flows_Fetch(samples, date.today())
+        assert set(concepts) == {item.key for item in samples}
+        assert set(flows) == {item.key for item in samples}
+        missing_concepts = [
+            item.code
+            for item in samples
+            if concepts[item.key].value is None
+            or not concepts[item.key].value.concepts
+        ]
+        missing_five_day = [
+            item.code
+            for item in samples
+            if flows[item.key].value is None
+            or flows[item.key].value.five_day_net is None
+        ]
+        assert len(missing_concepts) <= 1, missing_concepts
+        assert all(
+            "代码映射" not in (concepts[item.key].provenance.missing_reason or "")
+            for item in samples
+        )
+        assert not missing_five_day, missing_five_day
+        assert sum(
+            flows[item.key].value is not None
+            and flows[item.key].value.one_month_net is not None
+            for item in samples
+        ) >= 4
+    finally:
+        source.close()
+        official_source.close()
+
+
+def test_live_etnet_hk_quote_profile_and_related_indexes() -> None:
+    client = HttpJsonClient(
+        "ETNet",
+        network_mode=NetworkMode.DOMESTIC_DIRECT,
+        domestic=True,
+        request_interval=0.05,
+    )
+    source = EtnetSource(client)
+    try:
+        sample = Security(Market.HK, "HKEX", "00700", "腾讯控股", board="主板")
+        quote = source.Quote_Fetch(sample)
+        assert quote.value is not None
+        assert quote.value.price is not None and quote.value.price > 0
+        assert quote.value.quote_date <= date.today()
+        profile = source.Profile_Fetch(sample)
+        assert profile.value is not None
+        assert profile.value.industry
+        assert profile.value.concepts
+    finally:
+        source.close()
 
 
 def test_live_eastmoney_hk_five_and_twenty_day_flow() -> None:

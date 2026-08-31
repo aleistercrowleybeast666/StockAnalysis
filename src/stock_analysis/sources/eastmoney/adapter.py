@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import replace
 from datetime import UTC, date, datetime
 from typing import Any
@@ -35,6 +35,7 @@ from stock_analysis.sources.base import (
 )
 from stock_analysis.sources.fx import FrankfurterFxSource
 from stock_analysis.sources.normalization import (
+    Security_AShareBoardGet,
     Security_ExchangeFromCode,
     Security_FinancialClassify,
     Security_Secucode,
@@ -192,6 +193,11 @@ class EastmoneySource(MarketDataSource):
                         name, industry, security_code=code
                     ),
                     industry=industry,
+                    board=(
+                        Security_AShareBoardGet(exchange, code)
+                        if market is Market.A_SHARE
+                        else None
+                    ),
                 )
                 if security.key not in seen_keys:
                     seen_keys.add(security.key)
@@ -531,7 +537,9 @@ class EastmoneySource(MarketDataSource):
         )
 
     def Quotes_Fetch(
-        self, securities: Sequence[Security]
+        self,
+        securities: Sequence[Security],
+        progress_callback: Callable[[Security], None] | None = None,
     ) -> dict[str, SourceValue[Quote]]:
         results: dict[str, SourceValue[Quote]] = {}
         by_secid = {self._Secid(item): item for item in securities}
@@ -606,6 +614,9 @@ class EastmoneySource(MarketDataSource):
                     ),
                 )
                 remaining.discard(security.key)
+            if progress_callback is not None:
+                for security in batch:
+                    progress_callback(security)
         securities_by_key = {item.key: item for item in securities}
         for security_key in remaining:
             security = securities_by_key[security_key]

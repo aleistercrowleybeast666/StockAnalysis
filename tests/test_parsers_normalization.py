@@ -10,6 +10,8 @@ from openpyxl import Workbook
 from stock_analysis.domain.enums import Market
 from stock_analysis.sources.base import SourceSchemaError
 from stock_analysis.sources.normalization import (
+    Security_AShareBoardGet,
+    Security_ConceptsNormalize,
     Security_ExchangeFromCode,
     Security_FinancialClassify,
     Security_NormalizeCode,
@@ -54,6 +56,7 @@ def test_hkex_xlsx_parser_filters_to_ordinary_equity() -> None:
             "name": "TENCENT",
             "category": "Equity",
             "subcategory": "Equity Securities (Main Board)",
+            "board": "主板",
         }
     ]
 
@@ -142,6 +145,20 @@ def test_code_normalization_and_exchange_mapping() -> None:
     assert Security_Secucode("688981", Market.A_SHARE) == "688981.SH"
     with pytest.raises(ValueError):
         Security_NormalizeCode("12", Market.A_SHARE)
+
+
+def test_board_mapping_and_concept_normalization_are_deterministic() -> None:
+    assert Security_AShareBoardGet("SSE", "600519") == "沪市主板"
+    assert Security_AShareBoardGet("SSE", "688981") == "科创板"
+    assert Security_AShareBoardGet("SZSE", "000001") == "深市主板"
+    assert Security_AShareBoardGet("SZSE", "301001") == "创业板"
+    assert Security_AShareBoardGet("BSE", "920001") == "北交所"
+    assert Security_AShareBoardGet("BSE", "430047") == "北交所"
+    values = [" 概念一 ", "概念二", "概念一", "", *[f"标签{index}" for index in range(20)]]
+    normalized = Security_ConceptsNormalize(values, maximum=12)
+    assert normalized[:2] == ("概念一", "概念二")
+    assert len(normalized) == 12
+    assert len(set(normalized)) == 12
 
 
 def test_financial_classification_uses_industry_then_known_name_patterns() -> None:
