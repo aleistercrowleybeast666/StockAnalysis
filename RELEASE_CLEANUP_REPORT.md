@@ -1,27 +1,18 @@
-# StockAnalysis 0.5.0 发布清理报告
+# StockAnalysis 0.6.0 发布清理报告
 
-日期：2026-08-30（Asia/Shanghai）
+日期：2026-09-01（Asia/Shanghai）
 
 ## 已完成的安全清理
 
-- 已从当前工作树和 Git 索引移除 15,962 个旧版 `artifacts/` 跟踪文件，包括 0.2～0.4 的 PyInstaller build/dist 展开目录、旧 runtime/cache、旧 smoke、旧工作簿、旧截图和旧验证副本。
-- 已删除过时的 0.3/0.4 根因、性能、构建、数据源和恢复检查点文档；当前说明统一为 0.5.0。历史内容仍可通过 Git commit 历史查看。
-- 当前保留的审计产物仅为 0.5.0 的 `A_SHARE_REGRESSION.md`、`HK_COVERAGE_BASELINE.*`、`HK_COVERAGE_FINAL.*` 和最终 Top100 工作簿/运行报告。
-- 清理脚本默认只做 dry-run；在当前 Windows、macOS arm64、macOS x86_64 三个 ZIP 全部存在前，拒绝执行最终本地发布清理。
+- Git 当前索引不再跟踪 0.5.0 Top100 工作簿；本地旧文件保留，历史仍可通过 Git commit 查看。
+- 当前仓库正式跟踪 0.6.0 Top100、双市场全量工作簿、运行报告和覆盖率证据。
+- `dist/win` 已由严格脚本重新生成；`dist/mac` 的旧解压目录已删除，只保留两个未展开的 0.6.0 原生 ZIP、逐架构证明与哈希文件。
+- Git 历史没有 reset、rebase、filter 或强制改写；全部改动均为普通提交。
 
-## 当前待完成项
+## GitHub 远端状态
 
-真实 macOS 双架构 artifact、完整工程 ZIP 和滚动 `current` Release 尚未在本报告这一提交前生成。安全顺序保持为：验证 Windows → 构建并下载两种 macOS 架构 → 生成完整工程 ZIP → 创建/验证 `current` → 再删除旧 Release/tag/Actions artifact 和剩余本地旧发布文件。
+已登录账号确认其本人拥有私有仓库 `aleistercrowleybeast666/StockAnalysis`。仓库当前没有 `current` Release（`releases/tag/current` 返回 404），也没有可供清理的旧 Release 资产；因此本轮没有执行任何远端删除，也没有伪造“已清理”记录。
 
-远端删除是不可恢复操作，将在当前替代产物可下载且哈希通过后单独确认并执行。本报告届时补充：
+GitHub Actions run `33430887900` 的 18 个短期传输 artifact 保留为构建证据，并受工作流 `retention-days: 1` 自动过期策略约束。本轮未手工删除 Actions artifact。
 
-- 删除的本地旧发布目标数；
-- 删除的旧 GitHub Releases 和 release tags；
-- 删除的 Actions artifacts 数；
-- 当前 commit SHA；
-- 当前唯一 Release tag `current`；
-- Windows/macOS 三个平台资产和 SHA-256。
-
-## 历史安全性
-
-Git commit 历史没有被 reset、rebase、filter 或强制改写；清理只形成普通删除提交。主分支和与发布无关的 tag/分支不会被删除。
+创建新的 rolling `current` Release 属于新的远端发布动作，不由附件中的清理文字单独授权；本轮只完成用户明确要求的双平台构建、下载、校验与 `dist` 整理。如需创建并上传 `current` Release，可在用户明确确认后执行。
