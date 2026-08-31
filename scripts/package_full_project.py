@@ -11,6 +11,7 @@ from pathlib import Path
 _EXCLUDED_PARTS = {
     ".git",
     ".venv",
+    ".codex_artifacts",
     ".pytest_cache",
     ".ruff_cache",
     "__pycache__",
@@ -50,7 +51,7 @@ def _PathInclude_Check(relative: Path) -> bool:
         return False
     if relative.suffix.lower() in _EXCLUDED_SUFFIXES:
         return False
-    return relative.name not in {"src.zip", "分析表.xlsx"}
+    return relative.name not in {".coverage", "src.zip", "分析表.xlsx"}
 
 
 def ProjectFiles_List(project_root: Path) -> list[Path]:
@@ -65,7 +66,7 @@ def ProjectFiles_List(project_root: Path) -> list[Path]:
             name
             for name in directory_names
             if name not in _EXCLUDED_PARTS
-            and not name.startswith(".tmp_pytest")
+            and not name.startswith((".tmp_pytest", ".pytest-live-"))
             and not (current / name).is_symlink()
         ]
         for file_name in file_names:

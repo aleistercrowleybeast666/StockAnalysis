@@ -96,6 +96,9 @@ def test_full_project_archive_includes_required_tree_and_excludes_runtime_data(
     ):
         _Touch(tmp_path / file_name)
     _Touch(tmp_path / ".venv" / "secret.txt")
+    _Touch(tmp_path / ".codex_artifacts" / "browser" / "secret.bin")
+    _Touch(tmp_path / ".pytest-live-run" / "secret.txt")
+    _Touch(tmp_path / ".coverage")
     _Touch(tmp_path / "artifacts" / "run.log")
     _Touch(tmp_path / "src.zip")
 
@@ -108,6 +111,9 @@ def test_full_project_archive_includes_required_tree_and_excludes_runtime_data(
     assert "src/keep.txt" in names
     assert "dist/mac/StockAnalysis_macOS_arm64.zip" in names
     assert not any(name.startswith(".venv/") for name in names)
+    assert not any(name.startswith(".codex_artifacts/") for name in names)
+    assert not any(name.startswith(".pytest-live-") for name in names)
+    assert ".coverage" not in names
     assert not any(name.startswith("artifacts/") for name in names)
     assert "src.zip" not in names
 
